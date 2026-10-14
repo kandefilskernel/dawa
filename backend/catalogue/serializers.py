@@ -12,6 +12,7 @@ class MedicamentSerializer(serializers.ModelSerializer):
         fields = [
             "id", "dci", "nom_commercial", "dosage", "forme", "forme_libelle",
             "code_barres", "ordonnance_requise", "image", "image_est_illustration",
+            "image_credit",
         ]
 
     def get_image(self, obj):

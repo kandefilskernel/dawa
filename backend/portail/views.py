@@ -265,7 +265,8 @@ def envoyer_photo(request, medicament_id):
             medicament.image.save(photo.name, photo, save=False)
             medicament.image_est_illustration = False
             medicament.image_envoyee_par = request.pharmacie
-            medicament.save(update_fields=["image", "image_est_illustration", "image_envoyee_par"])
+            medicament.image_credit = ""
+            medicament.save(update_fields=["image", "image_est_illustration", "image_envoyee_par", "image_credit"])
             messages.success(request, f"Merci ! La photo de {medicament} est en ligne pour tous les patients.")
     return _rediriger(request, "portail:stock")
 

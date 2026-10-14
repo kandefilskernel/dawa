@@ -13,3 +13,6 @@ mobile/build/
 images_a_importer/
 backend/cles/
 *.pem
+
+# APK téléchargé
+*.apk

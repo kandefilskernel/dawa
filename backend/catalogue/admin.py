@@ -20,7 +20,7 @@ class MedicamentAdmin(admin.ModelAdmin):
     search_fields = ["nom_commercial", "dci", "code_barres"]
     readonly_fields = ["apercu"]
     fields = ["dci", "nom_commercial", "dosage", "forme", "code_barres", "ordonnance_requise",
-              "image", "apercu", "image_est_illustration", "image_envoyee_par"]
+              "image", "apercu", "image_est_illustration", "image_envoyee_par", "image_credit"]
 
     @admin.display(description="image")
     def miniature(self, obj):
@@ -36,4 +36,6 @@ class MedicamentAdmin(admin.ModelAdmin):
             obj.image = preparer_photo(obj.image, nom_fichier(obj))
             obj.image_est_illustration = False
             obj.image_envoyee_par = None  # Photo validée par l'équipe Dawa.
+            if "image_credit" not in form.changed_data:
+                obj.image_credit = ""  # Le crédit de l'ancienne photo ne vaut pas pour la nouvelle.
         super().save_model(request, obj, form, change)

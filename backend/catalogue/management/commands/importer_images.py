@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
@@ -13,7 +14,9 @@ class Command(BaseCommand):
     help = (
         "Importe en masse les photos d'un dossier. Chaque fichier est associé à un médicament par son nom : "
         "« doliprane-500-mg.jpg » (nom + dosage), « doliprane.jpg » (nom seul, si unique), "
-        "le code-barres « 3400935955838.jpg », ou l'identifiant « 12.jpg »."
+        "le code-barres « 3400935955838.jpg », ou l'identifiant « 12.jpg ». "
+        "Un fichier credits.json facultatif ({\"doliprane-500-mg\": \"Auteur, CC BY 4.0, source\"}) "
+        "renseigne le crédit de chaque photo, obligatoire pour une photo sous licence libre."
     )
 
     def add_arguments(self, parser):
@@ -35,6 +38,8 @@ class Command(BaseCommand):
             raise CommandError(f"Dossier introuvable : {chemin.resolve()}")
 
         index = self._index(medicaments)
+        fichier_credits = chemin / "credits.json"
+        credits = json.loads(fichier_credits.read_text(encoding="utf-8")) if fichier_credits.exists() else {}
         importes, inconnus = 0, []
         for fichier in sorted(chemin.iterdir()):
             if fichier.suffix.lower() not in EXTENSIONS:
@@ -43,8 +48,9 @@ class Command(BaseCommand):
             if medicament is None:
                 inconnus.append(fichier.name)
                 continue
+            credit = credits.get(fichier.stem, "")
             if simulation:
-                self.stdout.write(f"{fichier.name} → {medicament}")
+                self.stdout.write(f"{fichier.name} → {medicament}" + (f"  ({credit})" if credit else ""))
             else:
                 with fichier.open("rb") as f:
                     photo = preparer_photo(f, nom_fichier(medicament))
@@ -52,7 +58,8 @@ class Command(BaseCommand):
                     medicament.image.delete(save=False)
                 medicament.image.save(photo.name, photo, save=False)
                 medicament.image_est_illustration = False
-                medicament.save(update_fields=["image", "image_est_illustration"])
+                medicament.image_credit = credit
+                medicament.save(update_fields=["image", "image_est_illustration", "image_credit"])
             importes += 1
 
         verbe = "seraient importées" if simulation else "importée(s)"

@@ -40,4 +40,5 @@ def illustrer_automatiquement(sender, instance, update_fields=None, **kwargs):
     illustration = generer_illustration(instance)
     instance.image.save(illustration.name, illustration, save=False)
     instance.image_est_illustration = True
-    instance.save(update_fields=["image", "image_est_illustration"])
+    instance.image_credit = ""
+    instance.save(update_fields=["image", "image_est_illustration", "image_credit"])

@@ -28,6 +28,10 @@ class Medicament(models.Model):
         related_name="photos_envoyees", verbose_name="photo envoyée par",
         help_text="Pharmacie qui a envoyé la photo depuis le portail (à vérifier).",
     )
+    image_credit = models.CharField(
+        "crédit de la photo", max_length=300, blank=True,
+        help_text="Auteur, licence et source, obligatoires pour une photo sous licence libre (CC BY, CC BY-SA…).",
+    )
 
     # Champs dessinés sur l'illustration : si l'un change, elle est redessinée.
     CHAMPS_ILLUSTRATION = ("dci", "nom_commercial", "dosage", "forme", "ordonnance_requise")

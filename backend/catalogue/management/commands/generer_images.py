@@ -25,6 +25,7 @@ class Command(BaseCommand):
             illustration = generer_illustration(medicament)
             medicament.image.save(illustration.name, illustration, save=False)
             medicament.image_est_illustration = True
-            medicament.save(update_fields=["image", "image_est_illustration"])
+            medicament.image_credit = ""
+            medicament.save(update_fields=["image", "image_est_illustration", "image_credit"])
             nb += 1
         self.stdout.write(self.style.SUCCESS(f"{nb} illustration(s) générée(s) sur {medicaments.count()} médicaments."))
