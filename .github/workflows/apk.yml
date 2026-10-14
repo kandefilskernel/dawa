@@ -16,6 +16,8 @@ on:
 jobs:
   apk:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     defaults:
       run:
         working-directory: mobile
@@ -40,8 +42,20 @@ jobs:
 
       - run: flutter build apk --release --dart-define=API_URL=$API_URL
 
+      - run: cp build/app/outputs/flutter-apk/app-release.apk build/dawa.apk
+
       - uses: actions/upload-artifact@v4
         with:
           name: dawa-apk
-          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+          path: mobile/build/dawa.apk
           retention-days: 30
+
+      # Release publique : lien de téléchargement sans connexion GitHub.
+      # Dernière version toujours sur releases/latest/download/dawa.apk.
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-${{ github.run_number }}
+          name: Dawa APK ${{ github.run_number }}
+          body: "API : ${{ env.API_URL }}"
+          files: mobile/build/dawa.apk
+          make_latest: true
