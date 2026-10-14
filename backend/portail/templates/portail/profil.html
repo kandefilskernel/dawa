@@ -1,0 +1,95 @@
+{% extends "portail/base.html" %}
+{% block titre %}Ma pharmacie{% endblock %}
+{% block entete %}
+  <h1>Ma pharmacie</h1>
+  <p>Ces informations sont affichées aux patients dans l'application.</p>
+{% endblock %}
+
+{% block contenu %}
+<form class="carte" method="post">
+  {% csrf_token %}
+  {% for champ in form %}
+    <div class="champ">
+      <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+      {{ champ }}
+      {% if champ.help_text %}<div class="aide">{{ champ.help_text }}</div>{% endif %}
+      {% for e in champ.errors %}<div class="erreur">{{ e }}</div>{% endfor %}
+    </div>
+  {% endfor %}
+  <button class="btn bloc" type="submit">Enregistrer</button>
+  <p class="aide" style="margin-top:12px">Pour changer le nom ou la position sur la carte, contactez l'équipe Dawa.</p>
+</form>
+
+<a class="carte" href="{% url 'portail:abonnement' %}" style="display:flex;align-items:center;gap:12px;color:inherit;margin-top:14px">
+  <span class="icone-carre" style="background:#fef3c7;color:#b45309">★</span>
+  <div class="grow"><div class="nom">Abonnement et mise en avant</div>
+    <div class="sous">Apparaissez en tête des recherches de votre quartier.</div></div>
+  <span aria-hidden="true">›</span>
+</a>
+
+<div class="titre-section"><div><h2>Livraison à moto</h2>
+  <p>Avec au moins un livreur, vos clients peuvent choisir la livraison (frais calculés selon la distance).</p></div></div>
+<div class="carte">
+  {% if livreurs %}
+    <ul class="liste">
+      {% for l in livreurs %}
+        <li>
+          <span class="icone-carre">🛵</span>
+          <div class="grow"><div class="nom">{{ l.nom }}</div><div class="sous">{{ l.telephone }}</div></div>
+          <form method="post" action="{% url 'portail:livreurs' %}">{% csrf_token %}
+            <input type="hidden" name="action" value="retirer"><input type="hidden" name="livreur" value="{{ l.pk }}">
+            <button class="btn danger" type="submit">Retirer</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="aide" style="margin-top:0">Aucun livreur : la livraison n'est pas proposée aux clients.</p>
+  {% endif %}
+  <form method="post" action="{% url 'portail:livreurs' %}" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+    {% csrf_token %}<input type="hidden" name="action" value="ajouter">
+    <input type="text" name="nom" placeholder="Nom du livreur" required style="flex:1 1 140px">
+    <input type="tel" name="telephone" placeholder="Téléphone" required style="flex:1 1 140px">
+    <button class="btn" type="submit">Ajouter</button>
+  </form>
+</div>
+
+<div class="titre-section"><div><h2>Mise à jour par SMS / WhatsApp</h2>
+  <p>Sans smartphone ? Envoyez vos mises à jour depuis le numéro {{ request.pharmacie.telephone }}.</p></div></div>
+<div class="carte">
+  <ul class="liste">
+    <li><div class="grow"><div class="nom">DISPO doliprane 4500</div><div class="sous">disponible, prix en dernier (facultatif)</div></div></li>
+    <li><div class="grow"><div class="nom">RUPTURE amoxicilline</div><div class="sous">en rupture</div></div></li>
+    <li><div class="grow"><div class="nom">PRIX coartem 12000</div><div class="sous">change le prix</div></div></li>
+    <li><div class="grow"><div class="nom">OK</div><div class="sous">tout mon stock est à jour</div></div></li>
+  </ul>
+  <p class="aide">Une commande par ligne, 10 lignes maximum par message.</p>
+  <form method="post" action="{% url 'portail:tester_sms' %}" style="margin-top:12px">
+    {% csrf_token %}
+    <label for="texte-sms">Essayer ici (les changements sont appliqués à votre stock)</label>
+    <textarea id="texte-sms" name="texte" rows="2" placeholder="DISPO doliprane 4500"></textarea>
+    <button class="btn bloc" type="submit" style="margin-top:8px">Envoyer</button>
+  </form>
+</div>
+
+<div class="titre-section"><h2>Mes prochaines gardes</h2></div>
+<div class="carte">
+  {% if gardes %}
+    <ul class="liste">
+      {% for g in gardes %}
+        <li>
+          <span class="icone-carre" style="background:#e0e7ff;color:#4338ca">{% include "portail/icones/lune.html" %}</span>
+          <div class="grow">
+            <div class="nom">{{ g.debut|date:"l j F" }}</div>
+            <div class="sous">de {{ g.debut|time:"H:i" }} au {{ g.fin|date:"l j" }} à {{ g.fin|time:"H:i" }}</div>
+          </div>
+          {% if g.debut <= maintenant and g.fin > maintenant %}<span class="pastille p-prete">En cours</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="vide">{% include "portail/icones/lune.html" %}<p>Aucune garde planifiée.</p></div>
+  {% endif %}
+  <p class="aide" style="margin-top:12px">Le planning des gardes est établi par l'Ordre des pharmaciens et saisi par l'équipe Dawa.</p>
+</div>
+{% endblock %}

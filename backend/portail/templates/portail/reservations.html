@@ -1,0 +1,37 @@
+{% extends "portail/base.html" %}
+{% block titre %}Réservations{% endblock %}
+{% block entete %}
+  <h1>Réservations</h1>
+  <p>Le client a 2 heures pour venir. Marquez « prête » pour lui redonner 2 heures.</p>
+{% endblock %}
+
+{% block contenu %}
+<nav class="onglets" aria-label="Filtrer les réservations">
+  {% for code, libelle in sous_onglets.items %}
+    <a href="?onglet={{ code }}" class="{% if code == sous_onglet %}actif{% endif %}">{{ libelle }}{% if code == 'a_traiter' and request.nb_a_traiter %} ({{ request.nb_a_traiter }}){% endif %}</a>
+  {% endfor %}
+</nav>
+
+{% for r in reservations %}
+  {% include "portail/_reservation.html" with r=r retour=request.get_full_path Statut=Statut %}
+{% empty %}
+  <div class="carte vide">
+    {% include "portail/icones/reservations.html" %}
+    <p>{% if sous_onglet == 'a_traiter' %}Aucune nouvelle réservation. Cette page se met à jour toute seule.{% elif sous_onglet == 'en_cours' %}Aucune réservation en cours.{% else %}Pas encore d'historique.{% endif %}</p>
+  </div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+{% if sous_onglet != 'historique' %}
+<script>
+  // Actualise la liste toutes les 30 s, sauf si le pharmacien est en train d'écrire.
+  setInterval(function () {
+    var actif = document.activeElement;
+    var ecrit = actif && (actif.tagName === "INPUT" || actif.tagName === "TEXTAREA");
+    var refusOuvert = document.querySelector("details.refus[open]");
+    if (!ecrit && !refusOuvert && !document.hidden) location.reload();
+  }, 30000);
+</script>
+{% endif %}
+{% endblock %}

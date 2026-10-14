@@ -1,0 +1,64 @@
+{% extends "portail/base.html" %}
+{% load humanize %}
+{% block titre %}Abonnement{% endblock %}
+{% block entete %}
+  <h1>Abonnement</h1>
+  <p>Soyez visible auprès des patients de votre quartier.</p>
+{% endblock %}
+
+{% block contenu %}
+<div class="carte">
+  {% if actif %}
+    <span class="pastille p-prete">Actif</span>
+    <h2 style="margin-top:8px">{% if actif.formule == "visibilite" %}Visibilité{% else %}Essentiel{% endif %}</h2>
+    <p class="aide">Jusqu'au {{ actif.fin|date:"j F Y" }}.
+      {% if actif.formule == 'visibilite' %}Votre pharmacie remonte en tête des résultats proches, avec la mention « Sponsorisé ».{% endif %}</p>
+  {% else %}
+    <span class="pastille p-neutre">Pas d'abonnement actif</span>
+    <p class="aide">Pendant la phase pilote, l'accès de base reste gratuit.</p>
+  {% endif %}
+</div>
+
+{% if en_attente %}
+  <div class="bandeau section">
+    <div>
+      <strong>Paiement attendu : {{ en_attente.montant|intcomma }} FC</strong>
+      <div style="font-size:.88rem;margin-top:4px">
+        Envoyez le montant par M-Pesa, Orange Money ou Airtel Money au <strong>{{ numero_paiement }}</strong>
+        en indiquant la référence <strong>{{ en_attente.reference }}</strong>.
+        L'abonnement est activé dès réception par l'équipe Dawa.
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<div class="titre-section"><h2>Formules</h2></div>
+{% for f in formules %}
+  <form class="carte" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="formule" value="{{ f.code }}">
+    <div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">
+      <h2>{{ f.libelle }}</h2>
+      <strong style="color:var(--emeraude-fonce);white-space:nowrap">{{ f.prix|intcomma }} FC / mois</strong>
+    </div>
+    <p class="aide">{{ f.detail }}</p>
+    <div class="actions">
+      <select name="mois" aria-label="Durée" style="flex:1;font:inherit;padding:10px;border:1px solid var(--bordure);border-radius:12px;background:#fff">
+        <option value="1">1 mois</option><option value="3">3 mois</option><option value="6">6 mois</option><option value="12">12 mois</option>
+      </select>
+      <button class="btn" type="submit" style="flex:1">Choisir</button>
+    </div>
+  </form>
+{% endfor %}
+
+{% if historique %}
+  <div class="titre-section"><h2>Historique</h2></div>
+  <div class="carte"><ul class="liste">
+    {% for a in historique %}
+      <li><div class="grow"><div class="nom">{{ a.reference }} · {{ a.mois }} mois</div>
+        <div class="sous">{{ a.montant|intcomma }} FC{% if a.debut %} · du {{ a.debut|date:"d/m/Y" }} au {{ a.fin|date:"d/m/Y" }}{% endif %}</div></div>
+        <span class="pastille {% if a.statut == 'actif' %}p-ok{% elif a.statut == 'en_attente' %}p-attente{% else %}p-neutre{% endif %}">{{ a.get_statut_display }}</span></li>
+    {% endfor %}
+  </ul></div>
+{% endif %}
+{% endblock %}

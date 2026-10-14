@@ -1,0 +1,19 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Accès refusé · Dawa Pharmacie</title>
+  <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
+</head>
+<body class="page-connexion">
+  <main class="carte">
+    <div class="logo">{% include "portail/icones/logo.html" %}</div>
+    <h1>Accès refusé</h1>
+    <p class="intro">Ce compte n'est rattaché à aucune pharmacie. Contactez l'équipe Dawa pour l'activer.</p>
+    <form method="post" action="{% url 'portail:deconnexion' %}">{% csrf_token %}
+      <button class="btn bloc secondaire" type="submit">Se déconnecter</button>
+    </form>
+  </main>
+</body>
+</html>

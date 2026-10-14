@@ -1,0 +1,394 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+
+import '../langue.dart';
+import '../api.dart';
+import '../models.dart';
+import '../stockage.dart';
+import '../theme.dart';
+import '../widgets/communs.dart';
+import '../widgets/pharmacie_carte.dart';
+import 'choix_langue.dart';
+import 'fiche_pharmacie.dart';
+import 'resultats.dart';
+import 'traitements.dart';
+import '../widgets/image_medicament.dart';
+
+class EcranEspace extends StatefulWidget {
+  const EcranEspace({super.key, this.onAlertesVues});
+
+  /// Prévient l'accueil pour mettre à jour le badge de l'onglet.
+  final ValueChanged<int>? onAlertesVues;
+
+  @override
+  State<EcranEspace> createState() => EcranEspaceState();
+}
+
+class EcranEspaceState extends State<EcranEspace> with SingleTickerProviderStateMixin {
+  late final _onglets = TabController(length: 4, vsync: this);
+
+  void afficherTraitements() => _onglets.animateTo(2);
+  List<Reservation>? _reservations;
+  List<Alerte>? _alertes;
+  String? _erreur;
+  Timer? _horloge;
+
+  @override
+  void initState() {
+    super.initState();
+    rafraichir();
+    // Met à jour les comptes à rebours des réservations.
+    _horloge = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _horloge?.cancel();
+    _onglets.dispose();
+    super.dispose();
+  }
+
+  Future<void> rafraichir() async {
+    setState(() => _erreur = null);
+    try {
+      final resultats = await Future.wait([api.reservations(), api.alertes()]);
+      if (!mounted) return;
+      setState(() {
+        _reservations = resultats[0] as List<Reservation>;
+        _alertes = resultats[1] as List<Alerte>;
+      });
+      widget.onAlertesVues?.call(_alertes!.where((a) => a.declenchee).length);
+    } on ApiException catch (e) {
+      if (mounted) setState(() => _erreur = e.message);
+    }
+  }
+
+  Future<void> _annuler(Reservation r) async {
+    final confirme = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(tr('Annuler la réservation ?')),
+        content: Text(tr('{medicament} chez {pharmacie}', {'medicament': r.medicament.libelle, 'pharmacie': r.pharmacie.nom})),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(tr('Non'))),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(tr('Oui, annuler'))),
+        ],
+      ),
+    );
+    if (confirme != true) return;
+    try {
+      await api.annulerReservation(r.id);
+      await rafraichir();
+    } on ApiException catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  }
+
+  Future<void> _supprimerAlerte(Alerte a) async {
+    try {
+      await api.supprimerAlerte(a.id);
+      await rafraichir();
+    } on ApiException catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final actives = _reservations?.where((r) => r.statut.estActive).length ?? 0;
+    final declenchees = _alertes?.where((a) => a.declenchee).length ?? 0;
+
+    return Column(children: [
+      Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: Couleurs.degradeMarque,
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+        ),
+        padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 20, 20, 8),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(
+              child: Text(tr('Mon espace'),
+                  style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+            ),
+            // Toujours lisible : le nom de la langue est écrit dans la langue elle-même.
+            TextButton.icon(
+              onPressed: () => changerLangue(context),
+              style: TextButton.styleFrom(foregroundColor: Colors.white, backgroundColor: const Color(0x29FFFFFF)),
+              icon: const Icon(Icons.translate, size: 20),
+              label: Text(langues.courante.value.nom),
+            ),
+          ]),
+          const SizedBox(height: 4),
+          Text(tr('Réservations, alertes, rappels de traitement et favoris.'),
+              style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 13.5)),
+          const SizedBox(height: 12),
+          TabBar(
+            controller: _onglets,
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            labelColor: Colors.white,
+            unselectedLabelColor: const Color(0xB3FFFFFF),
+            indicatorColor: const Color(0xFFFDE68A),
+            indicatorWeight: 3,
+            dividerColor: Colors.transparent,
+            labelStyle: const TextStyle(fontWeight: FontWeight.w700),
+            tabs: [
+              Tab(child: _LibelleOnglet(tr('Réservations'), actives)),
+              Tab(child: _LibelleOnglet(tr('Alertes'), declenchees)),
+              Tab(text: tr('Traitements')),
+              Tab(text: tr('Favoris')),
+            ],
+          ),
+        ]),
+      ),
+      Expanded(
+        child: TabBarView(controller: _onglets, children: [
+          _liste(_reservations, _carteReservation,
+              vide: EtatIllustre(
+                illustration: 'reservation_vide',
+                titre: tr('Aucune réservation'),
+                texte: tr('Réservez un médicament depuis les résultats : la pharmacie le garde 2 heures.'),
+              )),
+          _liste(_alertes, _carteAlerte,
+              vide: EtatIllustre(
+                illustration: 'recherche_vide',
+                titre: tr('Aucune alerte'),
+                texte: tr('Quand un médicament est introuvable, appuyez sur « Me prévenir ».'),
+              )),
+          const VueTraitements(),
+          _favoris(),
+        ]),
+      ),
+    ]);
+  }
+
+  Widget _liste<T>(List<T>? elements, Widget Function(T) carte, {required Widget vide}) {
+    if (_erreur != null && elements == null) {
+      return EtatIllustre(illustration: 'hors_ligne', titre: tr('Connexion impossible'), texte: _erreur, action: rafraichir);
+    }
+    if (elements == null) return const Center(child: CircularProgressIndicator());
+    return RefreshIndicator(
+      onRefresh: rafraichir,
+      child: elements.isEmpty
+          ? ListView(children: [vide])
+          : ListView.separated(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              itemCount: elements.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
+              itemBuilder: (_, i) => carte(elements[i]),
+            ),
+    );
+  }
+
+  Widget _favoris() {
+    return ValueListenableBuilder(
+      valueListenable: stockage.favoris,
+      builder: (_, favoris, _) {
+        if (favoris.isEmpty) {
+          return EtatIllustre(
+            illustration: 'favoris_vide',
+            titre: tr('Aucune pharmacie favorite'),
+            texte: tr('Touchez le cœur sur la fiche d\'une pharmacie pour la retrouver ici.'),
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+          itemCount: favoris.length,
+          separatorBuilder: (_, _) => const SizedBox(height: 12),
+          itemBuilder: (_, i) => PharmacieCarte(pharmacie: favoris[i]),
+        );
+      },
+    );
+  }
+
+  Widget _carteReservation(Reservation r) {
+    final theme = Theme.of(context);
+    final (couleur, icone) = _apparence(r.statut);
+    final restant = r.expireLe.difference(DateTime.now());
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Pastille(tr(r.statutLibelle), couleur: couleur, icone: icone, plein: r.statut == StatutReservation.prete),
+            const Spacer(),
+            if (r.statut.estActive && !restant.isNegative)
+              Row(children: [
+                const Icon(Icons.timer_outlined, size: 15, color: Couleurs.texteDoux),
+                const SizedBox(width: 4),
+                Text(tr('Expire dans {duree}', {'duree': _duree(restant)}), style: theme.textTheme.bodySmall),
+              ]),
+          ]),
+          const SizedBox(height: 12),
+          Row(children: [
+            ImageMedicament(r.medicament, taille: 52),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('${r.medicament.libelle} × ${r.quantite}',
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                InkWell(
+                  onTap: () => ouvrirFichePharmacie(context, r.pharmacie),
+                  child: Text(r.pharmacie.nom,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                          color: Couleurs.emeraude, fontWeight: FontWeight.w600)),
+                ),
+              ]),
+            ),
+            if (r.total != null)
+              Text(formatPrix(r.total!),
+                  style: const TextStyle(fontWeight: FontWeight.w800, color: Couleurs.emeraudeFonce)),
+          ]),
+          if (r.messagePharmacie.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Couleurs.fond, borderRadius: BorderRadius.circular(10)),
+              child: Text('« ${r.messagePharmacie} »', style: const TextStyle(fontStyle: FontStyle.italic)),
+            ),
+          ],
+          if (r.statut.estActive) ...[
+            const SizedBox(height: 12),
+            Row(children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: () => appeler(context, r.pharmacie.telephone),
+                  icon: const Icon(Icons.call, size: 18),
+                  label: Text(tr('Appeler')),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(foregroundColor: Couleurs.rouge),
+                  onPressed: () => _annuler(r),
+                  child: Text(tr('Annuler')),
+                ),
+              ),
+            ]),
+          ],
+        ]),
+      ),
+    );
+  }
+
+  Widget _carteAlerte(Alerte a) {
+    final theme = Theme.of(context);
+    final pharmacie = a.pharmacie;
+    return Card(
+      color: a.declenchee ? const Color(0xFFECFDF5) : null,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            // Image du médicament, avec une pastille cloche indiquant l'état de l'alerte.
+            Stack(clipBehavior: Clip.none, children: [
+              ImageMedicament(a.medicament, taille: 52),
+              Positioned(
+                right: -6,
+                bottom: -6,
+                child: Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: a.declenchee ? Couleurs.emeraude : Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: ombreDouce,
+                  ),
+                  child: Icon(a.declenchee ? Icons.notifications_active : Icons.notifications_none,
+                      size: 14, color: a.declenchee ? Colors.white : Couleurs.texteDoux),
+                ),
+              ),
+            ]),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(a.medicament.libelle,
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+                Text(
+                  a.declenchee && pharmacie != null
+                      ? tr('Disponible chez {pharmacie} !', {'pharmacie': pharmacie.nom})
+                      : tr('On vous prévient dès qu\'il est disponible à moins de {km} km.', {'km': a.rayonKm}),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: a.declenchee ? Couleurs.emeraudeFonce : Couleurs.texteDoux,
+                    fontWeight: a.declenchee ? FontWeight.w700 : FontWeight.w400,
+                  ),
+                ),
+              ]),
+            ),
+            IconButton(
+              tooltip: tr('Supprimer l\'alerte'),
+              icon: const Icon(Icons.delete_outline, color: Couleurs.texteDoux),
+              onPressed: () => _supprimerAlerte(a),
+            ),
+          ]),
+          if (a.declenchee) ...[
+            const SizedBox(height: 12),
+            Row(children: [
+              Expanded(
+                child: FilledButton(
+                  onPressed: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => EcranResultats(medicament: a.medicament))),
+                  child: Text(tr('Voir les pharmacies')),
+                ),
+              ),
+              if (pharmacie != null) ...[
+                const SizedBox(width: 10),
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(48, 46)),
+                  onPressed: () => appeler(context, pharmacie.telephone),
+                  child: const Icon(Icons.call_outlined, size: 20),
+                ),
+              ],
+            ]),
+          ],
+        ]),
+      ),
+    );
+  }
+
+  (Color, IconData) _apparence(StatutReservation statut) => switch (statut) {
+        StatutReservation.enAttente => (const Color(0xFFB45309), Icons.hourglass_top),
+        StatutReservation.acceptee => (Couleurs.emeraude, Icons.thumb_up_alt_outlined),
+        StatutReservation.prete => (Couleurs.emeraude, Icons.check_circle),
+        StatutReservation.retiree => (Couleurs.texteDoux, Icons.done_all),
+        StatutReservation.refusee => (Couleurs.rouge, Icons.block),
+        StatutReservation.annulee => (Couleurs.texteDoux, Icons.close),
+        StatutReservation.expiree => (Couleurs.texteDoux, Icons.timer_off_outlined),
+      };
+
+  String _duree(Duration d) {
+    if (d.inMinutes < 60) return '${d.inMinutes} min';
+    return '${d.inHours} h ${(d.inMinutes % 60).toString().padLeft(2, '0')}';
+  }
+}
+
+class _LibelleOnglet extends StatelessWidget {
+  const _LibelleOnglet(this.texte, this.nombre);
+
+  final String texte;
+  final int nombre;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      Flexible(child: Text(texte, overflow: TextOverflow.ellipsis)),
+      if (nombre > 0) ...[
+        const SizedBox(width: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+          decoration: BoxDecoration(color: const Color(0xFFFDE68A), borderRadius: BorderRadius.circular(10)),
+          child: Text('$nombre',
+              style: const TextStyle(color: Couleurs.emeraudeFonce, fontSize: 12, fontWeight: FontWeight.w800)),
+        ),
+      ],
+    ]);
+  }
+}

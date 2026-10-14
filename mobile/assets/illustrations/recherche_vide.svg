@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 170">
+  <circle cx="100" cy="82" r="72" fill="#E7F5EF"/>
+  <circle cx="44" cy="30" r="6" fill="#A7F3D0"/>
+  <circle cx="168" cy="132" r="8" fill="#FDE68A"/>
+  <path d="M160 34h4v-6h4v6h4v4h-4v6h-4v-6h-4z" fill="#34D399"/>
+  <!-- gélule -->
+  <g transform="rotate(-35 92 76)">
+    <path d="M66 64h26v26H66a13 13 0 0 1 0-26z" fill="#FFFFFF" stroke="#10B981" stroke-width="3"/>
+    <path d="M92 64h26a13 13 0 0 1 0 26H92z" fill="#FCD34D" stroke="#F59E0B" stroke-width="3"/>
+  </g>
+  <!-- loupe -->
+  <circle cx="92" cy="78" r="44" fill="#FFFFFF" opacity="0.35"/>
+  <circle cx="92" cy="78" r="44" fill="none" stroke="#065F46" stroke-width="10"/>
+  <path d="M124 112l30 30" stroke="#065F46" stroke-width="14" stroke-linecap="round"/>
+  <path d="M70 52a32 32 0 0 1 18-8" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" fill="none"/>
+</svg>

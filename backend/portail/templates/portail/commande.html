@@ -1,0 +1,42 @@
+{% extends "portail/base.html" %}
+{% load humanize %}
+{% block titre %}Commande n° {{ commande.pk }}{% endblock %}
+{% block entete %}
+  <h1>Commande n° {{ commande.pk }}</h1>
+  <p>{{ commande.grossiste.nom }} · {{ commande.cree_le|date:"d/m/Y H:i" }}</p>
+{% endblock %}
+
+{% block contenu %}
+<div class="carte">
+  <span class="pastille {% if commande.statut == 'livree' %}p-ok{% elif commande.statut == 'annulee' %}p-neutre{% elif commande.statut == 'confirmee' %}p-prete{% else %}p-attente{% endif %}">{{ commande.get_statut_display }}</span>
+  <ul class="liste" style="margin-top:12px">
+    {% for l in lignes %}
+      <li>
+        {% if l.medicament.image %}<img class="vignette" src="{{ l.medicament.image.url }}" alt="" width="48" height="48" loading="lazy">{% endif %}
+        <div class="grow"><div class="nom">{{ l.quantite }} × {{ l.medicament.nom_commercial }} {{ l.medicament.dosage }}</div>
+          <div class="sous">{{ l.conditionnement }} · {{ l.prix_unitaire|intcomma }} FC</div></div>
+        <strong>{{ l.sous_total|intcomma }} FC</strong>
+      </li>
+    {% endfor %}
+  </ul>
+  <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:1.1rem">
+    <span>Total estimé</span><strong>{{ commande.total|intcomma }} FC</strong>
+  </div>
+  {% if commande.note %}<p class="aide">Note : {{ commande.note }}</p>{% endif %}
+</div>
+
+{% if commande.statut == 'envoyee' or commande.statut == 'confirmee' %}
+  <div class="actions">
+    {% if commande.statut == 'envoyee' %}
+      <a class="btn" href="{{ commande.message_whatsapp }}" target="_blank" rel="noopener" style="flex:1 1 100%;background:#25d366">Envoyer par WhatsApp au grossiste</a>
+    {% endif %}
+    <form method="post">{% csrf_token %}<input type="hidden" name="action" value="recue">
+      <button class="btn secondaire" type="submit">Marchandise reçue</button></form>
+    {% if commande.statut == 'envoyee' %}
+      <form method="post">{% csrf_token %}<input type="hidden" name="action" value="annuler">
+        <button class="btn danger" type="submit">Annuler</button></form>
+    {% endif %}
+  </div>
+{% endif %}
+<p style="margin-top:16px"><a href="{% url 'portail:commandes' %}">‹ Toutes les commandes</a></p>
+{% endblock %}

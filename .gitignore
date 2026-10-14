@@ -1,0 +1,15 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+staticfiles/
+media/
+.idea/
+.vscode/
+# Flutter
+mobile/.dart_tool/
+mobile/build/
+images_a_importer/
+backend/cles/
+*.pem

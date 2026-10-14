@@ -1,0 +1,60 @@
+{% extends "portail/base.html" %}
+{% load humanize %}
+{% block titre %}Commander{% endblock %}
+{% block entete %}
+  <h1>{{ grossiste.nom }}</h1>
+  <p>{% if grossiste.delai_livraison %}Livraison {{ grossiste.delai_livraison }} · {% endif %}{% if grossiste.minimum_commande %}minimum {{ grossiste.minimum_commande|intcomma }} FC{% else %}pas de minimum{% endif %}</p>
+{% endblock %}
+
+{% block contenu %}
+<form class="recherche" method="get" role="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="Rechercher un produit" aria-label="Rechercher un produit">
+  <button class="btn" type="submit">OK</button>
+</form>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="carte">
+    {% for o in offres %}
+      <div class="ligne-stock">
+        <div class="infos avec-vignette">
+          {% if o.medicament.image %}<img class="vignette" src="{{ o.medicament.image.url }}" alt="" width="48" height="48" loading="lazy">{% endif %}
+          <div>
+            <div class="nom">{{ o.medicament.nom_commercial }} {{ o.medicament.dosage }}
+              {% if o.medicament_id in ruptures %}<span class="pastille p-refus">En rupture chez vous</span>{% endif %}</div>
+            <div class="sous">{{ o.conditionnement }} · <strong>{{ o.prix|intcomma }} FC</strong></div>
+          </div>
+        </div>
+        <div class="controles">
+          <label class="aide" for="qte-{{ o.pk }}" style="margin:0">Quantité</label>
+          <input id="qte-{{ o.pk }}" class="js-qte" type="number" name="qte_{{ o.pk }}" min="0" max="10000" inputmode="numeric"
+                 data-prix="{{ o.prix }}" placeholder="0" style="width:96px">
+        </div>
+      </div>
+    {% empty %}
+      <div class="vide"><p>Aucun produit ne correspond.</p></div>
+    {% endfor %}
+  </div>
+
+  <div class="carte section">
+    <label for="note">Note pour le grossiste (facultatif)</label>
+    <input id="note" type="text" name="note" maxlength="255" placeholder="Ex. livrer avant midi">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:12px">
+      <div><div class="aide" style="margin:0">Total estimé</div><strong id="total" style="font-size:1.3rem">0 FC</strong></div>
+      <button class="btn" type="submit">Valider la commande</button>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  var champs = document.querySelectorAll("input.js-qte");
+  function majTotal() {
+    var total = 0;
+    champs.forEach(function (c) { total += (parseInt(c.value, 10) || 0) * parseInt(c.dataset.prix, 10); });
+    document.getElementById("total").textContent = total.toLocaleString("fr-FR") + " FC";
+  }
+  champs.forEach(function (c) { c.addEventListener("input", majTotal); });
+</script>
+{% endblock %}

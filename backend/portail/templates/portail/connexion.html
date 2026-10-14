@@ -1,0 +1,34 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b8f6a">
+  <title>Connexion · Dawa Pharmacie</title>
+  <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
+</head>
+<body class="page-connexion">
+  <main class="carte">
+    <div class="logo">{% include "portail/icones/logo.html" %}</div>
+    <h1>Espace pharmacie</h1>
+    <p class="intro">Gérez vos réservations et votre stock sur Dawa.</p>
+    <form method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <ul class="messages"><li class="error">Identifiant ou mot de passe incorrect.</li></ul>
+      {% endif %}
+      <div class="champ">
+        <label for="id_username">Identifiant</label>
+        <input type="text" name="username" id="id_username" autocomplete="username" autocapitalize="none" required autofocus value="{{ form.username.value|default:'' }}">
+      </div>
+      <div class="champ">
+        <label for="id_password">Mot de passe</label>
+        <input type="password" name="password" id="id_password" autocomplete="current-password" required>
+      </div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="btn bloc" type="submit">Se connecter</button>
+    </form>
+    <p class="aide" style="text-align:center;margin-top:16px">Pas encore de compte ? Contactez l'équipe Dawa.</p>
+  </main>
+</body>
+</html>

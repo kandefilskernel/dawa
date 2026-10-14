@@ -1,0 +1,148 @@
+{% extends "portail/base.html" %}
+{% block titre %}Stock{% endblock %}
+{% block entete %}
+  <h1>Mon stock</h1>
+  <p>Basculez disponible / rupture et ajustez le prix : c'est enregistré tout de suite.</p>
+{% endblock %}
+
+{% block contenu %}
+{% if nb_a_confirmer %}
+  <div class="bandeau" style="margin-bottom:12px">
+    <div><strong>{{ nb_a_confirmer }} à confirmer</strong><div style="font-size:.85rem">Pas de mise à jour depuis 48 h.</div></div>
+    <form method="post" action="{% url 'portail:confirmer_stock' %}">{% csrf_token %}
+      <input type="hidden" name="retour" value="{{ request.get_full_path }}">
+      <button class="btn ambre" type="submit">Tout est à jour</button>
+    </form>
+  </div>
+{% endif %}
+
+<a class="carte" href="{% url 'portail:commandes' %}" style="display:flex;align-items:center;gap:12px;color:inherit;margin-bottom:12px">
+  <span class="icone-carre">🚚</span>
+  <div class="grow"><div class="nom">Commander chez un grossiste</div><div class="sous">Réapprovisionner les ruptures en quelques clics</div></div>
+  <span aria-hidden="true">›</span>
+</a>
+<form class="recherche" method="get" role="search">
+  <input type="hidden" name="filtre" value="{{ filtre }}">
+  <input type="search" name="q" value="{{ q }}" placeholder="Rechercher un médicament" aria-label="Rechercher un médicament">
+  <button class="btn" type="submit">OK</button>
+</form>
+<nav class="onglets" aria-label="Filtrer le stock">
+  {% for code, libelle in filtres.items %}
+    <a href="?filtre={{ code }}{% if q %}&q={{ q|urlencode }}{% endif %}" class="{% if code == filtre %}actif{% endif %}">{{ libelle }}</a>
+  {% endfor %}
+</nav>
+
+<p class="aide" style="margin:0 4px 10px">📷 Touchez la vignette d'un produit sans vraie photo pour photographier la boîte : elle s'affichera pour tous les patients.</p>
+<div class="carte">
+  {% for l in lignes %}
+    {% with m=l.medicament s=l.stock %}
+    <form class="ligne-stock js-stock" method="post" action="{% url 'portail:modifier_stock' m.pk %}">
+      {% csrf_token %}
+      <input type="hidden" name="retour" value="{{ request.get_full_path }}">
+      <div class="infos avec-vignette">
+        {% if m.image and not m.image_est_illustration %}
+          <img class="vignette" src="{{ m.image.url }}" alt="" width="48" height="48" loading="lazy">
+        {% else %}
+          <label class="vignette-photo" title="Photographier la boîte">
+            {% if m.image %}<img class="vignette" src="{{ m.image.url }}" alt="" width="48" height="48" loading="lazy">{% else %}<span class="vignette"></span>{% endif %}
+            <span class="badge-photo" aria-hidden="true">📷</span>
+            <input class="js-photo" type="file" name="photo" accept="image/*" form="photo-{{ m.pk }}"
+                   aria-label="Envoyer une photo de {{ m.nom_commercial }} {{ m.dosage }}">
+          </label>
+        {% endif %}
+        <div>
+        <div class="nom">{{ m.nom_commercial }} {{ m.dosage }}</div>
+        <div class="sous">
+          {{ m.dci }} · {{ m.get_forme_display }}
+          {% if m.ordonnance_requise %} · <span style="color:var(--rouge)">ordonnance</span>{% endif %}
+          {% if not s %} · <em>non référencé</em>{% elif l.a_confirmer %} · <span style="color:#b45309">à confirmer</span>{% else %} · maj {{ s.mis_a_jour_le|date:"d/m H:i" }}{% endif %}
+        </div>
+        </div>
+      </div>
+      <div class="controles">
+        <input type="hidden" name="disponible" value="0">
+        <label class="interrupteur">
+          <input type="checkbox" name="disponible" value="1" aria-label="{{ m.nom_commercial }} {{ m.dosage }} disponible" {% if s.disponible %}checked{% endif %}>
+          <span class="piste"></span>
+          <span class="etat">{% if s.disponible %}En stock{% elif s %}Rupture{% else %}Absent{% endif %}</span>
+        </label>
+        <span class="prix">
+          <input type="text" inputmode="numeric" pattern="[0-9 ]*" name="prix" value="{{ s.prix|default_if_none:'' }}" placeholder="Prix" aria-label="Prix en francs congolais">
+          <span>FC</span>
+        </span>
+        <span class="etat-sauvegarde" aria-live="polite"></span>
+        <noscript><button class="btn" type="submit">OK</button></noscript>
+      </div>
+    </form>
+    {% if not m.image or m.image_est_illustration %}
+      <form id="photo-{{ m.pk }}" method="post" enctype="multipart/form-data" action="{% url 'portail:envoyer_photo' m.pk %}" hidden>
+        {% csrf_token %}
+        <input type="hidden" name="retour" value="{{ request.get_full_path }}">
+      </form>
+    {% endif %}
+    {% endwith %}
+  {% empty %}
+    <div class="vide">{% include "portail/icones/stock.html" %}<p>Aucun produit ne correspond.</p></div>
+  {% endfor %}
+</div>
+
+{% if page.has_other_pages %}
+  <div class="pagination">
+    {% if page.has_previous %}<a class="btn secondaire" href="?filtre={{ filtre }}&q={{ q|urlencode }}&page={{ page.previous_page_number }}">‹ Précédent</a>{% endif %}
+    <span>Page {{ page.number }} / {{ page.paginator.num_pages }}</span>
+    {% if page.has_next %}<a class="btn secondaire" href="?filtre={{ filtre }}&q={{ q|urlencode }}&page={{ page.next_page_number }}">Suivant ›</a>{% endif %}
+  </div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Photo de la boîte : envoi dès qu'elle est choisie (appareil photo ou galerie).
+  document.querySelectorAll("input.js-photo").forEach(function (champ) {
+    champ.addEventListener("change", function () {
+      if (!champ.files.length) return;
+      champ.closest(".vignette-photo").classList.add("envoi");
+      champ.form.submit();
+    });
+  });
+
+  // Enregistrement automatique de chaque ligne (interrupteur ou prix), sans recharger la page.
+  document.querySelectorAll("form.js-stock").forEach(function (formulaire) {
+    var etat = formulaire.querySelector(".etat-sauvegarde");
+    var case_ = formulaire.querySelector("input[type=checkbox]");
+    var libelle = formulaire.querySelector(".interrupteur .etat");
+    var minuterie;
+
+    function enregistrer() {
+      etat.className = "etat-sauvegarde";
+      etat.textContent = "…";
+      fetch(formulaire.action, {
+        method: "POST",
+        body: new FormData(formulaire),
+        headers: { "X-Requested-With": "fetch" },
+        credentials: "same-origin"
+      })
+        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (res) {
+          if (!res.ok) throw new Error(res.d.erreur || "Erreur");
+          etat.className = "etat-sauvegarde ok";
+          etat.textContent = "✓ Enregistré";
+        })
+        .catch(function (e) {
+          etat.className = "etat-sauvegarde ko";
+          etat.textContent = e.message === "Failed to fetch" ? "Hors ligne" : e.message;
+        });
+    }
+
+    case_.addEventListener("change", function () {
+      libelle.textContent = case_.checked ? "En stock" : "Rupture";
+      enregistrer();
+    });
+    formulaire.querySelector("input[name=prix]").addEventListener("input", function () {
+      clearTimeout(minuterie);
+      minuterie = setTimeout(enregistrer, 700);
+    });
+    formulaire.addEventListener("submit", function (e) { e.preventDefault(); enregistrer(); });
+  });
+</script>
+{% endblock %}

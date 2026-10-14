@@ -1,0 +1,81 @@
+{% extends "portail/base.html" %}
+{% load static %}
+{% block titre %}Accueil{% endblock %}
+{% block entete %}
+  <h1>Bonjour 👋</h1>
+  <p>Voici l'activité de votre pharmacie sur Dawa.</p>
+{% endblock %}
+
+{% block contenu %}
+<div class="grille-stats">
+  <a class="stat {% if nb_en_attente %}urgent{% endif %}" href="{% url 'portail:reservations' %}">
+    <div class="valeur">{{ nb_en_attente }}</div>
+    <div class="libelle">Réservation{{ nb_en_attente|pluralize }} à traiter</div>
+  </a>
+  <a class="stat" href="{% url 'portail:reservations' %}?onglet=en_cours">
+    <div class="valeur">{{ nb_en_cours }}</div>
+    <div class="libelle">En cours</div>
+  </a>
+  <a class="stat" href="{% url 'portail:stock' %}?filtre=dispo">
+    <div class="valeur">{{ nb_disponibles }}</div>
+    <div class="libelle">Produits en stock</div>
+  </a>
+  <a class="stat {% if nb_a_confirmer %}alerte{% endif %}" href="{% url 'portail:stock' %}?filtre=a_confirmer">
+    <div class="valeur">{{ nb_a_confirmer }}</div>
+    <div class="libelle">À confirmer</div>
+  </a>
+</div>
+
+{% if nb_a_confirmer %}
+  <div class="bandeau section">
+    <div>
+      <strong>{{ nb_a_confirmer }} produit{{ nb_a_confirmer|pluralize }} affiché{{ nb_a_confirmer|pluralize }} « à confirmer »</strong>
+      <div style="font-size:.85rem">Les patients font davantage confiance à un stock mis à jour récemment.</div>
+    </div>
+    <form method="post" action="{% url 'portail:confirmer_stock' %}">{% csrf_token %}
+      <input type="hidden" name="retour" value="{% url 'portail:tableau' %}">
+      <button class="btn ambre" type="submit">Tout confirmer</button>
+    </form>
+  </div>
+{% endif %}
+
+<div class="titre-section">
+  <div>
+    <h2>Demandés près de chez vous</h2>
+    <p>Recherches à moins de {{ rayon_demande }} km ces {{ jours_demande }} derniers jours, absentes de votre stock.</p>
+  </div>
+</div>
+<div class="carte">
+  {% if demande %}
+    {% with max=demande.0.nb %}
+    <ul class="liste">
+      {% for d in demande %}
+        <li>
+          {% if d.medicament__image %}<img class="vignette" src="{% get_media_prefix %}{{ d.medicament__image }}" alt="" width="48" height="48" loading="lazy">{% else %}<span class="icone-carre" style="background:#fef3c7;color:#b45309">{% include "portail/icones/tendance.html" %}</span>{% endif %}
+          <div class="grow">
+            <div style="display:flex;justify-content:space-between;gap:8px">
+              <span class="nom">{{ d.medicament__nom_commercial }} {{ d.medicament__dosage }}</span>
+              <span class="sous" style="white-space:nowrap">{{ d.nb }} recherche{{ d.nb|pluralize }}</span>
+            </div>
+            <div class="barre"><span style="width:{% widthratio d.nb max 100 %}%"></span></div>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+    <p class="aide" style="margin-top:12px">Astuce : ajoutez ces produits à votre stock pour apparaître dans ces recherches.</p>
+    {% endwith %}
+  {% else %}
+    <div class="vide">{% include "portail/icones/tendance.html" %}<p>Pas encore assez de recherches autour de vous.</p></div>
+  {% endif %}
+</div>
+
+<div class="titre-section"><h2>Réservations actives</h2><a href="{% url 'portail:reservations' %}">Tout voir</a></div>
+{% if dernieres %}
+  {% for r in dernieres %}
+    {% url 'portail:tableau' as retour %}
+    {% include "portail/_reservation.html" with r=r retour=retour Statut=Statut %}
+  {% endfor %}
+{% else %}
+  <div class="carte vide">{% include "portail/icones/reservations.html" %}<p>Aucune réservation en cours.</p></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,79 @@
+{# Carte d'une réservation. Variables : r (Reservation), retour (URL), Statut #}
+<article class="carte">
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    {% with s=r.statut_effectif %}
+      <span class="pastille {% if s == 'en_attente' %}p-attente{% elif s == 'acceptee' %}p-ok{% elif s == 'prete' %}p-prete{% elif s == 'refusee' %}p-refus{% else %}p-neutre{% endif %}">{{ r.get_statut_display }}{% if s == 'expiree' %} · expirée{% endif %}</span>
+    {% endwith %}
+    {% if r.medicament.ordonnance_requise %}<span class="pastille p-ordonnance">Ordonnance</span>{% endif %}
+    {% if r.est_active %}
+      <span class="aide" style="margin:0 0 0 auto;display:flex;align-items:center;gap:4px">
+        <span style="width:15px;height:15px;display:inline-flex">{% include "portail/icones/horloge.html" %}</span>
+        expire à {{ r.expire_le|time:"H:i" }}
+      </span>
+    {% endif %}
+  </div>
+
+  <ul class="liste" style="margin-top:12px">
+    <li>
+      {% if r.medicament.image %}<img class="vignette" src="{{ r.medicament.image.url }}" alt="" width="48" height="48" loading="lazy">{% else %}<span class="icone-carre">{% include "portail/icones/stock.html" %}</span>{% endif %}
+      <div class="grow">
+        <div class="nom">{{ r.medicament.nom_commercial }} {{ r.medicament.dosage }} × {{ r.quantite }}</div>
+        <div class="sous">{{ r.nom }} · <a href="tel:{{ r.telephone }}">{{ r.telephone }}</a> · demandé à {{ r.cree_le|time:"H:i" }}</div>
+        {% if r.message_pharmacie %}<div class="sous">Votre message : « {{ r.message_pharmacie }} »</div>{% endif %}
+        {% if r.est_livraison %}
+          <div class="sous" style="margin-top:6px;color:var(--texte)">
+            🛵 <strong>Livraison</strong> · {{ r.adresse_livraison }}
+            {% if r.frais_livraison %} · frais {{ r.frais_livraison }} FC{% endif %}
+            {% if r.position_livraison %} · <a href="https://www.google.com/maps/dir/?api=1&destination={{ r.position_livraison.y }},{{ r.position_livraison.x }}" target="_blank" rel="noopener">voir sur la carte</a>{% endif %}
+            {% if r.livreur %}<br>Livreur : {{ r.livreur.nom }} ({{ r.livreur.telephone }}){% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </li>
+  </ul>
+
+  {% if r.transitions_possibles %}
+    <div class="actions">
+      {% for t in r.transitions_possibles %}
+        {% if t == Statut.REFUSEE %}
+          <details class="refus" style="flex:1;min-width:130px">
+            <summary class="btn danger" style="width:100%">Refuser</summary>
+            <form method="post" action="{% url 'portail:statut_reservation' r.pk %}">
+              {% csrf_token %}
+              <input type="hidden" name="statut" value="{{ t }}">
+              <input type="hidden" name="retour" value="{{ retour }}">
+              <input type="text" name="message" maxlength="255" placeholder="Motif (ex. plus en stock)">
+              <button class="btn danger" type="submit">Confirmer le refus</button>
+            </form>
+          </details>
+        {% elif t == Statut.EN_LIVRAISON %}
+          <form method="post" action="{% url 'portail:statut_reservation' r.pk %}" style="flex-wrap:wrap;gap:8px">
+            {% csrf_token %}
+            <input type="hidden" name="statut" value="{{ t }}">
+            <input type="hidden" name="retour" value="{{ retour }}">
+            {% if livreurs %}
+              <select name="livreur" required style="flex:1 1 100%;font:inherit;padding:10px;border:1px solid var(--bordure);border-radius:12px;background:#fff">
+                {% for l in livreurs %}<option value="{{ l.pk }}">{{ l.nom }} — {{ l.telephone }}</option>{% endfor %}
+              </select>
+              <button class="btn" type="submit">🛵 Partir en livraison</button>
+            {% else %}
+              <a class="btn secondaire" href="{% url 'portail:profil' %}">Ajouter un livreur d'abord</a>
+            {% endif %}
+          </form>
+        {% else %}
+          <form method="post" action="{% url 'portail:statut_reservation' r.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="statut" value="{{ t }}">
+            <input type="hidden" name="retour" value="{{ retour }}">
+            <button class="btn" type="submit">
+              {% if t == Statut.ACCEPTEE %}Accepter{% elif t == Statut.PRETE %}Marquer prête{% elif t == Statut.RETIREE %}Client passé : retirée{% elif t == Statut.LIVREE %}Livrée au client{% endif %}
+            </button>
+          </form>
+        {% endif %}
+      {% endfor %}
+      <a class="btn secondaire" href="tel:{{ r.telephone }}" style="flex:0 0 auto" aria-label="Appeler le client">
+        <span style="width:18px;height:18px;display:inline-flex">{% include "portail/icones/telephone.html" %}</span>
+      </a>
+    </div>
+  {% endif %}
+</article>

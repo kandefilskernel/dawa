@@ -1,0 +1,60 @@
+{% extends "portail/base.html" %}
+{% block titre %}Questions{% endblock %}
+{% block entete %}
+  <h1>Questions des patients</h1>
+  <p>Répondez aux questions simples. Le premier pharmacien qui répond prend la question.</p>
+{% endblock %}
+
+{% block contenu %}
+<div class="bandeau" style="margin-bottom:14px">
+  <div style="font-size:.88rem">
+    <strong>Rappel :</strong> pas de diagnostic ni de prescription à distance.
+    Si la question évoque des symptômes inquiétants, cochez « Orienter vers un médecin ».
+  </div>
+</div>
+
+{% for q in en_attente %}
+  <article class="carte">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="pastille p-attente">En attente</span>
+      <span class="aide" style="margin:0 0 0 auto">{{ q.cree_le|timesince }}</span>
+    </div>
+    {% if q.medicament %}
+      <ul class="liste" style="margin-top:12px"><li>
+        {% if q.medicament.image %}<img class="vignette" src="{{ q.medicament.image.url }}" alt="" width="48" height="48" loading="lazy">{% endif %}
+        <div class="grow"><div class="nom">{{ q.medicament.nom_commercial }} {{ q.medicament.dosage }}</div>
+          <div class="sous">{{ q.medicament.dci }}</div></div>
+      </li></ul>
+    {% endif %}
+    <p style="margin:12px 0;white-space:pre-line">« {{ q.texte }} »</p>
+    <form method="post" action="{% url 'portail:repondre_question' q.pk %}">
+      {% csrf_token %}
+      <label for="reponse-{{ q.pk }}">Votre réponse</label>
+      <textarea id="reponse-{{ q.pk }}" name="reponse" rows="3" maxlength="2000" required></textarea>
+      <label style="display:flex;align-items:center;gap:8px;font-weight:500;margin:10px 0">
+        <input type="checkbox" name="orienter" value="1" style="width:20px;height:20px"> Orienter vers un médecin
+      </label>
+      <button class="btn bloc" type="submit">Envoyer la réponse</button>
+    </form>
+  </article>
+{% empty %}
+  <div class="carte vide">{% include "portail/icones/question.html" %}<p>Aucune question en attente.</p></div>
+{% endfor %}
+
+{% if mes_reponses %}
+  <div class="titre-section"><h2>Mes dernières réponses</h2></div>
+  <div class="carte">
+    <ul class="liste">
+      {% for q in mes_reponses %}
+        <li>
+          <div class="grow">
+            <div class="nom">« {{ q.texte|truncatechars:90 }} »</div>
+            <div class="sous">{{ q.reponse|truncatechars:140 }}</div>
+          </div>
+          <span class="pastille {% if q.statut == 'orientee' %}p-refus{% else %}p-ok{% endif %}">{{ q.get_statut_display }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+{% endblock %}

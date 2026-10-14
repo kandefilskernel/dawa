@@ -1,0 +1,40 @@
+{% extends "portail/base.html" %}
+{% load humanize %}
+{% block titre %}Commandes{% endblock %}
+{% block entete %}
+  <h1>Commandes grossistes</h1>
+  <p>Réapprovisionnez votre pharmacie auprès des grossistes partenaires.</p>
+{% endblock %}
+
+{% block contenu %}
+<div class="titre-section" style="margin-top:0"><h2>Nouvelle commande</h2></div>
+{% for g in grossistes %}
+  <a class="carte" href="{% url 'portail:nouvelle_commande' g.pk %}" style="display:flex;align-items:center;gap:12px;color:inherit">
+    <span class="icone-carre">🚚</span>
+    <div class="grow">
+      <div class="nom">{{ g.nom }}</div>
+      <div class="sous">{% if g.delai_livraison %}Livraison {{ g.delai_livraison }}{% endif %}{% if g.minimum_commande %} · minimum {{ g.minimum_commande|intcomma }} FC{% endif %}</div>
+    </div>
+    <span aria-hidden="true">›</span>
+  </a>
+{% empty %}
+  <div class="carte vide"><p>Aucun grossiste partenaire pour le moment.</p></div>
+{% endfor %}
+
+<div class="titre-section"><h2>Mes commandes</h2></div>
+{% if commandes %}
+  <div class="carte"><ul class="liste">
+    {% for c in commandes %}
+      <li>
+        <div class="grow">
+          <a class="nom" href="{% url 'portail:commande' c.pk %}">N° {{ c.pk }} · {{ c.grossiste.nom }}</a>
+          <div class="sous">{{ c.cree_le|date:"d/m/Y H:i" }} · {{ c.lignes.all|length }} produit{{ c.lignes.all|length|pluralize }} · {{ c.total|intcomma }} FC</div>
+        </div>
+        <span class="pastille {% if c.statut == 'livree' %}p-ok{% elif c.statut == 'annulee' %}p-neutre{% elif c.statut == 'confirmee' %}p-prete{% else %}p-attente{% endif %}">{{ c.get_statut_display }}</span>
+      </li>
+    {% endfor %}
+  </ul></div>
+{% else %}
+  <div class="carte vide"><p>Aucune commande pour l'instant.</p></div>
+{% endif %}
+{% endblock %}

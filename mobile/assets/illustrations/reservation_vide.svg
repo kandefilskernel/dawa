@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 170">
+  <circle cx="100" cy="85" r="72" fill="#E7F5EF"/>
+  <circle cx="38" cy="40" r="6" fill="#FDE68A"/>
+  <circle cx="166" cy="130" r="7" fill="#A7F3D0"/>
+  <path d="M160 36h4v-6h4v6h4v4h-4v6h-4v-6h-4z" fill="#34D399"/>
+  <!-- sac -->
+  <path d="M62 66h76l-6 74a8 8 0 0 1-8 7H76a8 8 0 0 1-8-7z" fill="#10B981"/>
+  <path d="M62 66h76l-1 12H63z" fill="#059669"/>
+  <path d="M82 66v-8a18 18 0 0 1 36 0v8" fill="none" stroke="#065F46" stroke-width="6" stroke-linecap="round"/>
+  <path d="M95 94h10v10h10v10h-10v10H95v-10H85v-10h10z" fill="#FFFFFF"/>
+  <!-- horloge 2h -->
+  <circle cx="142" cy="60" r="20" fill="#FFFFFF" stroke="#F59E0B" stroke-width="4"/>
+  <path d="M142 48v12l8 5" stroke="#B45309" stroke-width="4" stroke-linecap="round" fill="none"/>
+</svg>
