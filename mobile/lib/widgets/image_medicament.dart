@@ -49,7 +49,8 @@ class ImageMedicament extends StatelessWidget {
   }
 }
 
-/// Affiche l'image en grand (fiche produit), avec la mention « illustration » si besoin.
+/// Affiche l'image en grand (fiche produit), avec la mention « illustration » ou le crédit
+/// de la photo (auteur et licence, exigés par CC BY / CC BY-SA) si besoin.
 void ouvrirImageMedicament(BuildContext context, Medicament medicament) {
   final url = ImageMedicament.urlAbsolue(medicament.image);
   if (url == null) return;
@@ -58,22 +59,33 @@ void ouvrirImageMedicament(BuildContext context, Medicament medicament) {
     builder: (_) => Dialog(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        AspectRatio(aspectRatio: 1, child: CachedNetworkImage(imageUrl: url, fit: BoxFit.cover)),
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(medicament.libelle, style: Theme.of(context).textTheme.titleMedium),
-            Text([medicament.dci, tr(medicament.formeLibelle)].where((s) => s.isNotEmpty).join(' · '),
-                style: Theme.of(context).textTheme.bodySmall),
-            if (medicament.imageEstIllustration) ...[
-              const SizedBox(height: 8),
-              Text(tr('Image d\'illustration : la boîte vendue peut être différente.'),
-                  style: TextStyle(fontSize: 12, color: Couleurs.texteDoux, fontStyle: FontStyle.italic)),
-            ],
+      // Largeur limitée et défilement : en paysage, l'image carrée ne cache plus le texte (crédit).
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: SingleChildScrollView(
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            AspectRatio(aspectRatio: 1, child: CachedNetworkImage(imageUrl: url, fit: BoxFit.cover)),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(medicament.libelle, style: Theme.of(context).textTheme.titleMedium),
+                Text([medicament.dci, tr(medicament.formeLibelle)].where((s) => s.isNotEmpty).join(' · '),
+                    style: Theme.of(context).textTheme.bodySmall),
+                if (medicament.imageEstIllustration) ...[
+                  const SizedBox(height: 8),
+                  Text(tr('Image d\'illustration : la boîte vendue peut être différente.'),
+                      style: TextStyle(fontSize: 12, color: Couleurs.texteDoux, fontStyle: FontStyle.italic)),
+                ],
+                if (medicament.imageCredit.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  SelectableText(medicament.imageCredit,
+                      style: TextStyle(fontSize: 11, color: Couleurs.texteDoux)),
+                ],
+              ]),
+            ),
           ]),
         ),
-      ]),
+      ),
     ),
   );
 }

@@ -14,6 +14,9 @@ class Medicament {
   final String? image;
   final bool imageEstIllustration;
 
+  /// Crédit de la photo (auteur et licence, ex. Wikimedia Commons) ; vide si aucun.
+  final String imageCredit;
+
   /// JSON d'origine, conservé pour le stockage local (historique).
   final Map<String, dynamic> json;
 
@@ -25,7 +28,8 @@ class Medicament {
         formeLibelle = json['forme_libelle'] ?? '',
         ordonnanceRequise = json['ordonnance_requise'] ?? false,
         image = json['image'],
-        imageEstIllustration = json['image_est_illustration'] ?? false;
+        imageEstIllustration = json['image_est_illustration'] ?? false,
+        imageCredit = json['image_credit'] ?? '';
 
   String get libelle => [nomCommercial, dosage].where((s) => s.isNotEmpty).join(' ');
 }
