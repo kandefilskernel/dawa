@@ -17,3 +17,4 @@ backend/cles/
 # APK téléchargé
 *.apk
 backend/prive/
+deploy/.env.prod

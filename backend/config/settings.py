@@ -148,3 +148,28 @@ MESSAGERIE_JETON = os.environ.get("MESSAGERIE_JETON", "")
 # Assistant IA du portail (brouillons de réponses aux questions). Désactivé sans clé.
 ASSISTANT_IA_CLE = os.environ.get("ANTHROPIC_API_KEY", "")
 ASSISTANT_IA_MODELE = os.environ.get("DAWA_ASSISTANT_MODELE", "claude-opus-5-5")
+
+# --- Production (DJANGO_DEBUG=0 derrière le proxy HTTPS Caddy, voir deploy/) ---
+if not DEBUG and not TESTS:
+    from django.core.exceptions import ImproperlyConfigured
+
+    if SECRET_KEY in ("", "dev-insecure", "change-moi-en-production") or len(SECRET_KEY) < 40:
+        raise ImproperlyConfigured("DJANGO_SECRET_KEY doit être une valeur secrète longue en production.")
+    # Caddy termine le HTTPS et transmet X-Forwarded-Proto.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_TRUSTED_ORIGINS = [o for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o]
+    SECURE_HSTS_SECONDS = int(os.environ.get("DJANGO_HSTS_SECONDES", "3600"))
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = "same-origin"
+    X_FRAME_OPTIONS = "DENY"
+    # L'app mobile native n'a pas besoin de CORS ; la version web de l'app, si elle est publiée ailleurs, oui.
+    CORS_ALLOWED_ORIGINS = [o for o in os.environ.get("DJANGO_CORS_ORIGINES", "").split(",") if o]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": os.environ.get("DJANGO_LOG_NIVEAU", "WARNING")},
+}

@@ -1,0 +1,11 @@
+# Jamais dans l'image Docker : secrets, données locales et fichiers générés.
+# (Sinon un nouveau volume de production serait pré-rempli avec ces fichiers, dont la clé RSA de développement.)
+cles/
+prive/
+media/
+staticfiles/
+images_a_importer/
+.env
+.env.*
+**/__pycache__/
+**/*.pyc

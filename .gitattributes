@@ -1,0 +1,3 @@
+# Scripts exécutés sous Linux (serveur, conteneurs) : toujours en LF.
+*.sh text eol=lf
+deploy/Caddyfile text eol=lf

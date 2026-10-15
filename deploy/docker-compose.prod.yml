@@ -1,0 +1,66 @@
+# Dawa en production sur un serveur (VPS) : base PostGIS, Django (gunicorn) et Caddy (HTTPS automatique).
+# Utilisation (depuis le dossier deploy/) : docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+name: dawa-prod
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-dawa}
+      POSTGRES_USER: ${DATABASE_USER:-dawa}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD manquant dans .env.prod}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # En TCP : pendant la 1re initialisation, le serveur temporaire n'écoute que sur le socket local.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${DATABASE_USER:-dawa} -d ${DATABASE_NAME:-dawa}"]
+      interval: 5s
+      retries: 20
+    # Pas de port publié : la base n'est joignable que par le backend.
+
+  backend:
+    build: ../backend
+    restart: unless-stopped
+    env_file: .env.prod
+    environment:
+      DJANGO_DEBUG: "0"
+      DATABASE_HOST: db
+    command: ["sh", "/app/deploy/demarrer.sh"]
+    volumes:
+      - ./demarrer.sh:/app/deploy/demarrer.sh:ro
+      - statiques:/app/staticfiles
+      - medias:/app/media          # photos des médicaments (publiques)
+      - prive:/app/prive           # pièces KYC (jamais servies par Caddy)
+      - cles:/app/cles             # clé RSA des jetons d'appareil
+    depends_on:
+      db:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2.8
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DAWA_DOMAINE: ${DAWA_DOMAINE:?DAWA_DOMAINE manquant dans .env.prod}
+      DAWA_EMAIL_ADMIN: ${DAWA_EMAIL_ADMIN:?DAWA_EMAIL_ADMIN manquant (certificats HTTPS)}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - statiques:/srv/static:ro
+      - medias:/srv/media:ro
+      - caddy_donnees:/data        # certificats HTTPS
+      - caddy_config:/config
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  statiques:
+  medias:
+  prive:
+  cles:
+  caddy_donnees:
+  caddy_config:

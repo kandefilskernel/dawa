@@ -1,0 +1,39 @@
+# HTTPS automatique (Let's Encrypt) pour le domaine de Dawa.
+{
+	email {$DAWA_EMAIL_ADMIN}
+}
+
+{$DAWA_DOMAINE} {
+	encode zstd gzip
+
+	# Fichiers statiques du portail et de l'admin, mis en cache longtemps.
+	handle_path /static/* {
+		root * /srv/static
+		header Cache-Control "public, max-age=604800"
+		file_server
+	}
+
+	# Photos des médicaments uniquement. Les pièces KYC (dossier prive/) ne sont jamais servies ici.
+	handle_path /media/* {
+		root * /srv/media
+		header Cache-Control "public, max-age=86400"
+		header X-Content-Type-Options nosniff
+		file_server
+	}
+
+	handle {
+		reverse_proxy backend:8000
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy same-origin
+		-Server
+	}
+
+	# Pièces justificatives jusqu'à 8 Mo (+ marge du formulaire).
+	request_body {
+		max_size 12MB
+	}
+}
