@@ -61,7 +61,7 @@ class ReservationTests(TestCase):
         self.post(self.p1)
         self.assertEqual(self.post(self.p1).status_code, 400)
         r = self.client.post("/api/reservations/", {}, content_type="application/json")
-        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.status_code, 401)  # sans jeton : l'app redemande un jeton
 
     def test_expiration(self):
         rid = self.post(self.p1).json()["id"]

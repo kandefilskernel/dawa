@@ -1,11 +1,25 @@
 import uuid
 
 from django.conf import settings
+from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated
 
 from .jetons import JetonInvalide, lire_jeton
 
 ENTETE_ANCIEN = "X-Client-Id"
+
+
+class JetonAppareil(BaseAuthentication):
+    """
+    Annonce le schéma Bearer à DRF pour qu'un jeton absent ou invalide donne 401 (et non 403) :
+    l'app redemande alors un jeton. La lecture du jeton reste dans `client_id()`.
+    """
+
+    def authenticate(self, request):
+        return None
+
+    def authenticate_header(self, request):
+        return 'Bearer realm="dawa"'
 
 
 def client_id(request):

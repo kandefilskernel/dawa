@@ -108,6 +108,7 @@ CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOW_HEADERS = (*default_headers, "x-client-id")
 
 REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ["config.client.JetonAppareil"],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 20,
     "DEFAULT_THROTTLE_RATES": {"jeton_appareil": "30/hour"},
