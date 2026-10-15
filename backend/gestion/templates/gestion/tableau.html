@@ -1,0 +1,18 @@
+{% extends "gestion/base.html" %}
+{% block titre %}Accueil{% endblock %}
+{% block entete %}
+  <h1>Espace Dawa</h1>
+  <p>Inscriptions, visibilité des pharmacies, abonnements et signalements.</p>
+{% endblock %}
+{% block contenu %}
+<div class="grille-stats">
+  <a class="stat" href="{% url 'gestion:demandes' %}"><div class="valeur">{{ request.nb_demandes }}</div><div class="libelle">Inscriptions à vérifier</div></a>
+  <a class="stat" href="{% url 'gestion:pharmacies' %}?filtre=visibles"><div class="valeur">{{ pharmacies_visibles }}</div><div class="libelle">Pharmacies visibles dans l'app</div></a>
+  <a class="stat" href="{% url 'gestion:abonnements' %}"><div class="valeur">{{ abonnements_a_activer }}</div><div class="libelle">Paiements à confirmer</div></a>
+  <a class="stat" href="{% url 'gestion:signalements' %}"><div class="valeur">{{ signalements_a_traiter }}</div><div class="libelle">Signalements à traiter</div></a>
+</div>
+<div class="carte section">
+  <div class="sous">{{ abonnements_actifs }} abonnement(s) actif(s). Les réglages avancés (catalogue, grossistes, gardes) restent dans
+    <a href="{% url 'admin:index' %}">l'administration technique</a>.</div>
+</div>
+{% endblock %}

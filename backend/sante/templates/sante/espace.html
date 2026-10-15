@@ -1,0 +1,66 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b8f6a">
+  <title>Mon établissement · Dawa Santé</title>
+  <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
+</head>
+<body class="page-connexion">
+  <main class="carte" style="max-width:560px">
+    <div class="logo">{% include "portail/icones/logo.html" %}</div>
+    <h1>{{ etablissement.nom }}</h1>
+    <p class="intro">{{ etablissement.get_type_display }} · {{ responsable.fonction|default:"responsable" }}</p>
+    {% if messages %}
+      <ul class="messages">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>
+    {% endif %}
+
+    {% if responsable.statut == "en_attente" %}
+      <p><span class="pastille p-attente">Demande en cours de vérification</span></p>
+      {% if dossier.manquantes %}
+        <p><strong>Dernière étape :</strong> envoyez les justificatifs ci-dessous. L'établissement apparaîtra dans
+          l'annuaire santé de l'app dès que l'équipe Dawa les aura vérifiés.</p>
+      {% else %}
+        <p>Merci ! Votre dossier est complet. L'équipe Dawa vérifie vos documents.</p>
+      {% endif %}
+    {% elif responsable.statut == "refuse" %}
+      <p><span class="pastille p-refus">Demande refusée</span></p>
+      {% if responsable.motif %}<p><strong>Motif :</strong> {{ responsable.motif }}</p>{% endif %}
+    {% elif responsable.statut == "suspendu" %}
+      <p><span class="pastille p-refus">Compte suspendu</span></p>
+      {% if responsable.motif %}<p><strong>Motif :</strong> {{ responsable.motif }}</p>{% endif %}
+      <p>L'établissement n'apparaît plus dans l'app. Contactez l'équipe Dawa.</p>
+    {% else %}
+      <p><span class="pastille p-ok">Vérifié · visible dans l'app</span></p>
+    {% endif %}
+
+    {% if fiche %}
+      <div class="titre-section" style="margin-top:18px"><h2>Fiche affichée aux patients</h2></div>
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% for champ in fiche %}
+          <div class="champ">
+            {% if champ.field.widget.input_type == "checkbox" %}
+              <label style="display:flex;align-items:center;gap:8px">{{ champ }} {{ champ.label }}</label>
+            {% else %}
+              <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>{{ champ }}
+            {% endif %}
+            {% for e in champ.errors %}<div class="erreur">{{ e }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <button class="btn bloc" type="submit">Enregistrer</button>
+      </form>
+    {% endif %}
+
+    {% if responsable.statut != "refuse" %}
+      <div class="titre-section" style="margin-top:18px"><h2>Justificatifs</h2></div>
+      {% include "kyc/_dossier.html" %}
+    {% endif %}
+
+    <form method="post" action="{% url 'portail:deconnexion' %}" style="margin-top:18px">{% csrf_token %}
+      <button class="btn secondaire bloc" type="submit">Se déconnecter</button>
+    </form>
+  </main>
+</body>
+</html>

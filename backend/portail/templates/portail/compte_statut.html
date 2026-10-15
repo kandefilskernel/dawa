@@ -1,0 +1,46 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b8f6a">
+  <title>Mon compte · Dawa Pharmacie</title>
+  <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
+</head>
+<body class="page-connexion">
+  <main class="carte" style="max-width:520px">
+    <div class="logo">{% include "portail/icones/logo.html" %}</div>
+    <h1>{{ pharmacien.pharmacie.nom }}</h1>
+    {% if messages %}
+      <ul class="messages">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% if pharmacien.statut == "en_attente" %}
+      <p class="intro"><span class="pastille p-attente">Demande en cours de vérification</span></p>
+      {% if dossier.manquantes %}
+        <p><strong>Dernière étape :</strong> envoyez les justificatifs ci-dessous. L'équipe Dawa vérifie que la
+          pharmacie est bien enregistrée avant de l'afficher dans l'app.</p>
+      {% else %}
+        <p>Merci ! Votre dossier est complet. L'équipe Dawa vérifie vos documents et l'emplacement de la
+          pharmacie ; vous aurez accès au portail dès la validation.</p>
+      {% endif %}
+    {% elif pharmacien.statut == "refuse" %}
+      <p class="intro"><span class="pastille p-refus">Demande refusée</span></p>
+      {% if pharmacien.motif %}<p><strong>Motif :</strong> {{ pharmacien.motif }}</p>{% endif %}
+      <p>Pour toute question, contactez l'équipe Dawa.</p>
+    {% else %}
+      <p class="intro"><span class="pastille p-refus">Compte suspendu</span></p>
+      {% if pharmacien.motif %}<p><strong>Motif :</strong> {{ pharmacien.motif }}</p>{% endif %}
+      <p>Votre pharmacie n'apparaît plus dans l'app. Contactez l'équipe Dawa pour la réactiver.</p>
+    {% endif %}
+
+    {% if dossier and pharmacien.statut != "refuse" %}
+      <div class="titre-section" style="margin-top:18px"><h2>Justificatifs</h2></div>
+      {% include "kyc/_dossier.html" %}
+    {% endif %}
+
+    <form method="post" action="{% url 'portail:deconnexion' %}" style="margin-top:18px">{% csrf_token %}
+      <button class="btn secondaire bloc" type="submit">Se déconnecter</button>
+    </form>
+  </main>
+</body>
+</html>

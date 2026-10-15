@@ -1,0 +1,11 @@
+{% extends "portail/base.html" %}
+{% block titre %}Justificatifs{% endblock %}
+{% block entete %}
+  <h1>Justificatifs de la pharmacie</h1>
+  <p>Preuves que la pharmacie est enregistrée, vérifiées par l'équipe Dawa.</p>
+{% endblock %}
+{% block contenu %}
+<div class="carte">
+  {% include "kyc/_dossier.html" %}
+</div>
+{% endblock %}

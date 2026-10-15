@@ -3,6 +3,7 @@ from functools import wraps
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.measure import D
 from django.core.paginator import Paginator
@@ -10,6 +11,7 @@ from django.db import transaction
 from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
@@ -22,12 +24,13 @@ from catalogue.search import rechercher_medicaments
 from conseil.assistant import AssistantIndisponible, assistant_actif, suggerer_reponse
 from conseil.models import Question
 from grossistes.models import Commande, Grossiste, LigneCommande, Offre
+from kyc.dossier import Dossier, PieceForm
 from messagerie.commandes import traiter_message
 from messagerie.models import MessageEntrant
 from reservations.models import Livreur, Reservation
 from stock.models import Recherche, Stock
 
-from .forms import ProfilForm
+from .forms import InscriptionForm, ProfilForm
 
 RAYON_DEMANDE_KM = 5
 JOURS_DEMANDE = 30
@@ -41,7 +44,15 @@ def pharmacien_requis(vue):
     def enveloppe(request, *args, **kwargs):
         pharmacien = getattr(request.user, "pharmacien", None)
         if pharmacien is None:
+            if request.user.is_staff:
+                return redirect("gestion:tableau")  # équipe Dawa : vers l'espace de gestion
+            if hasattr(request.user, "responsable_etablissement"):
+                return redirect("etablissement:espace")
             return render(request, "portail/acces_refuse.html", status=403)
+        if not pharmacien.actif:
+            # Inscription en attente, refusée ou compte suspendu : seule la page de statut est accessible.
+            return render(request, "portail/compte_statut.html", _contexte_dossier(pharmacien), status=403)
+        request.dossier_incomplet = bool(Dossier(pharmacien.pharmacie.pieces.all()).manquantes)
         request.pharmacie = pharmacien.pharmacie
         request.nb_a_traiter = _reservations_actives(request.pharmacie).filter(
             statut=Reservation.Statut.EN_ATTENTE
@@ -50,6 +61,43 @@ def pharmacien_requis(vue):
         return vue(request, *args, **kwargs)
 
     return enveloppe
+
+
+def _contexte_dossier(pharmacien, form=None):
+    return {"pharmacien": pharmacien, "dossier": Dossier(pharmacien.pharmacie.pieces.all()),
+            "action": reverse("portail:dossier"), "form_piece": form}
+
+
+@login_required
+def dossier(request):
+    """Pièces justificatives (KYC) : accessible quel que soit le statut du compte, pour compléter le dossier."""
+    pharmacien = getattr(request.user, "pharmacien", None)
+    if pharmacien is None:
+        return render(request, "portail/acces_refuse.html", status=403)
+    formulaire = None
+    if request.method == "POST":
+        formulaire = PieceForm(request.POST, request.FILES)
+        if formulaire.is_valid():
+            formulaire.enregistrer(pharmacie=pharmacien.pharmacie)
+            messages.success(request, "Document envoyé. L'équipe Dawa va le vérifier.")
+            return redirect("portail:dossier")
+        messages.error(request, " ".join(e for erreurs in formulaire.errors.values() for e in erreurs))
+    if not pharmacien.actif:
+        return render(request, "portail/compte_statut.html", _contexte_dossier(pharmacien, formulaire), status=403)
+    request.pharmacie = pharmacien.pharmacie
+    return render(request, "portail/dossier.html", {**_contexte_dossier(pharmacien, formulaire), "onglet": "profil"})
+
+
+def inscription(request):
+    """Inscription en ligne d'une pharmacie : compte créé en attente de validation par l'équipe Dawa."""
+    if request.user.is_authenticated:
+        return redirect("portail:tableau")
+    formulaire = InscriptionForm(request.POST or None)
+    if request.method == "POST" and formulaire.is_valid():
+        pharmacien = formulaire.save()
+        login(request, pharmacien.utilisateur, backend="django.contrib.auth.backends.ModelBackend")
+        return redirect("portail:tableau")
+    return render(request, "portail/inscription.html", {"form": formulaire})
 
 
 def _rediriger(request, defaut):

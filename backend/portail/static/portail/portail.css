@@ -198,3 +198,10 @@ details.refus form { display: flex; flex-direction: column; gap: 8px; width: 100
 .page-connexion .logo { width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 12px; box-shadow: var(--ombre); }
 .page-connexion h1 { text-align: center; }
 .page-connexion .intro { text-align: center; color: var(--texte-doux); margin: 4px 0 20px; font-size: .92rem; }
+
+/* Espace Dawa : tuiles cliquables */
+a.stat { display: block; color: inherit; text-decoration: none; }
+select { width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--bordure); border-radius: 12px; background: #fff; color: var(--texte); }
+input[type=checkbox] { width: 20px; height: 20px; }
+input[type=file] { font: inherit; font-size: .85rem; max-width: 100%; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }

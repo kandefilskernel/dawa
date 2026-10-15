@@ -29,6 +29,8 @@ admin.site.site_title = "Dawa"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("portail/", include("portail.urls")),
+    path("dawa/", include("gestion.urls")),
+    path("etablissement/", include("sante.urls")),
     path("api/appareil/jeton/", JetonAppareilView.as_view(), name="jeton_appareil"),
     path("api/recherche/", RechercheView.as_view(), name="recherche"),
     path("api/verification/", VerificationView.as_view(), name="verification"),

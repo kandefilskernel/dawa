@@ -1,0 +1,36 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b8f6a">
+  <title>{% block titre %}Espace Dawa{% endblock %} · Dawa</title>
+  <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
+</head>
+<body>
+  <header class="entete">
+    <div class="entete-haut">
+      <span class="logo">{% include "portail/icones/logo.html" %}</span>
+      <span class="marque">Espace Dawa<small>{{ request.user.get_username }} · équipe</small></span>
+      <form method="post" action="{% url 'portail:deconnexion' %}">{% csrf_token %}
+        <button class="btn-lien" type="submit">Déconnexion</button>
+      </form>
+    </div>
+    <nav class="nav" aria-label="Navigation de l'espace Dawa">
+      <a href="{% url 'gestion:tableau' %}" class="{% if onglet == 'tableau' %}actif{% endif %}">{% include "portail/icones/tableau.html" %}Accueil</a>
+      <a href="{% url 'gestion:demandes' %}" class="{% if onglet == 'demandes' %}actif{% endif %}">{% include "portail/icones/check.html" %}Demandes{% if request.nb_demandes %}<span class="pastille-nav">{{ request.nb_demandes }}</span>{% endif %}</a>
+      <a href="{% url 'gestion:pharmacies' %}" class="{% if onglet == 'pharmacies' %}actif{% endif %}">{% include "portail/icones/stock.html" %}Pharmacies</a>
+      <a href="{% url 'gestion:etablissements' %}" class="{% if onglet == 'etablissements' %}actif{% endif %}">{% include "portail/icones/profil.html" %}Santé</a>
+      <a href="{% url 'gestion:abonnements' %}" class="{% if onglet == 'abonnements' %}actif{% endif %}">{% include "portail/icones/tendance.html" %}Abonnements</a>
+      <a href="{% url 'gestion:signalements' %}" class="{% if onglet == 'signalements' %}actif{% endif %}">{% include "portail/icones/question.html" %}Signalements</a>
+    </nav>
+    <div class="entete-titre">{% block entete %}{% endblock %}</div>
+  </header>
+  <main class="contenu">
+    {% if messages %}
+      <ul class="messages">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% block contenu %}{% endblock %}
+  </main>
+</body>
+</html>

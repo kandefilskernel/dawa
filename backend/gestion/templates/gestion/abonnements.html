@@ -1,0 +1,38 @@
+{% extends "gestion/base.html" %}
+{% block titre %}Abonnements{% endblock %}
+{% block entete %}
+  <h1>Abonnements</h1>
+  <p>Confirmez les paiements mobile money reçus pour activer les formules.</p>
+{% endblock %}
+{% block contenu %}
+<div class="titre-section"><h2>Paiements à confirmer</h2></div>
+{% for a in en_attente %}
+  <article class="carte">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div style="flex:1;min-width:0"><div style="font-weight:700">{{ a.pharmacie.nom }}</div>
+        <div class="aide">{{ a.get_formule_display }} · {{ a.mois }} mois · <strong>{{ a.montant }} FC</strong></div></div>
+      <span class="pastille p-attente">Réf. {{ a.reference }}</span>
+    </div>
+    <form method="post" action="{% url 'gestion:activer_abonnement' a.pk %}" class="actions" style="align-items:flex-end">
+      {% csrf_token %}
+      <div style="flex:2;min-width:180px">
+        <label for="ref-{{ a.pk }}">Référence de la transaction reçue</label>
+        <input type="text" id="ref-{{ a.pk }}" name="reference_paiement" maxlength="60" required placeholder="Ex. M-Pesa QJK7…">
+      </div>
+      <button class="btn" type="submit" style="flex:1">Paiement reçu : activer</button>
+    </form>
+  </article>
+{% empty %}
+  <div class="carte vide"><p>Aucun paiement en attente.</p></div>
+{% endfor %}
+
+<div class="titre-section"><h2>Abonnements actifs</h2></div>
+<div class="carte"><ul class="liste">
+  {% for a in actifs %}
+    <li><div class="grow"><div class="nom">{{ a.pharmacie.nom }}</div><div class="sous">{{ a.get_formule_display|truncatechars:40 }}</div></div>
+      <span class="aide">jusqu'au {{ a.fin|date:"d/m/Y" }}</span></li>
+  {% empty %}
+    <li><div class="sous">Aucun abonnement actif.</div></li>
+  {% endfor %}
+</ul></div>
+{% endblock %}

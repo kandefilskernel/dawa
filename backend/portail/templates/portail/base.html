@@ -30,6 +30,12 @@
     {% if messages %}
       <ul class="messages">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>
     {% endif %}
+    {% if request.dossier_incomplet and onglet != "profil" %}
+      <div class="bandeau" style="margin-bottom:14px">
+        <div style="font-size:.88rem"><strong>Dossier incomplet :</strong> envoyez les preuves d'enregistrement de la pharmacie.
+          <a href="{% url 'portail:dossier' %}">Compléter mon dossier</a></div>
+      </div>
+    {% endif %}
     {% block contenu %}{% endblock %}
   </main>
   {% block scripts %}{% endblock %}

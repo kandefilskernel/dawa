@@ -1,0 +1,58 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b8f6a">
+  <title>Inscription · Dawa Santé</title>
+  <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
+</head>
+<body class="page-connexion">
+  <main class="carte" style="max-width:520px">
+    <div class="logo">{% include "portail/icones/logo.html" %}</div>
+    <h1>Inscrire un établissement de santé</h1>
+    <p class="intro">Hôpitaux, cliniques, centres de santé, laboratoires, maternités : votre établissement apparaîtra dans l'annuaire santé de l'app après vérification de vos justificatifs.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <ul class="messages">{% for e in form.non_field_errors %}<li class="error">{{ e }}</li>{% endfor %}</ul>
+      {% endif %}
+      {% for champ in form.hidden_fields %}{{ champ }}{% endfor %}
+
+      <div class="titre-section"><h2>L'établissement</h2></div>
+      {% for champ in form.visible_fields %}
+        {% if champ.name == "username" %}<div class="titre-section" style="margin-top:20px"><h2>Votre compte</h2></div>{% endif %}
+        <div class="champ">
+          <label for="{{ champ.id_for_label }}">{{ champ.label }}{% if not champ.field.required %} <span class="aide">(facultatif)</span>{% endif %}</label>
+          {{ champ }}
+          {% if champ.name != "password1" and champ.help_text %}<div class="aide">{{ champ.help_text|safe }}</div>{% endif %}
+          {% if champ.name == "password1" %}<div class="aide">Au moins 8 caractères, pas uniquement des chiffres.</div>{% endif %}
+          {% for e in champ.errors %}<div class="erreur">{{ e }}</div>{% endfor %}
+        </div>
+        {% if champ.name == "urgences_24h" %}
+          <div class="champ">
+            <button class="btn secondaire bloc" type="button" id="ma-position">Je suis à l'établissement : utiliser ma position</button>
+            <div class="aide" id="etat-position" role="status" aria-live="polite">{% if form.latitude.value %}Position enregistrée.{% else %}Facultatif : sinon, l'équipe Dawa placera l'établissement sur la carte.{% endif %}</div>
+          </div>
+        {% endif %}
+      {% endfor %}
+      <button class="btn bloc" type="submit">Envoyer ma demande</button>
+    </form>
+    <p class="aide" style="text-align:center;margin-top:16px">Déjà inscrit ? <a href="{% url 'portail:connexion' %}">Se connecter</a></p>
+  </main>
+  <script>
+    // Position GPS de l'officine, pour la placer sur la carte de l'app.
+    document.getElementById("ma-position").addEventListener("click", () => {
+      const etat = document.getElementById("etat-position");
+      if (!navigator.geolocation) { etat.textContent = "Position indisponible sur cet appareil."; return; }
+      etat.textContent = "Recherche de la position…";
+      navigator.geolocation.getCurrentPosition((p) => {
+        document.getElementById("id_latitude").value = p.coords.latitude.toFixed(6);
+        document.getElementById("id_longitude").value = p.coords.longitude.toFixed(6);
+        etat.textContent = "Position enregistrée.";
+      }, () => { etat.textContent = "Position refusée ou introuvable. L'équipe Dawa la complétera."; },
+      {enableHighAccuracy: true, timeout: 15000});
+    });
+  </script>
+</body>
+</html>

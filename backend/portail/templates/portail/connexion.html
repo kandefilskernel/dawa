@@ -10,8 +10,8 @@
 <body class="page-connexion">
   <main class="carte">
     <div class="logo">{% include "portail/icones/logo.html" %}</div>
-    <h1>Espace pharmacie</h1>
-    <p class="intro">Gérez vos réservations et votre stock sur Dawa.</p>
+    <h1>Espace professionnel</h1>
+    <p class="intro">Pharmacies, hôpitaux et cliniques partenaires de Dawa.</p>
     <form method="post">
       {% csrf_token %}
       {% if form.non_field_errors %}
@@ -28,7 +28,9 @@
       <input type="hidden" name="next" value="{{ next }}">
       <button class="btn bloc" type="submit">Se connecter</button>
     </form>
-    <p class="aide" style="text-align:center;margin-top:16px">Pas encore de compte ? Contactez l'équipe Dawa.</p>
+    <p class="aide" style="text-align:center;margin-top:16px">Pas encore de compte ?
+      <a href="{% url 'portail:inscription' %}">Inscrire ma pharmacie</a> ·
+      <a href="{% url 'etablissement:inscription' %}">Inscrire un hôpital ou une clinique</a></p>
   </main>
 </body>
 </html>

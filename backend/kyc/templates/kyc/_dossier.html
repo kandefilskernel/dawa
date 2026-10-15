@@ -1,0 +1,32 @@
+{% comment %}
+Dossier KYC d'une structure. Contexte : dossier (kyc.dossier.Dossier), action (URL d'envoi), erreurs (dict type → message).
+{% endcomment %}
+<ul class="liste">
+  {% for l in dossier.lignes %}
+    <li style="flex-wrap:wrap;align-items:flex-start">
+      <div class="grow">
+        <div class="nom">{{ l.libelle }}{% if not l.obligatoire %} <span class="aide">(facultatif)</span>{% endif %}</div>
+        {% if l.aide %}<div class="sous">{{ l.aide }}</div>{% endif %}
+        {% if l.piece %}
+          <div class="sous">Envoyé le {{ l.piece.envoyee_le|date:"d/m/Y" }}{% if l.piece.nom_original %} · {{ l.piece.nom_original|truncatechars:40 }}{% endif %}</div>
+          {% if l.piece.statut == "rejetee" and l.piece.motif %}<div class="erreur">Rejeté : {{ l.piece.motif }}</div>{% endif %}
+        {% endif %}
+      </div>
+      {% if not l.piece %}<span class="pastille {% if l.obligatoire %}p-attente{% else %}p-neutre{% endif %}">À envoyer</span>
+      {% elif l.piece.statut == "acceptee" %}<span class="pastille p-ok">Vérifié</span>
+      {% elif l.piece.statut == "rejetee" %}<span class="pastille p-refus">À renvoyer</span>
+      {% else %}<span class="pastille p-neutre">En vérification</span>{% endif %}
+      {% if not l.piece or l.piece.statut != "acceptee" %}
+        <form method="post" action="{{ action }}" enctype="multipart/form-data" style="width:100%;display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          {% csrf_token %}
+          <input type="hidden" name="formulaire" value="piece">
+          <input type="hidden" name="type" value="{{ l.type }}">
+          <label for="fichier-{{ l.type }}" style="position:absolute;left:-9999px">{{ l.libelle }} : fichier</label>
+          <input type="file" id="fichier-{{ l.type }}" name="fichier" accept="application/pdf,image/jpeg,image/png,image/webp" required style="flex:2;min-width:180px">
+          <button class="btn secondaire" type="submit" style="flex:1">{% if l.piece %}Renvoyer{% else %}Envoyer{% endif %}</button>
+        </form>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+<p class="aide" style="margin-top:10px">PDF ou photo nette, 8 Mo maximum. Ces documents ne sont visibles que par l'équipe Dawa.</p>

@@ -1,0 +1,96 @@
+{% extends "gestion/base.html" %}
+{% block titre %}Demandes{% endblock %}
+{% block entete %}
+  <h1>Inscriptions à vérifier</h1>
+  <p>Pharmacies et établissements de santé : vérifiez chaque justificatif, puis l'emplacement.</p>
+{% endblock %}
+{% block contenu %}
+{% for d in demandes %}
+  <article class="carte" id="structure-{{ d.structure.pk }}">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="pastille p-neutre">{{ d.type }}</span>
+      {% if d.dossier.verifie %}<span class="pastille p-ok">Dossier vérifié</span>
+      {% elif d.dossier.manquantes %}<span class="pastille p-attente">Dossier incomplet</span>
+      {% else %}<span class="pastille p-attente">Pièces à vérifier</span>{% endif %}
+      <span class="aide" style="margin:0 0 0 auto">il y a {{ d.compte.cree_le|timesince }}</span>
+    </div>
+    <h2 style="margin:10px 0 4px">{{ d.structure.nom }}</h2>
+    <ul class="liste">
+      <li><div class="grow"><div class="sous">N° d'autorisation déclaré</div><div class="nom">{{ d.structure.numero_agrement|default:"—" }}</div></div></li>
+      <li><div class="grow"><div class="sous">Adresse</div><div class="nom">{{ d.structure.adresse }}{% if d.structure.quartier %}, {{ d.structure.quartier }}{% endif %}</div></div></li>
+      <li><div class="grow"><div class="sous">Contact</div><div class="nom">{{ d.structure.telephone|default:"—" }}</div>
+        <div class="sous">Compte : {{ d.compte.utilisateur.get_username }}{% if d.compte.fonction %} · {{ d.compte.fonction }}{% endif %}</div></div>
+        {% if d.structure.telephone %}<a class="btn secondaire" href="tel:{{ d.structure.telephone }}">Appeler</a>{% endif %}</li>
+      <li><div class="grow"><div class="sous">Position sur la carte</div>
+        {% if d.position_a_verifier %}<div class="nom" style="color:#b45309">Non fournie : à placer avant de valider</div>
+        {% else %}<div class="nom">{{ d.structure.position.y|floatformat:5 }}, {{ d.structure.position.x|floatformat:5 }}</div>{% endif %}</div>
+        <a class="btn secondaire" href="{{ d.admin_url }}">{% if d.position_a_verifier %}Placer{% else %}Modifier{% endif %}</a></li>
+    </ul>
+
+    <div class="titre-section" style="margin-top:14px"><h2>Justificatifs</h2></div>
+    <ul class="liste">
+      {% for l in d.dossier.lignes %}
+        <li style="flex-wrap:wrap;align-items:flex-start">
+          <div class="grow">
+            <div class="nom">{{ l.libelle }}{% if not l.obligatoire %} <span class="aide">(facultatif)</span>{% endif %}</div>
+            {% if l.piece %}
+              <div class="sous"><a href="{% url 'gestion:piece' l.piece.pk %}" target="_blank" rel="noopener">Ouvrir le document</a>
+                · envoyé le {{ l.piece.envoyee_le|date:"d/m/Y H:i" }}</div>
+              {% if l.piece.statut == "rejetee" %}<div class="erreur">Rejeté : {{ l.piece.motif }} (en attente d'un nouvel envoi)</div>{% endif %}
+            {% else %}
+              <div class="sous">Pas encore envoyé</div>
+            {% endif %}
+          </div>
+          {% if l.piece.statut == "acceptee" %}<span class="pastille p-ok">Acceptée</span>
+          {% elif l.piece.statut == "en_attente" %}
+            <div class="actions" style="width:100%;margin-top:6px">
+              <form method="post" action="{% url 'gestion:verifier_piece' l.piece.pk %}">{% csrf_token %}
+                <input type="hidden" name="decision" value="accepter">
+                <button class="btn" type="submit">Accepter</button>
+              </form>
+              <details class="refus" style="flex:1;min-width:130px">
+                <summary class="btn danger" style="width:100%">Rejeter</summary>
+                <form method="post" action="{% url 'gestion:verifier_piece' l.piece.pk %}">{% csrf_token %}
+                  <input type="hidden" name="decision" value="rejeter">
+                  <label for="motif-piece-{{ l.piece.pk }}">Motif (montré au demandeur)</label>
+                  <input type="text" id="motif-piece-{{ l.piece.pk }}" name="motif" maxlength="255" required placeholder="Ex. illisible, expirée, nom différent">
+                  <button class="btn danger" type="submit">Confirmer le rejet</button>
+                </form>
+              </details>
+            </div>
+          {% elif not l.piece and l.obligatoire %}<span class="pastille p-attente">Manquante</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div class="actions">
+      <form method="post" action="{% url 'gestion:decider_demande' d.genre d.compte.pk %}">{% csrf_token %}
+        <input type="hidden" name="decision" value="valider">
+        <button class="btn" type="submit" {% if not d.dossier.verifie %}disabled aria-disabled="true" title="Acceptez d'abord toutes les pièces obligatoires"{% endif %}>Valider et rendre visible</button>
+      </form>
+      <details class="refus" style="flex:1;min-width:130px">
+        <summary class="btn danger" style="width:100%">Refuser l'inscription</summary>
+        <form method="post" action="{% url 'gestion:decider_demande' d.genre d.compte.pk %}">{% csrf_token %}
+          <input type="hidden" name="decision" value="refuser">
+          <label for="motif-{{ d.genre }}-{{ d.compte.pk }}">Motif (montré au demandeur)</label>
+          <input type="text" id="motif-{{ d.genre }}-{{ d.compte.pk }}" name="motif" maxlength="255" required placeholder="Ex. autorisation introuvable">
+          <button class="btn danger" type="submit">Confirmer le refus</button>
+        </form>
+      </details>
+    </div>
+    {% if not d.dossier.verifie %}<p class="aide">La validation est possible quand toutes les pièces obligatoires sont acceptées.</p>{% endif %}
+  </article>
+{% empty %}
+  <div class="carte vide">{% include "portail/icones/check.html" %}<p>Aucune inscription en attente.</p></div>
+{% endfor %}
+
+{% if refusees %}
+  <div class="titre-section"><h2>Dernières demandes refusées</h2></div>
+  <div class="carte"><ul class="liste">
+    {% for r in refusees %}
+      <li><div class="grow"><div class="nom">{{ r.pharmacie|default:r.etablissement }}</div><div class="sous">{{ r.motif }}</div></div>
+        <span class="aide">{{ r.traite_le|date:"d/m/Y" }}</span></li>
+    {% endfor %}
+  </ul></div>
+{% endif %}
+{% endblock %}

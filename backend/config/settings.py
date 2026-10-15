@@ -29,6 +29,8 @@ INSTALLED_APPS = [
     "reservations",
     "sante",
     "portail",
+    "gestion",
+    "kyc",
     "verification",
     "conseil",
     "abonnements",
@@ -98,10 +100,13 @@ LOGOUT_REDIRECT_URL = "portail:connexion"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+# Pièces justificatives (KYC) : hors de MEDIA_ROOT, jamais servies publiquement.
+KYC_RACINE = Path(os.environ.get("KYC_RACINE", BASE_DIR / "prive"))
 TESTS = sys.argv[1:2] == ["test"]
 if TESTS:
     # Les tests génèrent des images : on ne pollue pas le vrai dossier media.
     MEDIA_ROOT = Path(tempfile.gettempdir()) / "dawa-tests-media"
+    KYC_RACINE = Path(tempfile.gettempdir()) / "dawa-tests-prive"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG

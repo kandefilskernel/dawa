@@ -1,10 +1,11 @@
 from django.conf import settings
 from django.db import models
 
+from kyc.models import CompteValidable
 from pharmacies.models import Pharmacie
 
 
-class Pharmacien(models.Model):
+class Pharmacien(CompteValidable):
     """Compte d'accès au portail, rattaché à une seule pharmacie."""
 
     utilisateur = models.OneToOneField(
@@ -17,3 +18,6 @@ class Pharmacien(models.Model):
 
     def __str__(self):
         return f"{self.utilisateur.get_username()} — {self.pharmacie}"
+
+    def _rendre_visible(self, visible):
+        Pharmacie.objects.filter(pk=self.pharmacie_id).update(est_validee=visible)
