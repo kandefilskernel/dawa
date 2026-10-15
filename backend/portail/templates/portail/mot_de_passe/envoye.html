@@ -1,0 +1,8 @@
+{% extends "portail/page_simple.html" %}
+{% block titre %}Lien envoyé{% endblock %}
+{% block contenu %}
+<h1>Vérifiez vos e-mails</h1>
+<p class="intro">Si un compte correspond à cette adresse, un lien vient d'être envoyé. Il est valable 24 heures.
+  Pensez à regarder dans les courriers indésirables.</p>
+<a class="btn bloc secondaire" href="{% url 'portail:connexion' %}">Retour à la connexion</a>
+{% endblock %}

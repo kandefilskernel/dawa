@@ -5,7 +5,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
+from config.securite import compter, limite_atteinte
 from kyc.dossier import Dossier, PieceForm
+from portail.views import MAX_INSCRIPTIONS_PAR_HEURE
 
 from .forms import FicheEtablissementForm, InscriptionEtablissementForm
 
@@ -14,9 +16,12 @@ def inscription(request):
     if request.user.is_authenticated:
         return redirect("etablissement:espace")
     formulaire = InscriptionEtablissementForm(request.POST or None)
-    if request.method == "POST" and formulaire.is_valid():
+    if request.method == "POST" and limite_atteinte(request, "inscription", MAX_INSCRIPTIONS_PAR_HEURE):
+        formulaire.add_error(None, "Trop d'inscriptions depuis cette connexion. Réessayez dans une heure.")
+    elif request.method == "POST" and formulaire.is_valid():
         responsable = formulaire.save()
-        login(request, responsable.utilisateur, backend="django.contrib.auth.backends.ModelBackend")
+        compter(request, "inscription")
+        login(request, responsable.utilisateur)
         return redirect("etablissement:espace")
     return render(request, "sante/inscription.html", {"form": formulaire})
 

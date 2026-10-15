@@ -1,0 +1,19 @@
+{% extends "gestion/base.html" %}
+{% block titre %}Lien mot de passe{% endblock %}
+{% block entete %}
+  <h1>Lien « nouveau mot de passe »</h1>
+  <p>{{ structure }} · compte {{ utilisateur.get_username }}</p>
+{% endblock %}
+{% block contenu %}
+<div class="carte">
+  <p>Envoyez ce lien <strong>uniquement au numéro officiel de la structure</strong>. Il est valable 24 heures et ne
+    sert qu'une fois. Vérifiez d'abord l'identité de la personne qui le demande (rappel au numéro enregistré).</p>
+  <label for="lien">Lien</label>
+  <input type="text" id="lien" value="{{ lien }}" readonly onclick="this.select()">
+  <div class="actions">
+    {% if whatsapp %}<a class="btn" href="{{ whatsapp }}" target="_blank" rel="noopener">Envoyer par WhatsApp</a>{% endif %}
+    <a class="btn secondaire" href="sms:{{ structure.telephone }}?body={{ texte|urlencode }}">Envoyer par SMS</a>
+  </div>
+  <p class="aide">Ce lien n'est pas enregistré : en cas de doute, recréez-en un.</p>
+</div>
+{% endblock %}

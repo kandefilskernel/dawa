@@ -2,14 +2,20 @@
 Espace Dawa : l'équipe valide les inscriptions, gère la visibilité des pharmacies,
 active les abonnements payés et traite les signalements. Réservé aux comptes « équipe » (is_staff).
 """
+import logging
 from functools import wraps
+from urllib.parse import quote
 
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from django.views.decorators.http import require_POST
 
 from abonnements.models import Abonnement
@@ -20,6 +26,8 @@ from portail.forms import CENTRE_LUBUMBASHI
 from portail.models import Pharmacien
 from sante.models import Etablissement, ResponsableEtablissement
 from verification.models import Signalement
+
+journal_securite = logging.getLogger("dawa.securite")
 
 
 def equipe_requise(vue):
@@ -131,7 +139,7 @@ def verifier_piece(request, pk):
 @equipe_requise
 def pharmacies(request):
     q = request.GET.get("q", "").strip()
-    liste = Pharmacie.objects.prefetch_related("pharmaciens", "pieces").order_by("nom")
+    liste = Pharmacie.objects.prefetch_related("pharmaciens__utilisateur", "pieces").order_by("nom")
     if q:
         liste = liste.filter(Q(nom__icontains=q) | Q(quartier__icontains=q) | Q(telephone__icontains=q)
                              | Q(numero_agrement__icontains=q))
@@ -173,7 +181,7 @@ def visibilite_pharmacie(request, pk):
 @equipe_requise
 def etablissements(request):
     q = request.GET.get("q", "").strip()
-    liste = Etablissement.objects.prefetch_related("responsables", "pieces").order_by("nom")
+    liste = Etablissement.objects.prefetch_related("responsables__utilisateur", "pieces").order_by("nom")
     if q:
         liste = liste.filter(Q(nom__icontains=q) | Q(quartier__icontains=q) | Q(numero_agrement__icontains=q))
     liste = list(liste[:100])
@@ -201,6 +209,33 @@ def visibilite_etablissement(request, pk):
     else:
         messages.error(request, "Indiquez le motif de la suspension.")
     return redirect("gestion:etablissements")
+
+
+@equipe_requise
+@require_POST
+def lien_mot_de_passe(request, pk):
+    """
+    Lien « nouveau mot de passe » créé par l'équipe, à envoyer par WhatsApp ou SMS à une structure
+    qui n'a pas (ou plus) accès à son e-mail. Jamais pour un compte de l'équipe.
+    """
+    utilisateur = get_object_or_404(get_user_model(), pk=pk, is_staff=False, is_superuser=False, is_active=True)
+    compte = (getattr(utilisateur, "pharmacien", None) or getattr(utilisateur, "responsable_etablissement", None))
+    if compte is None:
+        raise Http404
+    structure = getattr(compte, "pharmacie", None) or compte.etablissement
+    lien = request.build_absolute_uri(reverse("portail:mot_de_passe_nouveau", kwargs={
+        "uidb64": urlsafe_base64_encode(force_bytes(utilisateur.pk)),
+        "token": default_token_generator.make_token(utilisateur),
+    }))
+    journal_securite.warning("Lien de mot de passe créé par %s pour %s", request.user, utilisateur)
+    numero = "".join(c for c in (getattr(structure, "whatsapp", "") or structure.telephone) if c.isdigit())
+    texte = (f"Dawa : pour choisir un nouveau mot de passe du compte « {utilisateur.get_username()} », "
+             f"ouvrez ce lien (valable 24 h) : {lien}")
+    return render(request, "gestion/lien_mot_de_passe.html", {
+        "onglet": "pharmacies" if hasattr(compte, "pharmacie") else "etablissements",
+        "utilisateur": utilisateur, "structure": structure, "lien": lien, "texte": texte,
+        "whatsapp": f"https://wa.me/{numero}?text={quote(texte)}" if numero else "",
+    })
 
 
 @equipe_requise

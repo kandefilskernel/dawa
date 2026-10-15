@@ -23,12 +23,13 @@ class InscriptionEtablissementForm(UserCreationForm):
                                help_text="Ex. pédiatrie, maternité, radiologie, analyses")
     urgences_24h = forms.BooleanField(label="Urgences ouvertes 24h/24", required=False)
     fonction = forms.CharField(label="Votre fonction", max_length=100, help_text="Ex. médecin directeur, administrateur")
+    email = forms.EmailField(label="E-mail", help_text="Pour recevoir un lien si vous oubliez votre mot de passe.")
     latitude = forms.FloatField(required=False, min_value=-90, max_value=90, widget=forms.HiddenInput)
     longitude = forms.FloatField(required=False, min_value=-180, max_value=180, widget=forms.HiddenInput)
     site_web = forms.CharField(required=False, widget=forms.HiddenInput)  # piège à robots
 
     field_order = ["nom", "type", "numero_agrement", "telephone", "adresse", "quartier", "services",
-                   "urgences_24h", "fonction", "username", "password1", "password2"]
+                   "urgences_24h", "fonction", "email", "username", "password1", "password2"]
 
     class Meta(UserCreationForm.Meta):
         model = get_user_model()
@@ -55,7 +56,9 @@ class InscriptionEtablissementForm(UserCreationForm):
 
     @transaction.atomic
     def save(self, commit=True):
-        utilisateur = super().save()
+        utilisateur = super().save(commit=False)
+        utilisateur.email = self.cleaned_data["email"].strip().lower()
+        utilisateur.save()
         d = self.cleaned_data
         lat, lng = d.get("latitude"), d.get("longitude")
         etablissement = Etablissement.objects.create(

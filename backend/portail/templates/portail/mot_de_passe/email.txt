@@ -1,0 +1,10 @@
+Bonjour,
+
+Une demande de nouveau mot de passe a été faite pour le compte « {{ user.get_username }} » sur Dawa.
+Pour choisir un nouveau mot de passe, ouvrez ce lien (valable 24 heures) :
+
+{{ protocol }}://{{ domain }}{% url 'portail:mot_de_passe_nouveau' uidb64=uid token=token %}
+
+Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : votre mot de passe reste inchangé.
+
+L'équipe Dawa

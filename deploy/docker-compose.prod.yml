@@ -26,6 +26,7 @@ services:
     environment:
       DJANGO_DEBUG: "0"
       DATABASE_HOST: db
+      DAWA_DERRIERE_PROXY: "1"   # IP du client lue dans X-Forwarded-For posé par Caddy
     command: ["sh", "/app/deploy/demarrer.sh"]
     volumes:
       - ./demarrer.sh:/app/deploy/demarrer.sh:ro

@@ -134,3 +134,11 @@ class AssistantIATests(TestCase):
     def test_reserve_aux_pharmaciens(self):
         self.client.logout()
         self.assertEqual(self.client.post(self.url).status_code, 302)  # vers la connexion
+
+
+class DelaiAssistantTests(TestCase):
+    def test_pire_cas_sous_le_delai_du_serveur(self):
+        from conseil import assistant
+
+        pire_cas = assistant.DELAI_SECONDES * (assistant.NOUVELLES_TENTATIVES + 1)
+        self.assertLess(pire_cas, 60)  # --timeout de gunicorn dans deploy/demarrer.sh

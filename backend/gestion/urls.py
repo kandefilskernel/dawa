@@ -16,6 +16,7 @@ urlpatterns = [
     path("pharmacies/<int:pk>/visibilite/", views.visibilite_pharmacie, name="visibilite_pharmacie"),
     path("etablissements/", views.etablissements, name="etablissements"),
     path("etablissements/<int:pk>/visibilite/", views.visibilite_etablissement, name="visibilite_etablissement"),
+    path("comptes/<int:pk>/lien-mot-de-passe/", views.lien_mot_de_passe, name="lien_mot_de_passe"),
     path("abonnements/", views.abonnements, name="abonnements"),
     path("abonnements/<int:pk>/activer/", views.activer_abonnement, name="activer_abonnement"),
     path("signalements/", views.signalements, name="signalements"),

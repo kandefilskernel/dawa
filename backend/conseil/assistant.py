@@ -55,8 +55,15 @@ def assistant_actif():
     return bool(settings.ASSISTANT_IA_CLE)
 
 
+# Pire cas : 2 tentatives × 25 s = 50 s, sous le délai de 60 s de gunicorn (sinon la requête est coupée
+# et le pharmacien voit une erreur brute au lieu du message « service indisponible »).
+DELAI_SECONDES = 25.0
+NOUVELLES_TENTATIVES = 1
+
+
 def _client():
-    return anthropic.Anthropic(api_key=settings.ASSISTANT_IA_CLE, timeout=60.0, max_retries=2)
+    return anthropic.Anthropic(api_key=settings.ASSISTANT_IA_CLE, timeout=DELAI_SECONDES,
+                               max_retries=NOUVELLES_TENTATIVES)
 
 
 def _contexte(question):

@@ -2,6 +2,7 @@ import io
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from PIL import Image
@@ -28,6 +29,7 @@ def pdf(nom="autorisation.pdf", contenu=PDF):
 
 class DossierPharmacieTests(TestCase):
     def setUp(self):
+        cache.clear()  # compteurs de limites (inscriptions, connexions)
         self.equipe = get_user_model().objects.create_user("equipe", password="mdp-test-123", is_staff=True)
         self.client.post("/portail/inscription/", INSCRIPTION)  # connecte la pharmacie
         self.compte = Pharmacien.objects.get()
@@ -107,11 +109,14 @@ class DossierPharmacieTests(TestCase):
 
 
 class InscriptionEtablissementTests(TestCase):
+    def setUp(self):
+        cache.clear()  # compteurs de limites (inscriptions, connexions)
+
     DONNEES = {
         "nom": "Clinique Espoir", "type": "clinique", "numero_agrement": "DPS/HK/2026/015",
         "telephone": "+243990000123", "adresse": "Av. Kasai 3", "quartier": "Bel-Air", "services": "Maternité",
         "urgences_24h": "on", "fonction": "Médecin directeur", "latitude": "-11.66", "longitude": "27.48",
-        "username": "espoir", "password1": "Kasapa-2026!", "password2": "Kasapa-2026!",
+        "email": "direction@clinique-espoir.cd", "username": "espoir", "password1": "Kasapa-2026!", "password2": "Kasapa-2026!",
     }
 
     def test_parcours_complet(self):

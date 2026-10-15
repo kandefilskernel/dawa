@@ -15,7 +15,7 @@
     <form method="post">
       {% csrf_token %}
       {% if form.non_field_errors %}
-        <ul class="messages"><li class="error">Identifiant ou mot de passe incorrect.</li></ul>
+        <ul class="messages"><li class="error">{% if request.connexion_bloquee %}Trop de tentatives : réessayez dans 15 minutes.{% else %}Identifiant ou mot de passe incorrect.{% endif %}</li></ul>
       {% endif %}
       <div class="champ">
         <label for="id_username">Identifiant</label>
@@ -28,6 +28,7 @@
       <input type="hidden" name="next" value="{{ next }}">
       <button class="btn bloc" type="submit">Se connecter</button>
     </form>
+    <p class="aide" style="text-align:center;margin-top:12px"><a href="{% url 'portail:mot_de_passe_oublie' %}">Mot de passe oublié ?</a></p>
     <p class="aide" style="text-align:center;margin-top:16px">Pas encore de compte ?
       <a href="{% url 'portail:inscription' %}">Inscrire ma pharmacie</a> ·
       <a href="{% url 'etablissement:inscription' %}">Inscrire un hôpital ou une clinique</a></p>

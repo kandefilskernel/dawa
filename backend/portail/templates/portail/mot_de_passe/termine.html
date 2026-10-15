@@ -1,0 +1,7 @@
+{% extends "portail/page_simple.html" %}
+{% block titre %}Mot de passe changé{% endblock %}
+{% block contenu %}
+<h1>Mot de passe changé</h1>
+<p class="intro">Vous pouvez vous connecter avec votre nouveau mot de passe.</p>
+<a class="btn bloc" href="{% url 'portail:connexion' %}">Se connecter</a>
+{% endblock %}

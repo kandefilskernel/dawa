@@ -3,6 +3,7 @@
 set -e
 
 python manage.py migrate --noinput
+python manage.py createcachetable   # cache partagé : limites de tentatives de connexion
 python manage.py collectstatic --noinput
 
 # Première installation : crée la clé qui signe les jetons d'appareil (conservée dans le volume « cles »).

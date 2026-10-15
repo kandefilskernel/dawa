@@ -94,7 +94,11 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+AUTHENTICATION_BACKENDS = ["config.securite.ConnexionLimitee"]
+# Vrai derrière Caddy : l'IP du client est lue dans X-Forwarded-For (limites de tentatives).
+DERRIERE_PROXY = os.environ.get("DAWA_DERRIERE_PROXY", "0") == "1"
 LOGIN_URL = "portail:connexion"
+PASSWORD_RESET_TIMEOUT = 24 * 3600  # liens « mot de passe oublié » valables 24 h
 LOGIN_REDIRECT_URL = "portail:tableau"
 LOGOUT_REDIRECT_URL = "portail:connexion"
 STATIC_ROOT = BASE_DIR / "staticfiles"
@@ -167,9 +171,39 @@ if not DEBUG and not TESTS:
     # L'app mobile native n'a pas besoin de CORS ; la version web de l'app, si elle est publiée ailleurs, oui.
     CORS_ALLOWED_ORIGINS = [o for o in os.environ.get("DJANGO_CORS_ORIGINES", "").split(",") if o]
 
+# E-mails : liens « mot de passe oublié » et alertes d'erreur. Sans serveur SMTP, ils s'affichent dans les logs.
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_UTILISATEUR", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_MOT_DE_PASSE", "")
+EMAIL_USE_TLS = os.environ.get("EMAIL_TLS", "1") == "1"
+EMAIL_TIMEOUT = 15
+EMAIL_BACKEND = ("django.core.mail.backends.smtp.EmailBackend" if EMAIL_HOST
+                 else "django.core.mail.backends.console.EmailBackend")
+DEFAULT_FROM_EMAIL = SERVER_EMAIL = os.environ.get("EMAIL_EXPEDITEUR", "Dawa <ne-pas-repondre@localhost>")
+EMAIL_SUBJECT_PREFIX = "[Dawa] "
+# Destinataires des alertes d'erreur serveur (500), ex. « Équipe:equipe@dawa.cd,Autre:autre@dawa.cd ».
+ADMINS = [tuple(a.split(":", 1)) for a in os.environ.get("DAWA_ALERTES_EMAILS", "").split(",") if ":" in a]
+
+# Cache partagé entre les processus gunicorn (limites de tentatives, limites de l'API).
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"} if DEBUG or TESTS
+    else {"BACKEND": "django.core.cache.backends.db.DatabaseCache", "LOCATION": "dawa_cache"}
+}
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "filters": {"hors_debug": {"()": "django.utils.log.RequireDebugFalse"}},
+    "handlers": {
+        "console": {"class": "logging.StreamHandler"},
+        # Toute erreur 500 envoie un e-mail aux ADMINS (avec la trace), en production uniquement.
+        "alerte_email": {"class": "django.utils.log.AdminEmailHandler", "level": "ERROR",
+                         "filters": ["hors_debug"], "include_html": False},
+    },
+    "loggers": {
+        "django.request": {"handlers": ["console", "alerte_email"], "level": "ERROR", "propagate": False},
+        "dawa.securite": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+    },
     "root": {"handlers": ["console"], "level": os.environ.get("DJANGO_LOG_NIVEAU", "WARNING")},
 }

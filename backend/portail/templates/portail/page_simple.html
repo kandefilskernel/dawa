@@ -1,0 +1,16 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b8f6a">
+  <title>{% block titre %}{% endblock %} · Dawa</title>
+  <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
+</head>
+<body class="page-connexion">
+  <main class="carte">
+    <div class="logo">{% include "portail/icones/logo.html" %}</div>
+    {% block contenu %}{% endblock %}
+  </main>
+</body>
+</html>

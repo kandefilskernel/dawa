@@ -22,6 +22,11 @@
     </div>
     <div class="actions">
       <a class="btn secondaire" href="{% url 'admin:sante_etablissement_change' e.pk %}">Modifier la fiche</a>
+      {% for c in e.responsables.all %}
+        <form method="post" action="{% url 'gestion:lien_mot_de_passe' c.utilisateur_id %}">{% csrf_token %}
+          <button class="btn secondaire" type="submit" title="Compte {{ c.utilisateur.get_username }}">Lien mot de passe</button>
+        </form>
+      {% endfor %}
       {% if e.est_valide %}
         <details class="refus" style="flex:1;min-width:130px">
           <summary class="btn danger" style="width:100%">Suspendre</summary>

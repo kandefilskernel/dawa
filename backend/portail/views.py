@@ -5,13 +5,14 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import PasswordResetView
 from django.contrib.gis.measure import D
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
@@ -21,6 +22,7 @@ from abonnements.models import Abonnement
 from catalogue.images import nom_fichier, preparer_photo
 from catalogue.models import Medicament
 from catalogue.search import rechercher_medicaments
+from config.securite import compter, limite_atteinte
 from conseil.assistant import AssistantIndisponible, assistant_actif, suggerer_reponse
 from conseil.models import Question
 from grossistes.models import Commande, Grossiste, LigneCommande, Offre
@@ -33,6 +35,7 @@ from stock.models import Recherche, Stock
 from .forms import InscriptionForm, ProfilForm
 
 RAYON_DEMANDE_KM = 5
+MAX_INSCRIPTIONS_PAR_HEURE = 5
 JOURS_DEMANDE = 30
 
 
@@ -88,14 +91,33 @@ def dossier(request):
     return render(request, "portail/dossier.html", {**_contexte_dossier(pharmacien, formulaire), "onglet": "profil"})
 
 
+class MotDePasseOublie(PasswordResetView):
+    """« Mot de passe oublié » limité par adresse IP (pas d'envoi massif d'e-mails)."""
+
+    template_name = "portail/mot_de_passe/oublie.html"
+    email_template_name = "portail/mot_de_passe/email.txt"
+    subject_template_name = "portail/mot_de_passe/email_sujet.txt"
+    success_url = reverse_lazy("portail:mot_de_passe_envoye")
+
+    def form_valid(self, form):
+        if limite_atteinte(self.request, "mot_de_passe_oublie", 5):
+            # Même réponse qu'un envoi réussi : ne révèle rien sur les comptes existants.
+            return redirect(self.success_url)
+        compter(self.request, "mot_de_passe_oublie")
+        return super().form_valid(form)
+
+
 def inscription(request):
     """Inscription en ligne d'une pharmacie : compte créé en attente de validation par l'équipe Dawa."""
     if request.user.is_authenticated:
         return redirect("portail:tableau")
     formulaire = InscriptionForm(request.POST or None)
-    if request.method == "POST" and formulaire.is_valid():
+    if request.method == "POST" and limite_atteinte(request, "inscription", MAX_INSCRIPTIONS_PAR_HEURE):
+        formulaire.add_error(None, "Trop d'inscriptions depuis cette connexion. Réessayez dans une heure.")
+    elif request.method == "POST" and formulaire.is_valid():
         pharmacien = formulaire.save()
-        login(request, pharmacien.utilisateur, backend="django.contrib.auth.backends.ModelBackend")
+        compter(request, "inscription")
+        login(request, pharmacien.utilisateur)
         return redirect("portail:tableau")
     return render(request, "portail/inscription.html", {"form": formulaire})
 

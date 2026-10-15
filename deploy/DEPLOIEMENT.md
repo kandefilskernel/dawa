@@ -51,7 +51,10 @@ Remplissez au minimum :
 - `DJANGO_CSRF_TRUSTED_ORIGINS` : `https://` + votre domaine ;
 - `DAWA_EMAIL_ADMIN` : un e-mail réel (alertes des certificats HTTPS) ;
 - `DJANGO_SECRET_KEY` et `DATABASE_PASSWORD` : générez-les avec les commandes indiquées dans le fichier ;
-- `DAWA_NUMERO_PAIEMENT` : le numéro mobile money qui reçoit les abonnements.
+- `DAWA_NUMERO_PAIEMENT` : le numéro mobile money qui reçoit les abonnements ;
+- `EMAIL_*` : un service d'envoi d'e-mails (Brevo, Mailjet… ont une offre gratuite) — indispensable pour
+  « mot de passe oublié » et les alertes ;
+- `DAWA_ALERTES_EMAILS` : qui reçoit un e-mail à chaque erreur du serveur.
 
 `.env.prod` contient des secrets : il est ignoré par Git, ne le copiez nulle part ailleurs.
 
@@ -79,6 +82,12 @@ Les médicaments du catalogue s'ajoutent dans `/admin/` (Catalogue › Médicame
 
 ```sh
 docker compose -f docker-compose.prod.yml --env-file .env.prod exec backend python manage.py generer_images
+```
+
+Vérifiez que les e-mails partent (l'équipe doit recevoir un message de test) :
+
+```sh
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec backend python manage.py sendtestemail --admins
 ```
 
 ## 6. Les liens
@@ -122,6 +131,11 @@ cd deploy && docker compose -f docker-compose.prod.yml --env-file .env.prod up -
 Les migrations s'appliquent automatiquement au redémarrage.
 
 ## Points de vigilance
+
+- **Mot de passe oublié** : chaque structure reçoit un lien par e-mail. Sans e-mail, l'équipe crée un lien depuis
+  `/dawa/` (bouton « Lien mot de passe ») et l'envoie par WhatsApp ou SMS **au numéro officiel**, après avoir
+  vérifié l'identité de la personne.
+- **Tentatives de connexion** : 5 échecs sur un identifiant (ou 30 depuis une même connexion) bloquent 15 minutes.
 
 - Quand le HTTPS fonctionne depuis quelques jours, passez `DJANGO_HSTS_SECONDES=31536000` dans `.env.prod`.
 - Mettez à jour le serveur chaque mois : `apt update && apt upgrade -y`.

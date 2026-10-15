@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.contrib.gis.geos import Point
 from django.test import TestCase
 
@@ -13,11 +14,14 @@ INSCRIPTION = {
     "nom": "Pharmacie du Marché", "numero_agrement": "IPS/LSHI/2026/042", "telephone": "+243990000001",
     "whatsapp": "", "adresse": "Av. Mama Yemo 12", "quartier": "Centre", "commune": "Lubumbashi",
     "horaires": "Lun–Sam 8h–20h", "latitude": "-11.6601", "longitude": "27.4790",
-    "username": "marche", "password1": "Kasapa-2026!", "password2": "Kasapa-2026!",
+    "email": "contact@pharmacie-marche.cd", "username": "marche", "password1": "Kasapa-2026!", "password2": "Kasapa-2026!",
 }
 
 
 class InscriptionTests(TestCase):
+    def setUp(self):
+        cache.clear()  # compteurs de limites (inscriptions, connexions)
+
     def inscrire(self, **modifs):
         return self.client.post("/portail/inscription/", {**INSCRIPTION, **modifs})
 
@@ -51,6 +55,7 @@ class InscriptionTests(TestCase):
 
 class EspaceDawaTests(TestCase):
     def setUp(self):
+        cache.clear()  # compteurs de limites (inscriptions, connexions)
         self.equipe = get_user_model().objects.create_user("equipe", password="mdp-test-123", is_staff=True)
         self.client.post("/portail/inscription/", INSCRIPTION)
         self.compte = Pharmacien.objects.get()
@@ -145,6 +150,9 @@ class EspaceDawaTests(TestCase):
 
 
 class InscriptionMotDePasseTests(TestCase):
+    def setUp(self):
+        cache.clear()  # compteurs de limites (inscriptions, connexions)
+
     def test_mot_de_passe_obligatoire(self):
         r = self.client.post("/portail/inscription/", {**INSCRIPTION, "password1": "", "password2": ""})
         self.assertEqual(r.status_code, 200)

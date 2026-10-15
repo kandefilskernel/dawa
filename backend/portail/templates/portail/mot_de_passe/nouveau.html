@@ -1,0 +1,26 @@
+{% extends "portail/page_simple.html" %}
+{% block titre %}Nouveau mot de passe{% endblock %}
+{% block contenu %}
+{% if validlink %}
+  <h1>Nouveau mot de passe</h1>
+  <form method="post">
+    {% csrf_token %}
+    <div class="champ">
+      <label for="id_new_password1">Nouveau mot de passe</label>
+      <input type="password" name="new_password1" id="id_new_password1" autocomplete="new-password" required autofocus>
+      <div class="aide">Au moins 8 caractères, pas uniquement des chiffres.</div>
+      {% for e in form.new_password1.errors %}<div class="erreur">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="champ">
+      <label for="id_new_password2">Confirmation</label>
+      <input type="password" name="new_password2" id="id_new_password2" autocomplete="new-password" required>
+      {% for e in form.new_password2.errors %}<div class="erreur">{{ e }}</div>{% endfor %}
+    </div>
+    <button class="btn bloc" type="submit">Enregistrer</button>
+  </form>
+{% else %}
+  <h1>Lien expiré</h1>
+  <p class="intro">Ce lien a déjà servi ou n'est plus valable. Demandez-en un nouveau.</p>
+  <a class="btn bloc" href="{% url 'portail:mot_de_passe_oublie' %}">Nouveau lien</a>
+{% endif %}
+{% endblock %}

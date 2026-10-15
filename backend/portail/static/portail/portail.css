@@ -130,7 +130,7 @@ h2 { font-size: 1.1rem; font-weight: 750; }
 .actions form { flex: 1; min-width: 130px; display: flex; }
 .actions .btn { flex: 1; }
 label { font-weight: 600; font-size: .88rem; display: block; margin-bottom: 4px; }
-input[type=text], input[type=search], input[type=tel], input[type=password], input[type=number], textarea {
+input[type=text], input[type=email], input[type=search], input[type=tel], input[type=password], input[type=number], textarea {
   width: 100%; font: inherit; padding: 11px 12px; border: 1px solid var(--bordure); border-radius: 12px; background: #fff; color: var(--texte);
 }
 input:focus, textarea:focus { outline: 2px solid var(--emeraude); outline-offset: 0; border-color: transparent; }

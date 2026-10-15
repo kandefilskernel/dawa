@@ -1,0 +1,17 @@
+{% extends "portail/page_simple.html" %}
+{% block titre %}Mot de passe oublié{% endblock %}
+{% block contenu %}
+<h1>Mot de passe oublié</h1>
+<p class="intro">Indiquez l'e-mail de votre compte : nous vous envoyons un lien pour choisir un nouveau mot de passe.</p>
+<form method="post">
+  {% csrf_token %}
+  <div class="champ">
+    <label for="id_email">E-mail</label>
+    <input type="email" name="email" id="id_email" autocomplete="email" required autofocus maxlength="254">
+    {% for e in form.email.errors %}<div class="erreur">{{ e }}</div>{% endfor %}
+  </div>
+  <button class="btn bloc" type="submit">Recevoir le lien</button>
+</form>
+<p class="aide" style="text-align:center;margin-top:16px">Pas d'e-mail sur votre compte ? Contactez l'équipe Dawa :
+  elle peut vous envoyer un lien par WhatsApp ou SMS.<br><a href="{% url 'portail:connexion' %}">Retour à la connexion</a></p>
+{% endblock %}

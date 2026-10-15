@@ -21,7 +21,7 @@
 
       <div class="titre-section"><h2>La pharmacie</h2></div>
       {% for champ in form.visible_fields %}
-        {% if champ.name == "username" %}<div class="titre-section" style="margin-top:20px"><h2>Votre compte</h2></div>{% endif %}
+        {% if champ.name == "email" %}<div class="titre-section" style="margin-top:20px"><h2>Votre compte</h2></div>{% endif %}
         <div class="champ">
           <label for="{{ champ.id_for_label }}">{{ champ.label }}{% if not champ.field.required %} <span class="aide">(facultatif)</span>{% endif %}</label>
           {{ champ }}

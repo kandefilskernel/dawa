@@ -1,5 +1,5 @@
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import path, reverse_lazy
 
 from . import views
 
@@ -9,6 +9,15 @@ urlpatterns = [
     path("", views.tableau_de_bord, name="tableau"),
     path("connexion/", auth_views.LoginView.as_view(template_name="portail/connexion.html"), name="connexion"),
     path("inscription/", views.inscription, name="inscription"),
+    path("mot-de-passe-oublie/", views.MotDePasseOublie.as_view(), name="mot_de_passe_oublie"),
+    path("mot-de-passe-oublie/envoye/", auth_views.PasswordResetDoneView.as_view(
+        template_name="portail/mot_de_passe/envoye.html"), name="mot_de_passe_envoye"),
+    path("mot-de-passe/<uidb64>/<token>/", auth_views.PasswordResetConfirmView.as_view(
+        template_name="portail/mot_de_passe/nouveau.html",
+        success_url=reverse_lazy("portail:mot_de_passe_termine"),
+    ), name="mot_de_passe_nouveau"),
+    path("mot-de-passe/termine/", auth_views.PasswordResetCompleteView.as_view(
+        template_name="portail/mot_de_passe/termine.html"), name="mot_de_passe_termine"),
     path("deconnexion/", auth_views.LogoutView.as_view(), name="deconnexion"),
     path("reservations/", views.reservations, name="reservations"),
     path("reservations/<int:pk>/statut/", views.changer_statut_reservation, name="statut_reservation"),

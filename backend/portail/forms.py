@@ -39,13 +39,14 @@ class InscriptionForm(UserCreationForm):
     commune = forms.CharField(label="Commune", max_length=100, required=False)
     horaires = forms.CharField(label="Horaires d'ouverture", max_length=255, required=False,
                                help_text="Ex. Lun–Sam 8h–20h")
+    email = forms.EmailField(label="E-mail", help_text="Pour recevoir un lien si vous oubliez votre mot de passe.")
     latitude = forms.FloatField(required=False, min_value=-90, max_value=90, widget=forms.HiddenInput)
     longitude = forms.FloatField(required=False, min_value=-180, max_value=180, widget=forms.HiddenInput)
     # Piège à robots : champ caché que les humains laissent vide.
     site_web = forms.CharField(required=False, widget=forms.HiddenInput)
 
     field_order = ["nom", "numero_agrement", "telephone", "whatsapp", "adresse", "quartier", "commune",
-                   "horaires", "username", "password1", "password2"]
+                   "horaires", "email", "username", "password1", "password2"]
 
     class Meta(UserCreationForm.Meta):
         model = get_user_model()
@@ -73,7 +74,9 @@ class InscriptionForm(UserCreationForm):
 
     @transaction.atomic
     def save(self, commit=True):
-        utilisateur = super().save()
+        utilisateur = super().save(commit=False)
+        utilisateur.email = self.cleaned_data["email"].strip().lower()
+        utilisateur.save()
         d = self.cleaned_data
         lat, lng = d.get("latitude"), d.get("longitude")
         position_fournie = lat is not None and lng is not None
