@@ -24,4 +24,5 @@ urlpatterns = [
     path("commandes/nouvelle/<int:grossiste_id>/", views.nouvelle_commande, name="nouvelle_commande"),
     path("questions/", views.questions, name="questions"),
     path("questions/<int:pk>/repondre/", views.repondre_question, name="repondre_question"),
+    path("questions/<int:pk>/suggestion/", views.suggerer_reponse_question, name="suggerer_reponse"),
 ]

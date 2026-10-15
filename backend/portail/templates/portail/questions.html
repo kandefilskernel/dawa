@@ -31,6 +31,11 @@
       {% csrf_token %}
       <label for="reponse-{{ q.pk }}">Votre réponse</label>
       <textarea id="reponse-{{ q.pk }}" name="reponse" rows="3" maxlength="2000" required></textarea>
+      {% if assistant_ia %}
+        <button class="btn secondaire" type="button" style="margin-top:8px"
+                data-suggestion="{% url 'portail:suggerer_reponse' q.pk %}">Suggérer une réponse (IA)</button>
+        <p class="aide" role="status" aria-live="polite"></p>
+      {% endif %}
       <label style="display:flex;align-items:center;gap:8px;font-weight:500;margin:10px 0">
         <input type="checkbox" name="orienter" value="1" style="width:20px;height:20px"> Orienter vers un médecin
       </label>
@@ -56,5 +61,34 @@
       {% endfor %}
     </ul>
   </div>
+{% endif %}
+
+{% if assistant_ia %}
+<script>
+  // Remplit la réponse avec un brouillon de l'assistant IA ; le pharmacien relit avant d'envoyer.
+  document.querySelectorAll("[data-suggestion]").forEach((bouton) => {
+    bouton.addEventListener("click", async () => {
+      const form = bouton.form;
+      const etat = bouton.nextElementSibling;
+      bouton.disabled = true;
+      etat.textContent = "L'assistant rédige un brouillon…";
+      try {
+        const r = await fetch(bouton.dataset.suggestion, {
+          method: "POST",
+          headers: {"X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value},
+        });
+        const donnees = await r.json();
+        if (!r.ok) throw new Error(donnees.erreur || "Suggestion indisponible.");
+        form.querySelector("textarea").value = donnees.reponse;
+        form.querySelector("[name=orienter]").checked = donnees.orienter;
+        etat.textContent = "Brouillon proposé par l'IA : relisez et corrigez avant d'envoyer.";
+      } catch (e) {
+        etat.textContent = e.message === "Failed to fetch" ? "Connexion impossible." : e.message;
+      } finally {
+        bouton.disabled = false;
+      }
+    });
+  });
+</script>
 {% endif %}
 {% endblock %}

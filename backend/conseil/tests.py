@@ -1,9 +1,13 @@
 import uuid
+from types import SimpleNamespace
+from unittest import mock
 
+import anthropic
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import Point
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
+from catalogue.models import Medicament
 from config.jetons import entete_authorization
 from pharmacies.models import Pharmacie
 from portail.models import Pharmacien
@@ -59,3 +63,74 @@ class QuestionTests(TestCase):
         for _ in range(3):
             self.poser()
         self.assertEqual(self.poser().status_code, 400)  # 3 questions en attente maximum
+
+
+def reponse_ia(texte, stop_reason="end_turn"):
+    return SimpleNamespace(stop_reason=stop_reason, content=[SimpleNamespace(type="text", text=texte)])
+
+
+class AssistantIATests(TestCase):
+    def setUp(self):
+        self.client_id = uuid.uuid4()
+        self.medicament = Medicament.objects.create(dci="Amoxicilline", nom_commercial="Amoxil", dosage="500 mg",
+                                                    ordonnance_requise=True)
+        self.question = Question.objects.create(client_id=self.client_id, medicament=self.medicament,
+                                                texte="Je peux le prendre pendant le repas ?")
+        pharmacien("pharma1")
+        self.client.login(username="pharma1", password="mdp-test-123")
+        self.url = f"/portail/questions/{self.question.pk}/suggestion/"
+
+    def suggerer(self, resultat=None, erreur=None):
+        api = mock.Mock()
+        api.beta.messages.create.return_value = resultat
+        api.beta.messages.create.side_effect = erreur
+        with mock.patch("conseil.assistant._client", return_value=api):
+            return self.client.post(self.url), api.beta.messages.create
+
+    @override_settings(ASSISTANT_IA_CLE="")
+    def test_desactive_sans_cle(self):
+        self.assertNotContains(self.client.get("/portail/questions/"), "Suggérer une réponse")
+        self.assertEqual(self.client.post(self.url).status_code, 503)
+
+    @override_settings(ASSISTANT_IA_CLE="cle-test")
+    def test_brouillon(self):
+        self.assertContains(self.client.get("/portail/questions/"), "Suggérer une réponse")
+        page, appel = self.suggerer(reponse_ia('{"reponse": "Oui, pendant le repas.", "orienter_medecin": false}'))
+        self.assertEqual(page.json(), {"reponse": "Oui, pendant le repas.", "orienter": False})
+        envoye = appel.call_args.kwargs
+        message = envoye["messages"][0]["content"]
+        self.assertIn("pendant le repas", message)
+        self.assertIn("Amoxil 500 mg", message)
+        self.assertIn("sur ordonnance", message)
+        self.assertNotIn(str(self.client_id), message)  # aucun identifiant patient envoyé
+        self.assertEqual(envoye["fallbacks"], "default")
+        # Rien n'est envoyé au patient : la question reste en attente.
+        self.question.refresh_from_db()
+        self.assertEqual(self.question.statut, Question.Statut.EN_ATTENTE)
+
+    @override_settings(ASSISTANT_IA_CLE="cle-test")
+    def test_orientation_medecin(self):
+        page, _ = self.suggerer(reponse_ia('{"reponse": "Consultez un médecin.", "orienter_medecin": true}'))
+        self.assertTrue(page.json()["orienter"])
+
+    @override_settings(ASSISTANT_IA_CLE="cle-test")
+    def test_refus_et_erreurs(self):
+        page, _ = self.suggerer(reponse_ia("", stop_reason="refusal"))
+        self.assertEqual(page.status_code, 503)
+        page, _ = self.suggerer(erreur=anthropic.APIConnectionError(request=mock.Mock()))
+        self.assertEqual(page.status_code, 503)
+        self.assertIn("injoignable", page.json()["erreur"])
+        page, _ = self.suggerer(reponse_ia("pas du json"))
+        self.assertEqual(page.status_code, 503)
+
+    @override_settings(ASSISTANT_IA_CLE="cle-test")
+    def test_question_deja_repondue(self):
+        Question.objects.filter(pk=self.question.pk).update(statut=Question.Statut.REPONDUE)
+        page, appel = self.suggerer(reponse_ia("{}"))
+        self.assertEqual(page.status_code, 404)
+        appel.assert_not_called()
+
+    @override_settings(ASSISTANT_IA_CLE="cle-test")
+    def test_reserve_aux_pharmaciens(self):
+        self.client.logout()
+        self.assertEqual(self.client.post(self.url).status_code, 302)  # vers la connexion

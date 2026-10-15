@@ -19,6 +19,7 @@ from abonnements.models import Abonnement
 from catalogue.images import nom_fichier, preparer_photo
 from catalogue.models import Medicament
 from catalogue.search import rechercher_medicaments
+from conseil.assistant import AssistantIndisponible, assistant_actif, suggerer_reponse
 from conseil.models import Question
 from grossistes.models import Commande, Grossiste, LigneCommande, Offre
 from messagerie.commandes import traiter_message
@@ -324,7 +325,21 @@ def questions(request):
         .select_related("medicament").order_by("cree_le")[:30],
         "mes_reponses": Question.objects.filter(repondu_par=request.pharmacie)
         .select_related("medicament").order_by("-repondu_le")[:10],
+        "assistant_ia": assistant_actif(),
     })
+
+
+@pharmacien_requis
+@require_POST
+def suggerer_reponse_question(request, pk):
+    """Brouillon de réponse proposé par l'assistant IA ; le pharmacien le relit avant d'envoyer."""
+    question = get_object_or_404(Question.objects.select_related("medicament"), pk=pk,
+                                 statut=Question.Statut.EN_ATTENTE)
+    try:
+        suggestion = suggerer_reponse(question)
+    except AssistantIndisponible as e:
+        return JsonResponse({"erreur": str(e)}, status=503)
+    return JsonResponse({"reponse": suggestion.reponse, "orienter": suggestion.orienter_medecin})
 
 
 @pharmacien_requis

@@ -139,3 +139,7 @@ MAX_RESULTATS_SPONSORISES = 2
 
 # Webhook SMS / WhatsApp : jeton secret partagé avec le fournisseur (Africa's Talking, Twilio…).
 MESSAGERIE_JETON = os.environ.get("MESSAGERIE_JETON", "")
+
+# Assistant IA du portail (brouillons de réponses aux questions). Désactivé sans clé.
+ASSISTANT_IA_CLE = os.environ.get("ANTHROPIC_API_KEY", "")
+ASSISTANT_IA_MODELE = os.environ.get("DAWA_ASSISTANT_MODELE", "claude-opus-5-5")
