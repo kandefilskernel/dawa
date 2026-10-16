@@ -253,4 +253,9 @@ const sw = <String, String>{
   'Posez votre question en une phrase (10 caractères minimum).': 'Uliza swali lako kwa sentensi moja (angalau herufi 10).',
   'Vous avez déjà réservé ce médicament dans cette pharmacie.': 'Tayari umehifadhi dawa hii kwenye duka hili la dawa.',
   'Vous avez déjà 3 réservations en cours.': 'Tayari una uhifadhi 3 unaoendelea.',
+  // Notifications (Mon espace)
+  'Notifications activées': 'Arifa zimewashwa',
+  'Activation des notifications…': 'Inawasha arifa…',
+  'Notifications refusées : autorisez-les dans les réglages du téléphone': 'Arifa zimekataliwa: ziruhusu kwenye mipangilio ya simu',
+  'Notifications non activées': 'Arifa hazijawashwa',
 };

@@ -25,6 +25,9 @@ const _canal = AndroidNotificationChannel(
   importance: Importance.high,
 );
 
+/// Où en sont les notifications sur ce téléphone (affiché dans « Mon espace »).
+enum EtatNotifications { indisponibles, enCours, actives, refusees, erreur }
+
 /// Notifications envoyées par le serveur : réservation qui avance, médicament redevenu
 /// disponible, réponse d'un pharmacien. Android uniquement pour l'instant.
 class NotificationsPush {
@@ -36,6 +39,13 @@ class NotificationsPush {
 
   /// Incrémenté à chaque notification reçue app ouverte : l'accueil rafraîchit ses badges.
   final recues = ValueNotifier<int>(0);
+
+  final etat = ValueNotifier<EtatNotifications>(EtatNotifications.indisponibles);
+
+  /// Dernière erreur, montrée sous l'état pour pouvoir la signaler.
+  String? erreur;
+
+  bool _firebasePret = false;
 
   bool get _configure => _apiKey.isNotEmpty && _appId.isNotEmpty && _senderId.isNotEmpty && _projectId.isNotEmpty;
 
@@ -61,33 +71,60 @@ class NotificationsPush {
       // Jeton FCM classique (le serveur envoie avec `message.token`) ; register()/onRegistered donne
       // un identifiant d'installation pour un autre mode d'envoi, non utilisé ici.
       // ignore: deprecated_member_use
-      messagerie.onTokenRefresh.listen((jeton) => _enregistrer(jeton));
-      langues.courante.addListener(() => _enregistrer(_jeton));
-      unawaited(_demarrer(messagerie));
+      messagerie.onTokenRefresh.listen(_enregistrerEnFond);
+      langues.courante.addListener(() => _enregistrerEnFond(_jeton));
+      _firebasePret = true;
+      // Le jeton ne dépend pas de l'autorisation : on l'obtient tout de suite, sans attendre la personne.
+      unawaited(_obtenirJeton());
     } catch (e) {
-      debugPrint('Notifications indisponibles : $e');
+      _echec(e);
     }
   }
 
-  Future<void> _demarrer(FirebaseMessaging messagerie) async {
+  /// Demande l'autorisation d'afficher les notifications (Android 13+), une fois l'app affichée,
+  /// puis réessaie l'inscription si elle avait échoué. Appelé par l'accueil et le bouton de « Mon espace ».
+  Future<void> activer() async {
+    if (!_firebasePret) return;
     try {
-      await messagerie.requestPermission();
-      // ignore: deprecated_member_use
-      await _enregistrer(await messagerie.getToken());
+      final android = _locales.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      final autorise = await android?.requestNotificationsPermission() ?? true;
+      if (!autorise) {
+        etat.value = EtatNotifications.refusees;
+        return;
+      }
+      if (etat.value != EtatNotifications.actives) await _obtenirJeton();
     } catch (e) {
-      debugPrint('Jeton de notification indisponible : $e');
+      _echec(e);
     }
   }
 
-  /// Envoie le jeton au serveur, avec la langue des messages. Réessayé au prochain lancement si hors ligne.
+  Future<void> _obtenirJeton() async {
+    etat.value = EtatNotifications.enCours;
+    try {
+      // ignore: deprecated_member_use
+      final jeton = await FirebaseMessaging.instance.getToken().timeout(const Duration(seconds: 30));
+      if (jeton == null) throw StateError("Firebase n'a pas donné de jeton");
+      await _enregistrer(jeton);
+    } catch (e) {
+      _echec(e);
+    }
+  }
+
+  void _echec(Object e) {
+    debugPrint('Notifications indisponibles : $e');
+    erreur = e.toString();
+    etat.value = EtatNotifications.erreur;
+  }
+
+  void _enregistrerEnFond(String? jeton) => unawaited(_enregistrer(jeton).catchError((Object e) => _echec(e)));
+
+  /// Envoie le jeton au serveur, avec la langue des messages. En cas d'échec, « Mon espace » propose de réessayer.
   Future<void> _enregistrer(String? jeton) async {
     if (jeton == null) return;
     _jeton = jeton;
-    try {
-      await api.enregistrerNotifications(jeton, langues.courante.value.name);
-    } on ApiException catch (e) {
-      debugPrint('Enregistrement des notifications reporté : $e');
-    }
+    await api.enregistrerNotifications(jeton, langues.courante.value.name);
+    erreur = null;
+    if (etat.value != EtatNotifications.refusees) etat.value = EtatNotifications.actives;
   }
 
   Future<void> _afficher(RemoteMessage message) async {

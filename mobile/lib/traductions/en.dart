@@ -253,4 +253,9 @@ const en = <String, String>{
   'Posez votre question en une phrase (10 caractères minimum).': 'Ask your question in one sentence (at least 10 characters).',
   'Vous avez déjà réservé ce médicament dans cette pharmacie.': 'You have already reserved this medicine at this pharmacy.',
   'Vous avez déjà 3 réservations en cours.': 'You already have 3 reservations in progress.',
+  // Notifications (Mon espace)
+  'Notifications activées': 'Notifications on',
+  'Activation des notifications…': 'Turning on notifications…',
+  'Notifications refusées : autorisez-les dans les réglages du téléphone': 'Notifications blocked: allow them in the phone settings',
+  'Notifications non activées': 'Notifications not turned on',
 };

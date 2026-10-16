@@ -29,6 +29,8 @@ class _AccueilState extends State<Accueil> {
     _verifierAlertes();
     notificationsPush.ouvertures.addListener(_ouvrirEspace);
     notificationsPush.recues.addListener(_notificationRecue);
+    // Autorisation demandée une fois l'accueil affiché (Android 13+ l'exige dans un écran visible).
+    WidgetsBinding.instance.addPostFrameCallback((_) => notificationsPush.activer());
     if (notificationsPush.ouvertures.value > 0) {
       // App lancée en touchant une notification.
       WidgetsBinding.instance.addPostFrameCallback((_) => _ouvrirEspace());

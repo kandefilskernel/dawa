@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../langue.dart';
+import '../notifications_push.dart';
 import '../api.dart';
 import '../models.dart';
 import '../stockage.dart';
@@ -126,6 +127,7 @@ class EcranEspaceState extends State<EcranEspace> with SingleTickerProviderState
           const SizedBox(height: 4),
           Text(tr('Réservations, alertes, rappels de traitement et favoris.'),
               style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 13.5)),
+          const _EtatNotifications(),
           const SizedBox(height: 12),
           TabBar(
             controller: _onglets,
@@ -390,5 +392,47 @@ class _LibelleOnglet extends StatelessWidget {
         ),
       ],
     ]);
+  }
+}
+
+/// Notifications sur ce téléphone : actives, ou pourquoi elles ne le sont pas, avec un bouton pour réessayer.
+class _EtatNotifications extends StatelessWidget {
+  const _EtatNotifications();
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder<EtatNotifications>(
+      valueListenable: notificationsPush.etat,
+      builder: (context, etat, _) {
+        if (etat == EtatNotifications.indisponibles) return const SizedBox.shrink();
+        final (icone, texte) = switch (etat) {
+          EtatNotifications.actives => (Icons.notifications_active, tr('Notifications activées')),
+          EtatNotifications.enCours => (Icons.notifications_none, tr('Activation des notifications…')),
+          EtatNotifications.refusees => (Icons.notifications_off, tr('Notifications refusées : autorisez-les dans les réglages du téléphone')),
+          _ => (Icons.notifications_off, tr('Notifications non activées')),
+        };
+        const style = TextStyle(color: Color(0xD9FFFFFF), fontSize: 12.5);
+        return Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: Row(children: [
+            Icon(icone, color: Colors.white, size: 16),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(texte, style: style),
+                if (etat == EtatNotifications.erreur && notificationsPush.erreur != null)
+                  SelectableText(notificationsPush.erreur!, style: style.copyWith(fontSize: 11), maxLines: 3),
+              ]),
+            ),
+            if (etat == EtatNotifications.erreur || etat == EtatNotifications.refusees)
+              TextButton(
+                onPressed: notificationsPush.activer,
+                style: TextButton.styleFrom(foregroundColor: Colors.white, visualDensity: VisualDensity.compact),
+                child: Text(tr('Réessayer')),
+              ),
+          ]),
+        );
+      },
+    );
   }
 }
