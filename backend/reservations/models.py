@@ -135,3 +135,6 @@ class Reservation(models.Model):
             # Le client a de nouveau 2 heures (retrait), ou la course doit partir dans ce délai.
             self.expire_le = timezone.now() + DUREE_RESERVATION
         self.save(update_fields=["statut", "message_pharmacie", "expire_le", "livreur"])
+        from notifications.envoi import notifier_reservation
+
+        notifier_reservation(self)

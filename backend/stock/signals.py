@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from catalogue.search import equivalents
+from notifications.envoi import notifier_alerte
 
 from .models import AlerteStock, Stock
 
@@ -26,8 +27,10 @@ def declencher_alertes(sender, instance, **kwargs):
         )
         .annotate(distance=Distance("position", instance.pharmacie.position))
     )
-    a_declencher = [a.pk for a in alertes if a.distance.km <= a.rayon_km]
+    a_declencher = [a for a in alertes if a.distance.km <= a.rayon_km]
     if a_declencher:
-        AlerteStock.objects.filter(pk__in=a_declencher).update(
+        AlerteStock.objects.filter(pk__in=[a.pk for a in a_declencher]).update(
             declenchee_le=timezone.now(), pharmacie=instance.pharmacie
         )
+        for alerte in a_declencher:
+            notifier_alerte(alerte, instance)

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "abonnements",
     "grossistes",
     "messagerie",
+    "notifications",
 ]
 
 MIDDLEWARE = [
@@ -148,6 +149,15 @@ MAX_RESULTATS_SPONSORISES = 2
 
 # Webhook SMS / WhatsApp : jeton secret partagé avec le fournisseur (Africa's Talking, Twilio…).
 MESSAGERIE_JETON = os.environ.get("MESSAGERIE_JETON", "")
+
+# Notifications sur le téléphone (Firebase Cloud Messaging). Désactivées sans compte de service.
+# Contenu JSON du compte de service, ou fichier (par défaut backend/cles/firebase.json, ignoré par git).
+FIREBASE_COMPTE_SERVICE = os.environ.get("FIREBASE_COMPTE_SERVICE", "")
+FIREBASE_COMPTE_SERVICE_FICHIER = Path(
+    os.environ.get("FIREBASE_COMPTE_SERVICE_FICHIER", BASE_DIR / "cles" / "firebase.json")
+)
+# En test, envoi immédiat (pas de fil séparé) pour pouvoir le vérifier.
+NOTIFICATIONS_SYNCHRONES = TESTS
 
 # Assistant IA du portail (brouillons de réponses aux questions). Désactivé sans clé.
 ASSISTANT_IA_CLE = os.environ.get("ANTHROPIC_API_KEY", "")

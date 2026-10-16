@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'ecrans/accueil.dart';
 import 'ecrans/choix_langue.dart';
 import 'langue.dart';
+import 'notifications_push.dart';
 import 'rappels.dart';
 import 'stockage.dart';
 import 'theme.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
   await rappels.init();
   // Les notifications déjà programmées sont réécrites dans la nouvelle langue.
   langues.courante.addListener(rappels.reprogrammer);
+  await notificationsPush.init();
   runApp(const DawaApp());
 }
 

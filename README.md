@@ -88,6 +88,26 @@ http://localhost:8010/portail/ — pages web légères (sans application à inst
 Créer un accès : dans l'admin, créer un utilisateur, puis un **Pharmacien** qui le rattache à sa pharmacie.
 Compte de démo : `pharmacie-centre`, créé par `seed_demo` avec le mot de passe défini dans `.env` (`DAWA_DEMO_MOT_DE_PASSE`).
 
+## Notifications sur le téléphone (Firebase)
+
+Le patient est prévenu quand sa réservation est acceptée, prête, en livraison ou refusée, quand un médicament
+de ses alertes redevient disponible, et quand un pharmacien répond à sa question — dans la langue de l'app.
+Sans configuration, tout fonctionne sans notifications (les alertes restent visibles dans « Mon espace »).
+
+1. Sur https://console.firebase.google.com : créer un projet, puis **ajouter une app Android** avec le nom de
+   package `cd.dawa.dawa` (le fichier `google-services.json` proposé n'est pas nécessaire).
+2. **App mobile** : les valeurs du projet `dawa-44a42` (tirées de `google-services.json`) sont déjà dans
+   `.github/workflows/apk.yml`. Pour un autre projet, les remplacer, ou définir dans GitHub → Settings → Secrets
+   and variables → Actions → **Variables** : `FIREBASE_API_KEY`, `FIREBASE_APP_ID`, `FIREBASE_SENDER_ID`,
+   `FIREBASE_PROJECT_ID`. En local :
+   `flutter run --dart-define=FIREBASE_API_KEY=… --dart-define=FIREBASE_APP_ID=… --dart-define=FIREBASE_SENDER_ID=… --dart-define=FIREBASE_PROJECT_ID=…`
+3. **Serveur** : Paramètres du projet → Comptes de service → **Générer une nouvelle clé privée**. Enregistrer le
+   fichier sous `backend/cles/firebase.json` (ignoré par git, à ne jamais partager), puis
+   `docker compose restart backend`.
+
+`POST /api/appareil/notifications/` enregistre le jeton du téléphone (`{"jeton": "…", "langue": "fr"}`) ;
+les téléphones désinstallés sont oubliés automatiquement. Android uniquement pour l'instant.
+
 ## Lancer l'app mobile (Flutter)
 
 Le backend doit tourner (voir ci-dessus).

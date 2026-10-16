@@ -25,6 +25,7 @@ from catalogue.search import rechercher_medicaments
 from config.securite import compter, limite_atteinte
 from conseil.assistant import AssistantIndisponible, assistant_actif, suggerer_reponse
 from conseil.models import Question
+from notifications.envoi import notifier_reponse
 from grossistes.models import Commande, Grossiste, LigneCommande, Offre
 from kyc.dossier import Dossier, PieceForm
 from messagerie.commandes import traiter_message
@@ -428,6 +429,7 @@ def repondre_question(request, pk):
         statut=Question.Statut.ORIENTEE if orienter else Question.Statut.REPONDUE,
     )
     if nb:
+        notifier_reponse(Question.objects.get(pk=pk))
         messages.success(request, "Réponse envoyée au patient. Merci !")
     else:
         messages.warning(request, "Un confrère a déjà répondu à cette question.")

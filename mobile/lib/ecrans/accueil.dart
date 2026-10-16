@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../langue.dart';
 import '../api.dart';
+import '../notifications_push.dart';
 import '../theme.dart';
 import 'espace.dart';
 import 'garde.dart';
@@ -26,9 +27,32 @@ class _AccueilState extends State<Accueil> {
   void initState() {
     super.initState();
     _verifierAlertes();
+    notificationsPush.ouvertures.addListener(_ouvrirEspace);
+    notificationsPush.recues.addListener(_notificationRecue);
+    if (notificationsPush.ouvertures.value > 0) {
+      // App lancée en touchant une notification.
+      WidgetsBinding.instance.addPostFrameCallback((_) => _ouvrirEspace());
+    }
   }
 
-  /// Sans notifications push pour l'instant : on vérifie les alertes à l'ouverture.
+  @override
+  void dispose() {
+    notificationsPush.ouvertures.removeListener(_ouvrirEspace);
+    notificationsPush.recues.removeListener(_notificationRecue);
+    super.dispose();
+  }
+
+  /// Une notification touchée (réservation, alerte, réponse) mène à « Mon espace ».
+  void _ouvrirEspace() {
+    if (mounted) _allerA(_ongletEspace);
+  }
+
+  void _notificationRecue() {
+    _verifierAlertes();
+    if (_onglet == _ongletEspace) _espace.currentState?.rafraichir();
+  }
+
+  /// Badge des alertes déclenchées ; aussi rafraîchi à chaque notification reçue app ouverte.
   Future<void> _verifierAlertes() async {
     try {
       final alertes = await api.alertes();

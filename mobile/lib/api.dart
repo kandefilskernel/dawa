@@ -109,6 +109,10 @@ class Api {
         'lng': position.lng.toStringAsFixed(5),
       };
 
+  /// Le téléphone accepte les notifications : jeton Firebase et langue des messages.
+  Future<void> enregistrerNotifications(String jeton, String langue) =>
+      _requete('POST', '/api/appareil/notifications/', corps: {'jeton': jeton, 'langue': langue});
+
   Future<List<Medicament>> suggestions(String terme) async {
     final json = await _requete('GET', '/api/medicaments/', params: {'q': terme, 'limit': '8'});
     return (json['results'] as List).map((m) => Medicament.fromJson(m)).toList();

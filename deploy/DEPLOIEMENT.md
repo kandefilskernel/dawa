@@ -104,6 +104,15 @@ Sur GitHub : **Actions › APK Android › Run workflow**, et saisissez `https:/
 « Adresse de l'API ». L'APK publié dans la Release appellera alors le serveur en ligne.
 Pensez aussi à changer la valeur par défaut `api_url` dans `.github/workflows/apk.yml`.
 
+**Notifications (Firebase)** : copiez le fichier du compte de service dans le volume des clés, puis redémarrez :
+
+```bash
+docker compose -f docker-compose.prod.yml cp firebase.json backend:/app/cles/firebase.json
+docker compose -f docker-compose.prod.yml restart backend
+```
+
+Il est sauvegardé avec la clé RSA. Voir « Notifications sur le téléphone » dans le README pour créer le projet Firebase.
+
 ## 8. Sauvegardes (indispensable)
 
 `sauvegarde.sh` copie la base, les photos, les **pièces KYC** et la **clé RSA** (la perdre déconnecte tous les téléphones).

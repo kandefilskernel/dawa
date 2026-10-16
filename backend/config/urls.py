@@ -9,6 +9,7 @@ from config.views import JetonAppareilView
 from conseil.views import QuestionViewSet
 from pharmacies.views import PharmacieViewSet
 from messagerie.views import MessageEntrantView
+from notifications.views import AppareilPushView
 from reservations.views import DevisLivraisonView, ReservationViewSet
 from sante.views import EtablissementViewSet
 from stock.views import AlerteViewSet, RechercheView
@@ -32,6 +33,7 @@ urlpatterns = [
     path("dawa/", include("gestion.urls")),
     path("etablissement/", include("sante.urls")),
     path("api/appareil/jeton/", JetonAppareilView.as_view(), name="jeton_appareil"),
+    path("api/appareil/notifications/", AppareilPushView.as_view(), name="appareil_notifications"),
     path("api/recherche/", RechercheView.as_view(), name="recherche"),
     path("api/verification/", VerificationView.as_view(), name="verification"),
     path("api/livraison/devis/", DevisLivraisonView.as_view(), name="devis_livraison"),

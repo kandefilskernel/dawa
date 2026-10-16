@@ -24,6 +24,13 @@ jobs:
     env:
       # Sur un push, pas de saisie : on garde l'IP du PC de démo (même valeur par défaut).
       API_URL: ${{ inputs.api_url || 'http://10.202.119.131:8010' }}
+      # Notifications : configuration de l'app Android du projet Firebase dawa-44a42 (google-services.json).
+      # Valeurs publiques, intégrées à l'APK ; une variable GitHub du même nom (Settings → Secrets and
+      # variables → Actions → Variables) les remplace si besoin.
+      FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY || 'AIzaSyDyr81j3femFx-fUyKVO4KBq5f1sEE_2TE' }}
+      FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID || '1:654539355183:android:ff15098dac9b111522c2da' }}
+      FIREBASE_SENDER_ID: ${{ vars.FIREBASE_SENDER_ID || '654539355183' }}
+      FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID || 'dawa-44a42' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -40,7 +47,13 @@ jobs:
 
       - run: flutter pub get
 
-      - run: flutter build apk --release --dart-define=API_URL=$API_URL
+      - run: >-
+          flutter build apk --release
+          --dart-define=API_URL=$API_URL
+          --dart-define=FIREBASE_API_KEY=$FIREBASE_API_KEY
+          --dart-define=FIREBASE_APP_ID=$FIREBASE_APP_ID
+          --dart-define=FIREBASE_SENDER_ID=$FIREBASE_SENDER_ID
+          --dart-define=FIREBASE_PROJECT_ID=$FIREBASE_PROJECT_ID
 
       - run: cp build/app/outputs/flutter-apk/app-release.apk build/dawa.apk
 
@@ -56,6 +69,6 @@ jobs:
         with:
           tag_name: apk-${{ github.run_number }}
           name: Dawa APK ${{ github.run_number }}
-          body: "API : ${{ env.API_URL }}"
+          body: "API : ${{ env.API_URL }} — notifications : ${{ env.FIREBASE_PROJECT_ID != '' && 'actives' || 'désactivées' }}"
           files: mobile/build/dawa.apk
           make_latest: true
