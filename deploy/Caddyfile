@@ -1,4 +1,6 @@
-# HTTPS automatique (Let's Encrypt) pour le domaine de Dawa.
+# HTTPS automatique (Let's Encrypt) pour le domaine d'Uzima.
+# Le site des professionnels (Next.js) répond par défaut ; Django garde l'API, l'administration,
+# la page du livreur et le téléchargement des pièces KYC (réservé à l'équipe).
 {
 	email {$DAWA_EMAIL_ADMIN}
 }
@@ -6,7 +8,7 @@
 {$DAWA_DOMAINE} {
 	encode zstd gzip
 
-	# Fichiers statiques du portail et de l'admin, mis en cache longtemps.
+	# Fichiers statiques de l'administration Django, mis en cache longtemps.
 	handle_path /static/* {
 		root * /srv/static
 		header Cache-Control "public, max-age=604800"
@@ -21,8 +23,37 @@
 		file_server
 	}
 
-	handle {
+	# Servi par Django : API (app mobile et site), administration, page du livreur, pièces KYC.
+	@django path /api/* /admin/* /livreur/* /dawa/pieces/*
+	handle @django {
 		reverse_proxy backend:8000
+	}
+
+	# Anciennes adresses des pages Django → nouvelles pages du site (liens enregistrés, anciens e-mails).
+	@ancien_lien_mdp path_regexp mdp ^/portail/mot-de-passe/([^/]+)/([^/]+)/?$
+	handle @ancien_lien_mdp {
+		redir * /mot-de-passe/{re.mdp.1}/{re.mdp.2}
+	}
+	@anciennes_pages path /portail /portail/* /etablissement /etablissement/* /dawa /dawa/*
+	handle @anciennes_pages {
+		@connexion path /portail/connexion/*
+		redir @connexion /connexion
+		@mdp_oublie path /portail/mot-de-passe-oublie/*
+		redir @mdp_oublie /mot-de-passe-oublie
+		@inscription_pharmacie path /portail/inscription/*
+		redir @inscription_pharmacie /inscription/pharmacie
+		@inscription_etablissement path /etablissement/inscription/*
+		redir @inscription_etablissement /inscription/etablissement
+		@portail path /portail /portail/*
+		redir @portail /pharmacie
+		@etablissement path /etablissement /etablissement/*
+		redir @etablissement /sante
+		redir * /equipe
+	}
+
+	# Tout le reste : site Next.js (pharmacies, établissements de santé, équipe Uzima).
+	handle {
+		reverse_proxy web:3000
 	}
 
 	header {
@@ -32,7 +63,7 @@
 		-Server
 	}
 
-	# Pièces justificatives jusqu'à 8 Mo (+ marge du formulaire).
+	# Pièces justificatives jusqu'à 8 Mo, photos de boîtes jusqu'à 10 Mo (+ marge du formulaire).
 	request_body {
 		max_size 12MB
 	}

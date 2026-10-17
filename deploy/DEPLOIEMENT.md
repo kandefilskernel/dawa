@@ -1,13 +1,19 @@
-# Mettre Dawa en ligne
+# Mettre Uzima en ligne
 
-Ce guide installe le site web (portail des pharmacies et établissements, espace Dawa, API de l'app)
-sur un serveur loué, avec un nom de domaine et le HTTPS automatique.
+Ce guide installe le site web (espaces des pharmacies, des établissements de santé et de l'équipe Uzima,
+API de l'app) sur un serveur loué, avec un nom de domaine et le HTTPS automatique.
 
 ```
-Internet ──HTTPS──> Caddy (certificat automatique) ──> Django/gunicorn ──> PostgreSQL + PostGIS
-                     │ sert /static et /media (photos)
-                     └ ne sert JAMAIS les pièces KYC (dossier prive/)
+Internet ──HTTPS──> Caddy (certificat automatique)
+                     ├─ pages du site ───────────────> Next.js (dossier web/)
+                     ├─ /api, /admin, /livreur ───────> Django/gunicorn ──> PostgreSQL + PostGIS
+                     │  (et le téléchargement des pièces KYC, réservé à l'équipe)
+                     ├─ sert /static et /media (photos)
+                     └─ ne sert JAMAIS les pièces KYC directement (dossier prive/)
 ```
+
+Les anciennes adresses (`/portail/…`, `/etablissement/…`, `/dawa/…`) sont redirigées vers les nouvelles pages,
+y compris les liens « mot de passe oublié » déjà envoyés.
 
 ## 1. Ce qu'il faut acheter
 
@@ -74,7 +80,7 @@ Créez ensuite le compte administrateur et le compte de l'équipe Dawa :
 docker compose -f docker-compose.prod.yml --env-file .env.prod exec backend python manage.py createsuperuser
 ```
 
-Ce compte se connecte sur `https://votre-domaine/portail/connexion/` et arrive dans l'espace Dawa (`/dawa/`).
+Ce compte se connecte sur `https://votre-domaine/connexion` et arrive dans l'espace de l'équipe (`/equipe`).
 Pour d'autres membres de l'équipe : créez-les dans `/admin/` et cochez « Statut équipe ».
 
 Ne lancez **pas** `seed_demo` en production : il crée des pharmacies fictives.
@@ -92,10 +98,11 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod exec backend pyth
 
 ## 6. Les liens
 
-- Connexion des professionnels : `https://votre-domaine/portail/connexion/`
-- Inscription d'une pharmacie : `https://votre-domaine/portail/inscription/`
-- Inscription d'un hôpital ou d'une clinique : `https://votre-domaine/etablissement/inscription/`
-- Espace Dawa (équipe) : `https://votre-domaine/dawa/`
+- Connexion des professionnels : `https://votre-domaine/connexion`
+- Inscription d'une pharmacie : `https://votre-domaine/inscription/pharmacie`
+- Inscription d'un hôpital, d'une clinique ou d'un centre de santé : `https://votre-domaine/inscription/etablissement`
+- Espace de l'équipe Uzima : `https://votre-domaine/equipe`
+- Administration technique (catalogue, grossistes, gardes) : `https://votre-domaine/admin/`
 - API de l'app : `https://votre-domaine/api/`
 
 ## 7. Relier l'application mobile
@@ -142,7 +149,7 @@ Les migrations s'appliquent automatiquement au redémarrage.
 ## Points de vigilance
 
 - **Mot de passe oublié** : chaque structure reçoit un lien par e-mail. Sans e-mail, l'équipe crée un lien depuis
-  `/dawa/` (bouton « Lien mot de passe ») et l'envoie par WhatsApp ou SMS **au numéro officiel**, après avoir
+  `/equipe` (Pharmacies ou Santé, bouton « Lien mot de passe ») et l'envoie par WhatsApp ou SMS **au numéro officiel**, après avoir
   vérifié l'identité de la personne.
 - **Tentatives de connexion** : 5 échecs sur un identifiant (ou 30 depuis une même connexion) bloquent 15 minutes.
 

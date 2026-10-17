@@ -5,7 +5,7 @@ Trouver un médicament dans une pharmacie proche — Lubumbashi.
 ```
 backend/   API Django + PostGIS, back-office admin
 mobile/    App patient Flutter (à venir)
-web/       Portail pharmacies (à venir)
+web/       Site Next.js des pharmacies, établissements de santé et de l'équipe
 ```
 
 ## Lancer le backend
@@ -75,9 +75,20 @@ Chaque médicament a une image, affichée dans l'app (mise en cache sur le tél�
 
 Utilisez uniquement des photos que vous avez prises vous-mêmes (boîtes achetées localement) ou fournies avec l'accord du laboratoire.
 
-## Portail pharmacien
+## Site des professionnels (Next.js)
 
-http://localhost:8010/portail/ — pages web légères (sans application à installer) pour chaque pharmacie :
+`docker compose up -d web` puis http://localhost:3000 — site sans application à installer, fait pour le téléphone
+(dossier `web/`, voir `web/README.md`). Il parle à Django par `/api/web/`. Trois espaces :
+
+- `/pharmacie` : portail des pharmacies (détail ci-dessous), inscription sur `/inscription/pharmacie` ;
+- `/sante` : hôpitaux, cliniques, centres de santé, laboratoires, maternités (fiche, justificatifs),
+  inscription sur `/inscription/etablissement` ;
+- `/equipe` : équipe Uzima (inscriptions et pièces KYC, visibilité, liens de mot de passe, abonnements, signalements).
+
+Les anciennes pages Django (`/portail/`, `/etablissement/`, `/dawa/`) existent encore en local ; en production,
+Caddy les redirige vers le nouveau site. La page du livreur (`/livreur/<jeton>/`) reste servie par Django.
+
+Portail des pharmacies :
 
 - **Accueil** : réservations à traiter, état du stock, médicaments recherchés à moins de 5 km mais absents du stock.
 - **Réservations** : accepter → marquer prête (redonne 2 h au client) → retirée, ou refuser avec un motif. Actualisation automatique.

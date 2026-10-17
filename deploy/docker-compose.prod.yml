@@ -1,4 +1,4 @@
-# Dawa en production sur un serveur (VPS) : base PostGIS, Django (gunicorn) et Caddy (HTTPS automatique).
+# Uzima en production sur un serveur (VPS) : base PostGIS, Django (gunicorn), site Next.js et Caddy (HTTPS automatique).
 # Utilisation (depuis le dossier deploy/) : docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
 name: dawa-prod
 
@@ -27,6 +27,7 @@ services:
       DJANGO_DEBUG: "0"
       DATABASE_HOST: db
       DAWA_DERRIERE_PROXY: "1"   # IP du client lue dans X-Forwarded-For posé par Caddy
+      UZIMA_WEB_URL: https://${DAWA_DOMAINE:?DAWA_DOMAINE manquant dans .env.prod}   # liens des e-mails
     command: ["sh", "/app/deploy/demarrer.sh"]
     volumes:
       - ./demarrer.sh:/app/deploy/demarrer.sh:ro
@@ -37,6 +38,16 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  # Site des pharmacies, établissements de santé et de l'équipe (dossier web/).
+  web:
+    build:
+      context: ../web
+      args:
+        UZIMA_BACKEND_URL: http://backend:8000
+    restart: unless-stopped
+    depends_on:
+      - backend
 
   caddy:
     image: caddy:2.8
@@ -56,6 +67,7 @@ services:
       - caddy_config:/config
     depends_on:
       - backend
+      - web
 
 volumes:
   pgdata:

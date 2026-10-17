@@ -12,6 +12,7 @@ const FICHIERS = ["media", "static"];
 const config: NextConfig = {
   // Les adresses Django finissent par « / » : Next.js ne doit pas l'enlever.
   skipTrailingSlashRedirect: true,
+  output: "standalone", // image de production légère (voir Dockerfile)
   poweredByHeader: false,
   devIndicators: false, // le bouton « N » de Next.js cachait la navigation sur téléphone
   async rewrites() {
