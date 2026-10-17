@@ -6,7 +6,7 @@ from rest_framework.routers import DefaultRouter
 
 from catalogue.views import MedicamentViewSet
 from config.views import JetonAppareilView
-from conseil.views import QuestionViewSet
+from conseil.views import AssistantChoixView, QuestionViewSet
 from pharmacies.views import ItineraireView, PharmacieViewSet
 from messagerie.views import MessageEntrantView
 from notifications.views import AppareilPushView
@@ -35,6 +35,7 @@ urlpatterns = [
     path("livreur/", include("reservations.urls_livreur")),
     path("api/appareil/jeton/", JetonAppareilView.as_view(), name="jeton_appareil"),
     path("api/appareil/notifications/", AppareilPushView.as_view(), name="appareil_notifications"),
+    path("api/assistant/", AssistantChoixView.as_view(), name="assistant_choix"),
     path("api/itineraire/", ItineraireView.as_view(), name="itineraire"),
     path("api/recherche/", RechercheView.as_view(), name="recherche"),
     path("api/verification/", VerificationView.as_view(), name="verification"),

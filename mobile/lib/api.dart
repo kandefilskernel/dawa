@@ -63,7 +63,7 @@ class Api {
   }
 
   Future<dynamic> _requete(String methode, String chemin,
-      {Map<String, String>? params, Object? corps, bool nouvelEssai = true}) async {
+      {Map<String, String>? params, Object? corps, bool nouvelEssai = true, Duration delai = _delai}) async {
     await _assurerJeton();
     final uri = Uri.parse('$apiUrl$chemin').replace(queryParameters: params);
     final http.Response reponse;
@@ -73,7 +73,7 @@ class Api {
         'DELETE' => _client.delete(uri, headers: _entetes),
         _ => _client.get(uri, headers: _entetes),
       };
-      reponse = await envoi.timeout(_delai);
+      reponse = await envoi.timeout(delai);
     } on TimeoutException {
       throw ApiException(tr('Le réseau est lent. Réessayez.'));
     } on http.ClientException {
@@ -81,7 +81,7 @@ class Api {
     }
     if (reponse.statusCode == 401 && nouvelEssai) {
       await stockage.oublierJeton();
-      return _requete(methode, chemin, params: params, corps: corps, nouvelEssai: false);
+      return _requete(methode, chemin, params: params, corps: corps, nouvelEssai: false, delai: delai);
     }
     final texte = utf8.decode(reponse.bodyBytes);
     if (reponse.statusCode == 400) throw ApiException(_premierMessage(texte));
@@ -137,6 +137,13 @@ class Api {
         'vers_lng': versLng.toStringAsFixed(5),
         'mode': mode.code,
       }));
+
+  /// « J'ai besoin d'Amoxicilline, je suis à pied » → la pharmacie et l'action les plus rapides.
+  Future<ReponseAssistant> demanderAssistant(String message, Position position) async =>
+      ReponseAssistant.fromJson(await _requete('POST', '/api/assistant/',
+          corps: {'message': message, 'lat': position.lat, 'lng': position.lng},
+          // L'IA consulte les stocks puis rédige : jusqu'à ~45 s côté serveur.
+          delai: const Duration(seconds: 60)));
 
   Future<List<Pharmacie>> pharmaciesDeGarde(Position position) async {
     final json = await _requete('GET', '/api/pharmacies/garde/', params: _position(position));

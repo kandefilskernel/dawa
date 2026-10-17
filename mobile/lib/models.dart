@@ -131,6 +131,18 @@ class Acces {
         };
 }
 
+/// Livraison possible depuis une pharmacie : durée (préparation + trajet) et frais.
+class OffreLivraison {
+  final bool possible;
+  final int? minutes;
+  final int? frais;
+
+  OffreLivraison.fromJson(Map<String, dynamic> json)
+      : possible = json['possible'] ?? false,
+        minutes = json['minutes'],
+        frais = json['frais'];
+}
+
 class Resultat {
   final Pharmacie pharmacie;
   final Medicament medicament;
@@ -139,13 +151,46 @@ class Resultat {
   final double? distanceKm;
   final Acces? acces;
 
+  /// Présent dans les réponses de l'assistant.
+  final OffreLivraison? livraison;
+
   Resultat.fromJson(Map<String, dynamic> json)
       : pharmacie = Pharmacie.fromJson(json['pharmacie']),
         medicament = Medicament.fromJson(json['medicament']),
         prix = json['prix'],
         confirme = json['confirme'] ?? false,
         distanceKm = _double(json['distance_km']),
-        acces = json['acces'] == null ? null : Acces.fromJson(json['acces']);
+        acces = json['acces'] == null ? null : Acces.fromJson(json['acces']),
+        livraison = json['livraison'] == null ? null : OffreLivraison.fromJson(json['livraison']);
+}
+
+/// Ce que l'assistant conseille pour obtenir le médicament au plus vite.
+class ReponseAssistant {
+  /// Texte rédigé par l'IA ; vide quand la réponse vient de la règle simple (l'app compose la phrase).
+  final String reponse;
+  final bool parIA;
+
+  /// trouve, medicament_inconnu ou introuvable.
+  final String situation;
+  final Medicament? medicament;
+  final Resultat? recommandation;
+
+  /// reserver, se_faire_livrer, y_aller ou aucune.
+  final String action;
+  final ModeTrajet mode;
+  final bool orienterMedecin;
+  final List<Resultat> autres;
+
+  ReponseAssistant.fromJson(Map<String, dynamic> json)
+      : reponse = json['reponse'] ?? '',
+        parIA = json['source'] == 'ia',
+        situation = json['situation'] ?? 'trouve',
+        medicament = json['medicament'] == null ? null : Medicament.fromJson(json['medicament']),
+        recommandation = json['recommandation'] == null ? null : Resultat.fromJson(json['recommandation']),
+        action = json['action'] ?? 'aucune',
+        mode = ModeTrajet.depuis(json['mode']),
+        orienterMedecin = json['orienter_medecin'] ?? false,
+        autres = [for (final r in json['autres'] as List? ?? []) Resultat.fromJson(r)];
 }
 
 class ReponseRecherche {

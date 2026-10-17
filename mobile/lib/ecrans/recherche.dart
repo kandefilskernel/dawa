@@ -8,6 +8,7 @@ import '../models.dart';
 import '../stockage.dart';
 import '../theme.dart';
 import '../widgets/communs.dart';
+import 'assistant.dart';
 import 'conseil.dart';
 import 'resultats.dart';
 import 'scanner.dart';
@@ -210,6 +211,18 @@ class _EcranRechercheState extends State<EcranRecherche> {
               onPressed: () => _choisirFrequent(nom),
             ),
         ]),
+        const SizedBox(height: 20),
+        Card(
+          clipBehavior: Clip.antiAlias,
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+            leading: const IconeTeintee(Icons.assistant_outlined),
+            title: Text(tr("Besoin d'un médicament vite ?"), style: const TextStyle(fontWeight: FontWeight.w700)),
+            subtitle: Text(tr("Demandez à l'assistant : la pharmacie la plus rapide, réserver ou se faire livrer.")),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EcranAssistant())),
+          ),
+        ),
         const SizedBox(height: 28),
         Text(tr('Services'), style: theme.textTheme.titleMedium),
         const SizedBox(height: 12),

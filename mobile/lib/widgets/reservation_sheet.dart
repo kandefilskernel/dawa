@@ -15,13 +15,15 @@ Future<Reservation?> ouvrirReservation(
   required Pharmacie pharmacie,
   required Medicament medicament,
   int? prix,
+  bool livraison = false,
 }) async {
   final reservation = await showModalBottomSheet<Reservation>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.white,
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
-    builder: (_) => _FormulaireReservation(pharmacie: pharmacie, medicament: medicament, prix: prix),
+    builder: (_) => _FormulaireReservation(
+        pharmacie: pharmacie, medicament: medicament, prix: prix, livraison: livraison && pharmacie.livraison),
   );
   if (reservation != null && context.mounted) {
     await showDialog(context: context, builder: (_) => _Confirmation(reservation: reservation));
@@ -30,11 +32,14 @@ Future<Reservation?> ouvrirReservation(
 }
 
 class _FormulaireReservation extends StatefulWidget {
-  const _FormulaireReservation({required this.pharmacie, required this.medicament, this.prix});
+  const _FormulaireReservation({required this.pharmacie, required this.medicament, this.prix, this.livraison = false});
 
   final Pharmacie pharmacie;
   final Medicament medicament;
   final int? prix;
+
+  /// Ouvrir directement en mode livraison (conseil de l'assistant).
+  final bool livraison;
 
   @override
   State<_FormulaireReservation> createState() => _FormulaireReservationState();
@@ -86,6 +91,12 @@ class _FormulaireReservationState extends State<_FormulaireReservation> {
     } on ApiException catch (e) {
       if (mounted) setState(() => _erreurLivraison = e.message);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.livraison) WidgetsBinding.instance.addPostFrameCallback((_) => _choisirLivraison(true));
   }
 
   bool get _livraisonPrete => _devis?.possible == true && _positionLivraison != null;

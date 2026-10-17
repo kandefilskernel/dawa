@@ -32,6 +32,7 @@ const textesServeur = [
   'Ce médicament n\'est plus disponible dans cette pharmacie.',
   'Cette pharmacie ne livre pas encore. Choisissez le retrait.',
   "Cette réservation n'est pas une livraison.",
+  'Écrivez le médicament dont vous avez besoin.',
   'Décrivez le problème en quelques mots (10 caractères minimum).',
   'Indiquez l\'adresse de livraison (avenue, numéro, repère).',
   'Numéro de téléphone invalide.',

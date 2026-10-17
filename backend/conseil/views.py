@@ -1,9 +1,17 @@
+from django.core.cache import cache
 from rest_framework import mixins, serializers, viewsets
+from rest_framework.exceptions import Throttled, ValidationError
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from catalogue.models import Medicament
 from catalogue.serializers import MedicamentSerializer
 from config.client import client_id
+from pharmacies.serializers import contexte_pharmacies
+from stock.serializers import ResultatSerializer
 
+from .assistant import assistant_actif
+from .choix import LONGUEUR_MAX, meilleur_choix
 from .models import Question
 
 MAX_QUESTIONS_EN_ATTENTE = 3
@@ -59,3 +67,50 @@ class QuestionViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.G
         if self.action == "create":
             context["client_id"] = client_id(self.request)
         return context
+
+
+class AssistantChoixView(APIView):
+    """
+    POST /api/assistant/ {"message": "J'ai besoin d'Amoxicilline, je suis à pied", "lat": .., "lng": ..}
+
+    Meilleur choix pour obtenir le médicament vite : pharmacie, délai, réserver / y aller / se faire livrer.
+    Rédigé par l'IA si elle est configurée (`source` = "ia"), sinon par une règle simple ("regles").
+    """
+
+    MESSAGES_PAR_HEURE = 20
+
+    def get(self, request):
+        return Response({"ia_active": assistant_actif()})
+
+    def post(self, request):
+        appareil = client_id(request)
+        message = str(request.data.get("message", "")).strip()
+        if len(message) < 3:
+            raise ValidationError({"message": "Écrivez le médicament dont vous avez besoin."})
+        try:
+            lat, lng = float(request.data["lat"]), float(request.data["lng"])
+        except (KeyError, TypeError, ValueError):
+            raise ValidationError({"position": "lat et lng sont obligatoires."})
+        if not (-90 <= lat <= 90 and -180 <= lng <= 180):
+            raise ValidationError({"position": "Coordonnées hors limites."})
+        cle = f"assistant:{appareil}"
+        if not cache.add(cle, 1, 3600) and cache.incr(cle) > self.MESSAGES_PAR_HEURE:
+            raise Throttled(detail="Trop de messages. Réessayez dans une heure.")
+
+        choix = meilleur_choix(message[:LONGUEUR_MAX], (lat, lng))
+        contexte = {**contexte_pharmacies(), "request": request}
+
+        def option(s):
+            return {**ResultatSerializer(s, context=contexte).data, "livraison": s.livraison}
+
+        return Response({
+            "reponse": choix.reponse,
+            "source": choix.source,
+            "situation": choix.situation,
+            "medicament": MedicamentSerializer(choix.medicament, context=contexte).data if choix.medicament else None,
+            "recommandation": option(choix.option) if choix.option is not None else None,
+            "action": choix.action,
+            "mode": choix.mode,
+            "orienter_medecin": choix.orienter_medecin,
+            "autres": [option(s) for s in choix.autres],
+        })

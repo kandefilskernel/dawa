@@ -1,3 +1,4 @@
+import json
 import uuid
 from types import SimpleNamespace
 from unittest import mock
@@ -142,3 +143,129 @@ class DelaiAssistantTests(TestCase):
 
         pire_cas = assistant.DELAI_SECONDES * (assistant.NOUVELLES_TENTATIVES + 1)
         self.assertLess(pire_cas, 60)  # --timeout de gunicorn dans deploy/demarrer.sh
+
+
+def bloc_outil(medicament, identifiant="outil_1"):
+    return SimpleNamespace(type="tool_use", id=identifiant, name="chercher_medicament", input={"medicament": medicament})
+
+
+class AssistantChoixTests(TestCase):
+    """« J'ai besoin d'Amoxicilline, je suis à pied » → la pharmacie la plus rapide, avec les vraies données."""
+
+    @classmethod
+    def setUpTestData(cls):
+        from reservations.models import Livreur
+        from stock.models import Stock
+
+        cls.amox = Medicament.objects.create(dci="Amoxicilline", nom_commercial="Amoxicilline", dosage="500 mg",
+                                             ordonnance_requise=True)
+
+        def pharmacie(nom, lng):
+            p = Pharmacie.objects.create(nom=nom, adresse="x", telephone="0", est_validee=True,
+                                         horaires="24h/24", position=Point(lng, -11.664, srid=4326))
+            Stock.objects.create(pharmacie=p, medicament=cls.amox, prix=5000)
+            return p
+
+        cls.proche = pharmacie("Proche", 27.489)        # ~1,1 km
+        cls.livre = pharmacie("Avec livreur", 27.505)   # ~2,8 km, livre à moto
+        Livreur.objects.create(pharmacie=cls.livre, nom="Jean", telephone="+243990000009")
+
+    def setUp(self):
+        from django.core.cache import cache
+
+        cache.clear()
+        self.client_id = str(uuid.uuid4())
+
+    def demander(self, message, **extra):
+        return self.client.post("/api/assistant/", {"message": message, "lat": -11.664, "lng": 27.479, **extra},
+                                content_type="application/json",
+                                HTTP_AUTHORIZATION=entete_authorization(self.client_id))
+
+    @override_settings(ASSISTANT_IA_CLE="")
+    def test_regles_sans_ia(self):
+        self.assertFalse(self.client.get("/api/assistant/").json()["ia_active"])
+        d = self.demander("J'ai besoin d'amoxiciline, je suis à moto").json()
+        self.assertEqual((d["source"], d["situation"], d["mode"], d["action"]), ("regles", "trouve", "moto", "reserver"))
+        self.assertEqual(d["recommandation"]["pharmacie"]["nom"], "Proche")
+        self.assertEqual(d["medicament"]["nom_commercial"], "Amoxicilline")
+        self.assertEqual(len(d["autres"]), 1)
+
+    @override_settings(ASSISTANT_IA_CLE="")
+    def test_regles_livraison_plus_rapide_qu_a_pied(self):
+        from pharmacies.models import Pharmacie as P
+
+        P.objects.filter(pk=self.proche.pk).update(position=Point(27.530, -11.664, srid=4326))  # 5,5 km à pied
+        d = self.demander("Amoxicilline svp, je suis à pied, c'est urgent").json()
+        self.assertEqual((d["mode"], d["action"]), ("pied", "se_faire_livrer"))
+        self.assertEqual(d["recommandation"]["pharmacie"]["nom"], "Avec livreur")
+        self.assertTrue(d["recommandation"]["livraison"]["possible"])
+        self.assertLess(d["recommandation"]["livraison"]["minutes"], d["recommandation"]["acces"]["delai_min"]["pied"])
+
+    @override_settings(ASSISTANT_IA_CLE="")
+    def test_regles_inconnu_et_introuvable(self):
+        self.assertEqual(self.demander("Bonjour, ça va ?").json()["situation"], "medicament_inconnu")
+        Medicament.objects.create(dci="Artéméther", nom_commercial="Coartem", dosage="20/120 mg")
+        d = self.demander("Il me faut du Coartem").json()
+        self.assertEqual((d["situation"], d["recommandation"]), ("introuvable", None))
+
+    def ia(self, *reponses):
+        api = mock.Mock()
+        api.beta.messages.create.side_effect = list(reponses)
+        return mock.patch("conseil.choix._client", return_value=api), api.beta.messages.create
+
+    @override_settings(ASSISTANT_IA_CLE="cle-test")
+    def test_ia_utilise_les_vraies_donnees(self):
+        final = json.dumps({"reponse": "Allez à la pharmacie Proche : 3 min à moto, 5 000 FC.",
+                            "pharmacie_id": self.proche.pk, "action": "reserver", "mode": "moto",
+                            "orienter_medecin": False})
+        patch, appel = self.ia(SimpleNamespace(stop_reason="tool_use", content=[bloc_outil("Amoxicilline")]),
+                               reponse_ia(final))
+        with patch:
+            d = self.demander("J'ai besoin d'Amoxicilline vite").json()
+        self.assertEqual((d["source"], d["action"]), ("ia", "reserver"))
+        self.assertIn("Proche", d["reponse"])
+        self.assertEqual(d["recommandation"]["pharmacie"]["id"], self.proche.pk)
+        # Le 2e appel contient le résultat de l'outil : stocks et délais réels de la base.
+        envoye = appel.call_args_list[1].kwargs
+        resultat = envoye["messages"][-1]["content"][0]
+        self.assertEqual(resultat["tool_use_id"], "outil_1")
+        donnees = json.loads(resultat["content"])
+        self.assertEqual({p["pharmacie"] for p in donnees["pharmacies"]}, {"Proche", "Avec livreur"})
+        self.assertTrue(donnees["medicament"]["ordonnance_requise"])
+        self.assertNotIn(self.client_id, json.dumps(envoye["messages"], default=str))
+        self.assertNotIn("27.479", json.dumps(envoye["messages"], default=str))  # pas la position du patient
+        self.assertEqual(envoye["fallbacks"], "default")
+
+    @override_settings(ASSISTANT_IA_CLE="cle-test")
+    def test_ia_pharmacie_inventee_ignoree(self):
+        final = json.dumps({"reponse": "Pharmacie Imaginaire.", "pharmacie_id": 99999, "action": "reserver",
+                            "mode": "moto", "orienter_medecin": True})
+        patch, _ = self.ia(SimpleNamespace(stop_reason="tool_use", content=[bloc_outil("amox")]), reponse_ia(final))
+        with patch:
+            d = self.demander("Amoxicilline, j'ai du mal à respirer").json()
+        self.assertEqual((d["recommandation"], d["action"], d["orienter_medecin"]), (None, "aucune", True))
+
+    @override_settings(ASSISTANT_IA_CLE="cle-test")
+    def test_ia_en_panne_regles_en_secours(self):
+        patch, _ = self.ia(anthropic.APIConnectionError(request=mock.Mock()))
+        with patch:
+            d = self.demander("amoxicilline").json()
+        self.assertEqual((d["source"], d["recommandation"]["pharmacie"]["nom"]), ("regles", "Proche"))
+        patch, _ = self.ia(reponse_ia("", stop_reason="refusal"))
+        with patch:
+            self.assertEqual(self.demander("amoxicilline").json()["source"], "regles")
+
+    @override_settings(ASSISTANT_IA_CLE="")
+    def test_validation_et_limite(self):
+        self.assertEqual(self.demander("").status_code, 400)
+        self.assertEqual(self.client.post("/api/assistant/", {"message": "amoxicilline"},
+                                          content_type="application/json",
+                                          HTTP_AUTHORIZATION=entete_authorization(self.client_id)).status_code, 400)
+        for _ in range(20):
+            self.demander("amoxicilline")
+        self.assertEqual(self.demander("amoxicilline").status_code, 429)
+
+    def test_pire_cas_sous_le_delai_du_serveur(self):
+        from conseil import choix
+
+        self.assertLess(choix.DELAI_SECONDES * choix.TOURS_MAX, 60)
