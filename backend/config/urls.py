@@ -41,6 +41,7 @@ urlpatterns = [
     path("api/verification/", VerificationView.as_view(), name="verification"),
     path("api/livraison/devis/", DevisLivraisonView.as_view(), name="devis_livraison"),
     path("api/messagerie/entrant/", MessageEntrantView.as_view(), name="messagerie_entrant"),
+    path("api/web/", include("pro_api.urls")),
     path("api/", include(router.urls)),
 ]
 

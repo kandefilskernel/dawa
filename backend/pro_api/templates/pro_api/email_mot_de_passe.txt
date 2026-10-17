@@ -1,0 +1,10 @@
+Bonjour,
+
+Une demande de nouveau mot de passe a été faite pour le compte « {{ user.get_username }} » sur Uzima.
+Pour choisir un nouveau mot de passe, ouvrez ce lien (valable 24 heures) :
+
+{{ adresse_web }}/mot-de-passe/{{ uid }}/{{ token }}
+
+Si vous n'êtes pas à l'origine de cette demande, ignorez ce message : votre mot de passe reste inchangé.
+
+L'équipe Uzima

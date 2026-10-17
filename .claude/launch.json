@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8090", "--directory", "mobile/build/web"],
       "port": 8090
+    },
+    {
+      "name": "uzima-web",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": ["compose", "up", "web"],
+      "port": 3000
     }
   ]
 }

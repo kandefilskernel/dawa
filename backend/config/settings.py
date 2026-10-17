@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "grossistes",
     "messagerie",
     "notifications",
+    "pro_api",
 ]
 
 MIDDLEWARE = [
@@ -115,6 +116,13 @@ if TESTS:
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG
+
+# Site Next.js des espaces professionnels (dossier web/). Il transmet /api/web/ à Django :
+# son adresse doit être une origine de confiance pour le contrôle CSRF.
+UZIMA_WEB_URL = os.environ.get("UZIMA_WEB_URL", "http://localhost:3000").rstrip("/")
+CSRF_TRUSTED_ORIGINS = [o for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o]
+if DEBUG and UZIMA_WEB_URL not in CSRF_TRUSTED_ORIGINS:
+    CSRF_TRUSTED_ORIGINS.append(UZIMA_WEB_URL)
 CORS_ALLOW_HEADERS = (*default_headers, "x-client-id")
 
 REST_FRAMEWORK = {
@@ -177,7 +185,6 @@ if not DEBUG and not TESTS:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
-    CSRF_TRUSTED_ORIGINS = [o for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",") if o]
     SECURE_HSTS_SECONDS = int(os.environ.get("DJANGO_HSTS_SECONDES", "3600"))
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_REFERRER_POLICY = "same-origin"
