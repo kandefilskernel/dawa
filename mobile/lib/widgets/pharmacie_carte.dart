@@ -7,6 +7,7 @@ import '../models.dart';
 import '../theme.dart';
 import 'communs.dart';
 import 'reservation_sheet.dart';
+import 'trajet.dart';
 import 'image_medicament.dart';
 
 String formatPrix(int prix) {
@@ -46,6 +47,8 @@ class PharmacieCarte extends StatelessWidget {
     this.medicamentRecherche,
     this.meilleurPrix = false,
     this.plusProche = false,
+    this.plusRapide = false,
+    this.mode = ModeTrajet.moto,
   });
 
   final Pharmacie pharmacie;
@@ -53,16 +56,23 @@ class PharmacieCarte extends StatelessWidget {
   final Medicament? medicamentRecherche;
   final bool meilleurPrix;
   final bool plusProche;
+  final bool plusRapide;
+
+  /// Mode de trajet pour le délai affiché (résultats de recherche avec position).
+  final ModeTrajet mode;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final r = resultat;
-    final distance = r?.distanceKm ?? pharmacie.distanceKm;
+    final acces = r?.acces;
+    // Avec un trajet calculé, la distance par la route est affichée plus bas.
+    final distance = acces != null ? null : r?.distanceKm ?? pharmacie.distanceKm;
     final equivalent = r != null && medicamentRecherche != null && r.medicament.id != medicamentRecherche!.id;
 
     final pastilles = [
       if (meilleurPrix) Pastille(tr('Meilleur prix'), couleur: Couleurs.ambreFonce, icone: Icons.sell, plein: true),
+      if (plusRapide) Pastille(tr('Le plus rapide'), couleur: Couleurs.emeraude, icone: Icons.bolt, plein: true),
       if (plusProche) Pastille(tr('Le plus proche'), couleur: Couleurs.emeraude, icone: Icons.near_me, plein: true),
       if (pharmacie.deGarde) Pastille(tr('De garde'), couleur: Couleurs.indigo, icone: Icons.nightlight_round),
       if (r != null && !r.confirme)
@@ -128,6 +138,10 @@ class PharmacieCarte extends StatelessWidget {
               ]),
             ],
           ]),
+          if (acces != null) ...[
+            const SizedBox(height: 12),
+            LigneAcces(acces: acces, mode: mode),
+          ],
           if (r != null) ...[
             const SizedBox(height: 12),
             Container(

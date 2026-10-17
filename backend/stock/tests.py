@@ -98,7 +98,10 @@ class RechercheTests(TestCase):
     def test_stock_ancien_non_confirme(self):
         Stock.objects.filter(pharmacie=self.proche).update(mis_a_jour_le=timezone.now() - timedelta(days=3))
         r = self.rechercher(q="panadol", lat=CENTRE[0], lng=CENTRE[1])
-        self.assertFalse(r.json()["resultats"][0]["confirme"])
+        proche = next(res for res in r.json()["resultats"] if res["pharmacie"]["nom"] == "Proche")
+        self.assertFalse(proche["confirme"])
+        # Stock incertain : classé après la pharmacie à 3 km dont le stock est confirmé.
+        self.assertEqual(self.noms(r), ["Moyenne", "Proche"])
 
     def test_journalise_zone_arrondie(self):
         self.rechercher(q="doliprane", lat=-11.66789, lng=27.47912)

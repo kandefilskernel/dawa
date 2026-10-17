@@ -17,11 +17,13 @@ class CartePharmacies extends StatelessWidget {
     required this.position,
     required this.resultats,
     this.medicamentRecherche,
+    this.mode = ModeTrajet.moto,
   });
 
   final Position position;
   final List<Resultat> resultats;
   final Medicament? medicamentRecherche;
+  final ModeTrajet mode;
 
   @override
   Widget build(BuildContext context) {
@@ -94,6 +96,7 @@ class CartePharmacies extends StatelessWidget {
             pharmacie: resultat.pharmacie,
             resultat: resultat,
             medicamentRecherche: medicamentRecherche,
+            mode: mode,
           ),
         ),
       ),

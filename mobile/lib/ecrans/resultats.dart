@@ -10,6 +10,7 @@ import '../theme.dart';
 import '../widgets/carte_pharmacies.dart';
 import '../widgets/communs.dart';
 import '../widgets/pharmacie_carte.dart';
+import '../widgets/trajet.dart';
 import '../widgets/image_medicament.dart';
 
 class EcranResultats extends StatefulWidget {
@@ -24,6 +25,7 @@ class EcranResultats extends StatefulWidget {
 class _EcranResultatsState extends State<EcranResultats> {
   int _rayon = rayonParDefautKm;
   bool _surCarte = false;
+  ModeTrajet _mode = stockage.modeTrajet;
   Position? _position;
   ReponseRecherche? _reponse;
   String? _erreur;
@@ -43,7 +45,7 @@ class _EcranResultatsState extends State<EcranResultats> {
     });
     try {
       final position = _position ?? await positionActuelle();
-      final reponse = await api.rechercher(widget.medicament, position, _rayon);
+      final reponse = await api.rechercher(widget.medicament, position, _rayon, mode: _mode);
       if (!mounted) return;
       setState(() {
         _position = position;
@@ -71,6 +73,12 @@ class _EcranResultatsState extends State<EcranResultats> {
     } on ApiException catch (e) {
       messager.showSnackBar(SnackBar(content: Text(e.message)));
     }
+  }
+
+  void _changerMode(ModeTrajet mode) {
+    setState(() => _mode = mode);
+    stockage.choisirModeTrajet(mode);
+    _charger();
   }
 
   void _changerRayon(int rayon) {
@@ -138,6 +146,11 @@ class _EcranResultatsState extends State<EcranResultats> {
             ),
           ]),
         ),
+        if (_position != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: SizedBox(width: double.infinity, child: SelecteurMode(mode: _mode, onChanged: _changerMode)),
+          ),
         if (_chargement) const LinearProgressIndicator(minHeight: 2) else const SizedBox(height: 2),
         Expanded(child: _contenu()),
       ]),
@@ -162,6 +175,7 @@ class _EcranResultatsState extends State<EcranResultats> {
           position: _position!,
           resultats: resultats,
           medicamentRecherche: widget.medicament,
+          mode: _mode,
         ),
       );
     }
@@ -203,6 +217,9 @@ class _EcranResultatsState extends State<EcranResultats> {
     final prixMin = resultats.map((r) => r.prix).whereType<int>().fold<int?>(
         null, (min, p) => min == null || p < min ? p : min);
     final avecPosition = !(_position?.approximative ?? true);
+    // Le plus rapide : délai minimal pour ce mode (les sponsorisés peuvent être en tête de liste).
+    final delais = [for (final r in resultats) r.acces?.delaiMin[_mode]];
+    final delaiMin = delais.whereType<int>().fold<int?>(null, (min, d) => min == null || d < min ? d : min);
 
     return RefreshIndicator(
       onRefresh: _charger,
@@ -217,7 +234,9 @@ class _EcranResultatsState extends State<EcranResultats> {
             resultat: r,
             medicamentRecherche: widget.medicament,
             meilleurPrix: prixMin != null && r.prix == prixMin && resultats.length > 1,
-            plusProche: i == 0 && avecPosition,
+            plusRapide: avecPosition && delaiMin != null && delais[i] == delaiMin && resultats.length > 1,
+            plusProche: avecPosition && delaiMin == null && i == 0,
+            mode: _mode,
           );
         },
       ),

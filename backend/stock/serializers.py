@@ -15,10 +15,16 @@ class ResultatSerializer(serializers.ModelSerializer):
     distance_km = serializers.SerializerMethodField()
     confirme = serializers.BooleanField(source="est_confirme")
     sponsorise = serializers.SerializerMethodField()
+    acces = serializers.SerializerMethodField()
 
     class Meta:
         model = Stock
-        fields = ["pharmacie", "medicament", "prix", "mis_a_jour_le", "confirme", "distance_km", "sponsorise"]
+        fields = ["pharmacie", "medicament", "prix", "mis_a_jour_le", "confirme", "distance_km", "sponsorise",
+                  "acces"]
+
+    def get_acces(self, obj):
+        """Trajets et délai pour obtenir le médicament (présent seulement avec une position)."""
+        return getattr(obj, "acces", None)
 
     def get_sponsorise(self, obj):
         return getattr(obj, "sponsorise", False)

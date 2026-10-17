@@ -46,6 +46,10 @@ class Stockage {
     await _prefs.setString('telephone', telephone);
   }
 
+  /// Façon de se déplacer choisie dans les résultats (moto par défaut).
+  ModeTrajet get modeTrajet => ModeTrajet.depuis(_prefs.getString('mode_trajet'));
+  Future<void> choisirModeTrajet(ModeTrajet mode) => _prefs.setString('mode_trajet', mode.code);
+
   List<Medicament> get historique => _lireListe('historique').map(Medicament.fromJson).toList();
 
   Future<void> ajouterHistorique(Medicament medicament) async {

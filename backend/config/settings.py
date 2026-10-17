@@ -140,6 +140,10 @@ LIVRAISON_FORFAIT_FC = 2000
 LIVRAISON_PRIX_KM_FC = 500
 LIVRAISON_DISTANCE_MAX_KM = 15
 
+# Serveur de routage OSRM (distances par la route, données OpenStreetMap). Vide : estimation seule.
+# Par défaut le serveur public de FOSSGIS (profils routed-foot / routed-car) ; jamais en test.
+ROUTAGE_URL = "" if TESTS else os.environ.get("UZIMA_ROUTAGE_URL", "https://routing.openstreetmap.de").rstrip("/")
+
 # Abonnements des pharmacies (montants mensuels en FC, à ajuster après le terrain).
 ABONNEMENT_PRIX_FC = {"essentiel": 30_000, "visibilite": 75_000}
 # Numéro mobile money Uzima où les pharmacies paient leur abonnement.

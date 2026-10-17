@@ -51,6 +51,9 @@ MEDICAMENTS = [
 ]
 
 # Pharmacies fictives, positions approximatives dans les communes de Lubumbashi.
+# Horaires variés : le classement « le plus rapide » tient compte des pharmacies fermées.
+HORAIRES_DEMO = ["Lun–Sam 8h–20h", "Lun–Dim 7h–22h", "Lun–Ven 8h–18h, Sam 9h–13h", "Lun–Sam 8h–20h, Dim 9h–13h"]
+
 PHARMACIES = [
     ("Pharmacie Démo Centre", "Av. Mama Yemo", "Centre-ville", "Lubumbashi", -11.664, 27.479),
     ("Pharmacie Démo Kenya", "Av. du Marché", "Kenya", "Kenya", -11.688, 27.468),
@@ -126,7 +129,7 @@ class Command(BaseCommand):
                 nom=nom,
                 defaults={
                     "adresse": adresse, "quartier": quartier, "commune": commune,
-                    "telephone": f"+24399000{i:04d}", "horaires": "Lun–Sam 8h–20h",
+                    "telephone": f"+24399000{i:04d}", "horaires": HORAIRES_DEMO[i % len(HORAIRES_DEMO)],
                     "position": Point(lng, lat, srid=4326), "est_validee": True,
                 },
             )

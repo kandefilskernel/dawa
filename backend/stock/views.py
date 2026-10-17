@@ -15,9 +15,11 @@ from catalogue.serializers import MedicamentSerializer
 from pharmacies.geo import position_depuis_requete, rayon_depuis_requete
 from pharmacies.models import Pharmacie
 from pharmacies.serializers import contexte_pharmacies
+from pharmacies.trajets import mode_depuis
 
 from config.client import client_id
 
+from .delais import classer_par_delai
 from .models import AlerteStock, Recherche, Stock
 from .serializers import AlerteSerializer, ResultatSerializer
 
@@ -30,7 +32,8 @@ class RechercheView(APIView):
     GET /api/recherche/?q=amoxicilline&lat=-11.66&lng=27.48           (meilleure correspondance)
 
     Pharmacies qui ont le médicament ou un équivalent (même DCI, même forme) en stock.
-    Triées par distance si une position est fournie, sinon par prix.
+    Avec une position : triées par délai pour obtenir le médicament (trajet par la route selon
+    `?mode=pied|moto|voiture`, horaires, gardes, stock confirmé). Sans position : par prix.
     """
 
     def get(self, request):
@@ -56,6 +59,10 @@ class RechercheView(APIView):
             stocks = stocks.order_by(F("prix").asc(nulls_last=True))
 
         resultats = list(stocks[:MAX_RESULTATS])
+        contexte = contexte_pharmacies()
+        mode = mode_depuis(request.query_params.get("mode"))
+        if position is not None:
+            resultats = classer_par_delai(resultats, (position.y, position.x), mode, contexte["ids_garde"])
         ids_sponsor = Abonnement.objects.ids_pharmacies_sponsorisees()
         resultats = self._sponsorises_en_tete(resultats, ids_sponsor)
         self._journaliser(terme, medicament, position, len(resultats))
@@ -63,10 +70,8 @@ class RechercheView(APIView):
         return Response({
             "terme": terme,
             "medicament": MedicamentSerializer(medicament, context={"request": request}).data if medicament else None,
-            "resultats": ResultatSerializer(
-                resultats, many=True,
-                context={**contexte_pharmacies(), "request": request}
-            ).data,
+            "mode": mode,
+            "resultats": ResultatSerializer(resultats, many=True, context={**contexte, "request": request}).data,
         })
 
     @staticmethod

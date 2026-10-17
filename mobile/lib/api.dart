@@ -118,10 +118,13 @@ class Api {
     return (json['results'] as List).map((m) => Medicament.fromJson(m)).toList();
   }
 
-  Future<ReponseRecherche> rechercher(Medicament medicament, Position position, int rayonKm) async {
+  /// Pharmacies qui ont le médicament, de la plus rapide à la plus lente pour ce mode de trajet.
+  Future<ReponseRecherche> rechercher(Medicament medicament, Position position, int rayonKm,
+      {ModeTrajet mode = ModeTrajet.moto}) async {
     final json = await _requete('GET', '/api/recherche/', params: {
       'medicament': '${medicament.id}',
       'rayon': '$rayonKm',
+      'mode': mode.code,
       ..._position(position),
     });
     return ReponseRecherche.fromJson(json);

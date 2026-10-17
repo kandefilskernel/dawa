@@ -64,19 +64,68 @@ class Pharmacie {
         deGarde = json['de_garde'] ?? false;
 }
 
+/// Façon de se rendre à la pharmacie (codes de l'API : pied, moto, voiture).
+enum ModeTrajet {
+  pied('pied'),
+  moto('moto'),
+  voiture('voiture');
+
+  const ModeTrajet(this.code);
+  final String code;
+
+  static ModeTrajet depuis(String? code) => values.firstWhere((m) => m.code == code, orElse: () => moto);
+}
+
+class Trajet {
+  final double distanceKm;
+  final int minutes;
+
+  /// Vrai si la distance vient du routage par la route, faux si c'est une estimation.
+  final bool parLaRoute;
+
+  Trajet.fromJson(Map<String, dynamic> json)
+      : distanceKm = _double(json['distance_km'])!,
+        minutes = json['minutes'],
+        parLaRoute = json['source'] == 'route';
+}
+
+/// Trajets et délai pour obtenir le médicament dans une pharmacie (calculés par le serveur).
+class Acces {
+  /// null : horaires inconnus.
+  final bool? ouverte;
+  final int? ouvreDansMin;
+  final Map<ModeTrajet, Trajet> trajets;
+
+  /// Trajet + attente de l'ouverture ; null si la pharmacie reste fermée toute la semaine.
+  final Map<ModeTrajet, int?> delaiMin;
+
+  Acces.fromJson(Map<String, dynamic> json)
+      : ouverte = json['ouverte'],
+        ouvreDansMin = json['ouvre_dans_min'],
+        trajets = {
+          for (final e in (json['trajets'] as Map).entries)
+            ModeTrajet.depuis(e.key): Trajet.fromJson(e.value),
+        },
+        delaiMin = {
+          for (final e in (json['delai_min'] as Map).entries) ModeTrajet.depuis(e.key): e.value as int?,
+        };
+}
+
 class Resultat {
   final Pharmacie pharmacie;
   final Medicament medicament;
   final int? prix;
   final bool confirme;
   final double? distanceKm;
+  final Acces? acces;
 
   Resultat.fromJson(Map<String, dynamic> json)
       : pharmacie = Pharmacie.fromJson(json['pharmacie']),
         medicament = Medicament.fromJson(json['medicament']),
         prix = json['prix'],
         confirme = json['confirme'] ?? false,
-        distanceKm = _double(json['distance_km']);
+        distanceKm = _double(json['distance_km']),
+        acces = json['acces'] == null ? null : Acces.fromJson(json['acces']);
 }
 
 class ReponseRecherche {
