@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Écran de démarrage Uzima (Android 11 et avant) : fond vert et icône au centre. -->
+<!-- Écran de démarrage Uzima (Android 11 et avant) : fond vert et icône au centre.
+     L'image doit être un PNG : @mipmap/ic_launcher est une icône adaptative (XML) sur Android 8+,
+     que <bitmap> ne sait pas lire (l'app plantait au démarrage). -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/uzima_vert" />
     <item>
         <bitmap
             android:gravity="center"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@mipmap/ic_launcher_foreground" />
     </item>
 </layer-list>
