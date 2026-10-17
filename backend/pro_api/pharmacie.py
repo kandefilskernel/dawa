@@ -64,7 +64,7 @@ def reservation_json(r):
     return {
         "id": r.pk,
         "statut": effectif,
-        "statut_libelle": Reservation.Statut(effectif).label if effectif != r.statut else r.get_statut_display(),
+        "statut_libelle": r.get_statut_display(),  # statut enregistré ; « expiree » signale le délai dépassé
         "expiree": effectif == Reservation.Statut.EXPIREE,
         "est_active": r.est_active,
         "transitions": [str(t) for t in r.transitions_possibles],

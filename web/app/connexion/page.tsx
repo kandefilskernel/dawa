@@ -57,8 +57,8 @@ export default function Connexion() {
       </form>
       <p className="aide lien-centre"><Link href="/mot-de-passe-oublie">Mot de passe oublié ?</Link></p>
       <p className="aide lien-centre" style={{ marginTop: 16 }}>
-        Pas encore de compte ? <a href="/portail/inscription/">Inscrire ma pharmacie</a> ·{" "}
-        <a href="/etablissement/inscription/">Inscrire un hôpital ou une clinique</a>
+        Pas encore de compte ? <Link href="/inscription/pharmacie">Inscrire ma pharmacie</Link> ·{" "}
+        <Link href="/inscription/etablissement">Inscrire un hôpital ou une clinique</Link>
       </p>
     </CarteConnexion>
   );

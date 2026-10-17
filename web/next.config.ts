@@ -13,6 +13,7 @@ const config: NextConfig = {
   // Les adresses Django finissent par « / » : Next.js ne doit pas l'enlever.
   skipTrailingSlashRedirect: true,
   poweredByHeader: false,
+  devIndicators: false, // le bouton « N » de Next.js cachait la navigation sur téléphone
   async rewrites() {
     return [
       ...AVEC_BARRE.flatMap((p) => [
