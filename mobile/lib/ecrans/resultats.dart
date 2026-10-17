@@ -184,11 +184,20 @@ class _EcranResultatsState extends State<EcranResultats> {
       return SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(32, 16, 32, 32),
         child: Column(children: [
-          const Illustration('recherche_vide', hauteur: 140),
-          const SizedBox(height: 16),
+          Container(
+            width: 168,
+            height: 168,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(colors: [Couleurs.menthe, Color(0x00D1FAE5)], stops: [0.45, 1]),
+            ),
+            child: const Illustration('recherche_vide', hauteur: 124),
+          ),
+          const SizedBox(height: 12),
           Text(tr('Pas en stock dans un rayon de {km} km', {'km': _rayon}),
-              style: Theme.of(context).textTheme.titleMedium, textAlign: TextAlign.center),
-          const SizedBox(height: 6),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 19), textAlign: TextAlign.center),
+          const SizedBox(height: 8),
           Text(tr("Les pharmacies proches n'ont pas signalé ce médicament."),
               textAlign: TextAlign.center, style: TextStyle(color: Couleurs.texteDoux)),
           const SizedBox(height: 20),
@@ -265,7 +274,7 @@ class _Resume extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: Couleurs.degradeMarque,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: ombreDouce,
+        boxShadow: const [BoxShadow(color: Color(0x33065F46), blurRadius: 24, offset: Offset(0, 10))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -315,7 +324,7 @@ class _Info extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: alerte ? const Color(0xFFFEE2E2) : Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icone, size: 15, color: couleur),

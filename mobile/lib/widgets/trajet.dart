@@ -104,10 +104,17 @@ class SelecteurMode extends StatelessWidget {
         backgroundColor: Colors.white,
         side: const BorderSide(color: Couleurs.bordure),
         visualDensity: VisualDensity.compact,
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        textStyle: const TextStyle(fontFamily: policeMarque, fontSize: 13, fontWeight: FontWeight.w700),
       ),
       segments: [
         for (final m in ModeTrajet.values)
-          ButtonSegment(value: m, icon: Icon(m.icone, size: 18), label: Text(m.libelle)),
+          ButtonSegment(
+            value: m,
+            icon: Icon(m.icone, size: 18),
+            // Réduit plutôt que couper le mot quand la traduction est longue (« Motorbike »).
+            label: FittedBox(fit: BoxFit.scaleDown, child: Text(m.libelle, maxLines: 1)),
+          ),
       ],
       selected: {mode},
       onSelectionChanged: (s) => onChanged(s.first),

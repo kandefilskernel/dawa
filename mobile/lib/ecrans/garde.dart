@@ -74,7 +74,7 @@ class _EcranGardeState extends State<EcranGarde> {
     }
     final pharmacies = _pharmacies;
     if (pharmacies == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Chargement();
     }
     if (pharmacies.isEmpty) {
       return EtatIllustre(
@@ -110,90 +110,18 @@ class _EnTeteNuit extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final haut = MediaQuery.paddingOf(context).top;
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: Couleurs.degradeNuit,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
-      ),
-      padding: EdgeInsets.fromLTRB(20, haut + 20, 12, 22),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          const Positioned(
-            right: -4,
-            bottom: -8,
-            child: Illustration('garde', hauteur: 96),
-          ),
-          // La Row occupe toute la largeur, pour que l'illustration se cale à droite.
-          Row(
-            children: [
-              SizedBox(
-                width: 190,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tr('Pharmacies\nde garde'),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        height: 1.1,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      tr('Ouvertes en dehors des heures habituelles.'),
-                      style: TextStyle(
-                        color: Color(0xCCFFFFFF),
-                        fontSize: 13.5,
-                      ),
-                    ),
-                    if (nombre != null && nombre! > 0) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFDE68A),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 8,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF16A34A),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              nombre! > 1 ? tr('{n} ouvertes maintenant', {'n': nombre}) : tr('{n} ouverte maintenant', {'n': nombre}),
-                              style: const TextStyle(
-                                color: Couleurs.indigoFonce,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 12.5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    final n = nombre;
+    return EnTeteEcran(
+      titre: tr('Pharmacies\nde garde'),
+      sousTitre: tr('Ouvertes en dehors des heures habituelles.'),
+      degrade: Couleurs.degradeNuit,
+      illustration: 'garde',
+      bas: n != null && n > 0
+          ? PastilleEnTete(
+              n > 1 ? tr('{n} ouvertes maintenant', {'n': n}) : tr('{n} ouverte maintenant', {'n': n}),
+              point: const Color(0xFF4ADE80),
+            )
+          : null,
     );
   }
 }
@@ -207,8 +135,12 @@ class _BandeauHorsLigne extends StatelessWidget {
   Widget build(BuildContext context) {
     String deux(int n) => n.toString().padLeft(2, '0');
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Couleurs.ambreClair, borderRadius: BorderRadius.circular(14)),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Couleurs.ambreClair,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFDE68A)),
+      ),
       child: Row(children: [
         const Icon(Icons.cloud_off_outlined, color: Color(0xFFB45309), size: 20),
         const SizedBox(width: 10),

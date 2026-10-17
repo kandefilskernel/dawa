@@ -124,7 +124,10 @@ class _EcranRechercheState extends State<EcranRecherche> {
 
   Widget _champRecherche() {
     return DecoratedBox(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(18), boxShadow: ombreDouce),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [BoxShadow(color: Color(0x40022C22), blurRadius: 24, offset: Offset(0, 10))],
+      ),
       child: TextField(
         controller: _champ,
         focusNode: _focus,
@@ -136,6 +139,12 @@ class _EcranRechercheState extends State<EcranRecherche> {
         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         decoration: InputDecoration(
           hintText: tr('Nom du médicament'),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide.none),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(18),
+            borderSide: const BorderSide(color: Couleurs.soleil, width: 2),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
           prefixIcon: const Padding(
             padding: EdgeInsets.only(left: 6),
             child: Icon(Icons.search, color: Couleurs.emeraude, size: 26),
@@ -169,21 +178,17 @@ class _EcranRechercheState extends State<EcranRecherche> {
     final theme = Theme.of(context);
     final recents = stockage.historique;
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+      padding: const EdgeInsets.fromLTRB(Mesures.marge, 26, Mesures.marge, 32),
       children: [
         if (recents.isNotEmpty) ...[
-          Row(children: [
-            Text(tr('Recherches récentes'), style: theme.textTheme.titleMedium),
-            const Spacer(),
-            TextButton(
-              onPressed: () async {
-                await stockage.effacerHistorique();
-                setState(() {});
-              },
-              child: Text(tr('Effacer')),
-            ),
-          ]),
-          const SizedBox(height: 4),
+          TitreSection(
+            tr('Recherches récentes'),
+            libelleAction: tr('Effacer'),
+            action: () async {
+              await stockage.effacerHistorique();
+              setState(() {});
+            },
+          ),
           Card(
             clipBehavior: Clip.antiAlias,
             child: Column(children: [
@@ -201,8 +206,7 @@ class _EcranRechercheState extends State<EcranRecherche> {
           ),
           const SizedBox(height: 28),
         ],
-        Text(tr('Recherches fréquentes'), style: theme.textTheme.titleMedium),
-        const SizedBox(height: 12),
+        TitreSection(tr('Recherches fréquentes')),
         Wrap(spacing: 8, runSpacing: 8, children: [
           for (final nom in _recherchesFrequentes)
             ActionChip(
@@ -212,20 +216,11 @@ class _EcranRechercheState extends State<EcranRecherche> {
             ),
         ]),
         const SizedBox(height: 20),
-        Card(
-          clipBehavior: Clip.antiAlias,
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            leading: const IconeTeintee(Icons.assistant_outlined),
-            title: Text(tr("Besoin d'un médicament vite ?"), style: const TextStyle(fontWeight: FontWeight.w700)),
-            subtitle: Text(tr("Demandez à l'assistant : la pharmacie la plus rapide, réserver ou se faire livrer.")),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EcranAssistant())),
-          ),
+        _CarteAssistant(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EcranAssistant())),
         ),
         const SizedBox(height: 28),
-        Text(tr('Services'), style: theme.textTheme.titleMedium),
-        const SizedBox(height: 12),
+        TitreSection(tr('Services')),
         // Pas de hauteur fixe : les cartes grandissent avec la taille de texte choisie sur le téléphone.
         _GrilleDeux(
           children: [
@@ -235,7 +230,7 @@ class _EcranRechercheState extends State<EcranRecherche> {
             ),
             _Service(
               icone: Icons.verified_user_outlined, titre: tr('Vérifier un lot'), texte: tr('Anti-contrefaçon'),
-              couleur: const Color(0xFF0369A1),
+              couleur: Couleurs.ciel,
               onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EcranVerification())),
             ),
             _Service(
@@ -252,14 +247,13 @@ class _EcranRechercheState extends State<EcranRecherche> {
         const SizedBox(height: 28),
         _CarteGarde(onTap: widget.onVoirGarde),
         const SizedBox(height: 28),
-        Text(tr('Comment ça marche'), style: theme.textTheme.titleMedium),
-        const SizedBox(height: 12),
+        TitreSection(tr('Comment ça marche')),
         IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Expanded(child: _Etape(icone: Icons.search, titre: tr('Cherchez'), texte: tr('Tapez ou dites le nom du médicament'))),
+          Expanded(child: _Etape(numero: 1, icone: Icons.search, titre: tr('Cherchez'), texte: tr('Tapez ou dites le nom du médicament'))),
           SizedBox(width: 10),
-          Expanded(child: _Etape(icone: Icons.compare_arrows, titre: tr('Comparez'), texte: tr('Prix et distance'), couleur: Couleurs.ambreFonce)),
+          Expanded(child: _Etape(numero: 2, icone: Icons.compare_arrows, titre: tr('Comparez'), texte: tr('Prix et distance'), couleur: Couleurs.ambreFonce)),
           SizedBox(width: 10),
-          Expanded(child: _Etape(icone: Icons.call, titre: tr('Appelez'), texte: tr('La pharmacie le garde'), couleur: Couleurs.indigo)),
+          Expanded(child: _Etape(numero: 3, icone: Icons.call, titre: tr('Appelez'), texte: tr('La pharmacie le garde'), couleur: Couleurs.indigo)),
         ])),
         const SizedBox(height: 24),
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -326,58 +320,67 @@ class _EnTete extends StatelessWidget {
   Widget build(BuildContext context) {
     final haut = MediaQuery.paddingOf(context).top;
     return Container(
+      clipBehavior: Clip.antiAlias,
       decoration: const BoxDecoration(
         gradient: Couleurs.degradeMarque,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
       ),
-      padding: EdgeInsets.fromLTRB(20, haut + 16, 20, 20),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          const Illustration('logo', hauteur: 36),
-          const SizedBox(width: 10),
-          const Text('Uzima',
-              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-          const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.place, size: 16, color: Colors.white),
-              SizedBox(width: 4),
-              Text('Lubumbashi', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+      child: Stack(children: [
+        Positioned(right: -70, top: -90, child: _cercle(240, 0.07)),
+        Positioned(left: -60, bottom: -90, child: _cercle(180, 0.05)),
+        Padding(
+          padding: EdgeInsets.fromLTRB(Mesures.marge, haut + 16, Mesures.marge, 20),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [BoxShadow(color: Color(0x33022C22), blurRadius: 12, offset: Offset(0, 4))],
+                ),
+                child: const Illustration('logo', hauteur: 38),
+              ),
+              const SizedBox(width: 10),
+              const Text('Uzima',
+                  style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w800, letterSpacing: -0.8)),
+              const Spacer(),
+              const PastilleEnTete('Lubumbashi', icone: Icons.place_rounded),
             ]),
-          ),
-        ]),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutCubic,
-          child: compact
-              ? const SizedBox(height: 16, width: double.infinity)
-              : Padding(
-                  padding: const EdgeInsets.only(top: 12, bottom: 8),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                    Expanded(
-                      flex: 5,
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(tr('Uzima, la santé\nprès de chez vous.'),
-                            style: TextStyle(color: Colors.white, fontSize: 26, height: 1.15,
-                                fontWeight: FontWeight.w800, letterSpacing: -0.6)),
-                        SizedBox(height: 8),
-                        Text(tr('Disponibilité, prix et distance\ndes pharmacies autour de vous.'),
-                            style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13.5, height: 1.35)),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              child: compact
+                  ? const SizedBox(height: 16, width: double.infinity)
+                  : Padding(
+                      padding: const EdgeInsets.only(top: 12, bottom: 8),
+                      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                        Expanded(
+                          flex: 5,
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Text(tr('Uzima, la santé\nprès de chez vous.'),
+                                style: TextStyle(color: Colors.white, fontSize: 26, height: 1.15,
+                                    fontWeight: FontWeight.w800, letterSpacing: -0.8)),
+                            SizedBox(height: 8),
+                            Text(tr('Disponibilité, prix et distance\ndes pharmacies autour de vous.'),
+                                style: TextStyle(color: Color(0xE6FFFFFF), fontSize: 13.5, height: 1.4,
+                                    fontWeight: FontWeight.w500)),
+                          ]),
+                        ),
+                        const Expanded(flex: 4, child: Illustration('pharmacie', hauteur: 130)),
                       ]),
                     ),
-                    const Expanded(flex: 4, child: Illustration('pharmacie', hauteur: 130)),
-                  ]),
-                ),
+            ),
+            champ,
+          ]),
         ),
-        champ,
       ]),
     );
   }
+
+  Widget _cercle(double taille, double opacite) => Container(
+        width: taille,
+        height: taille,
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white.withValues(alpha: opacite)),
+      );
 }
 
 class _LigneMedicament extends StatelessWidget {
@@ -411,6 +414,57 @@ class _LigneMedicament extends StatelessWidget {
           ),
           const Icon(Icons.chevron_right, color: Couleurs.texteDoux),
         ]),
+      ),
+    );
+  }
+}
+
+class _CarteAssistant extends StatelessWidget {
+  const _CarteAssistant({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(Mesures.rayonCarte),
+        child: Ink(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Couleurs.menthePale,
+            borderRadius: BorderRadius.circular(Mesures.rayonCarte),
+            border: Border.all(color: const Color(0xFFA7F3D0)),
+          ),
+          child: Row(children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(gradient: Couleurs.degradeMarque, borderRadius: BorderRadius.circular(15)),
+              child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 28),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(tr("Besoin d'un médicament vite ?"),
+                    style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800, fontSize: 15)),
+                const SizedBox(height: 3),
+                Text(tr("Demandez à l'assistant : la pharmacie la plus rapide, réserver ou se faire livrer."),
+                    style: theme.textTheme.bodySmall?.copyWith(color: Couleurs.emeraudeFonce)),
+              ]),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              width: 32,
+              height: 32,
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              child: const Icon(Icons.arrow_forward_rounded, size: 18, color: Couleurs.emeraude),
+            ),
+          ]),
+        ),
       ),
     );
   }
@@ -466,8 +520,15 @@ class _CarteGarde extends StatelessWidget {
 }
 
 class _Etape extends StatelessWidget {
-  const _Etape({required this.icone, required this.titre, required this.texte, this.couleur = Couleurs.emeraude});
+  const _Etape({
+    required this.numero,
+    required this.icone,
+    required this.titre,
+    required this.texte,
+    this.couleur = Couleurs.emeraude,
+  });
 
+  final int numero;
   final IconData icone;
   final String titre;
   final String texte;
@@ -480,9 +541,14 @@ class _Etape extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          IconeTeintee(icone, couleur: couleur, taille: 38),
+          Row(children: [
+            IconeTeintee(icone, couleur: couleur, taille: 38),
+            const Spacer(),
+            Text('$numero',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: couleur.withValues(alpha: 0.25))),
+          ]),
           const SizedBox(height: 10),
-          Text(titre, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+          Text(titre, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
           const SizedBox(height: 2),
           Text(texte, style: theme.textTheme.bodySmall),
         ]),
@@ -530,11 +596,16 @@ class _Service extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            IconeTeintee(icone, couleur: couleur, taille: 38),
-            const SizedBox(height: 10),
-            Text(titre, style: const TextStyle(fontWeight: FontWeight.w700)),
+            Row(children: [
+              IconeTeintee(icone, couleur: couleur, taille: 42),
+              const Spacer(),
+              Icon(Icons.arrow_outward_rounded, size: 18, color: couleur.withValues(alpha: 0.7)),
+            ]),
+            const SizedBox(height: 12),
+            Text(titre, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, letterSpacing: -0.1)),
+            const SizedBox(height: 2),
             Text(texte, style: Theme.of(context).textTheme.bodySmall),
           ]),
         ),

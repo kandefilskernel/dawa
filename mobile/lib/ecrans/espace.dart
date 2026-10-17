@@ -104,42 +104,39 @@ class EcranEspaceState extends State<EcranEspace> with SingleTickerProviderState
     final declenchees = _alertes?.where((a) => a.declenchee).length ?? 0;
 
     return Column(children: [
-      Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: Couleurs.degradeMarque,
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+      EnTeteEcran(
+        titre: tr('Mon espace'),
+        sousTitre: tr('Réservations, alertes, rappels de traitement et favoris.'),
+        paddingBas: 10,
+        // Toujours lisible : le nom de la langue est écrit dans la langue elle-même.
+        action: TextButton.icon(
+          onPressed: () => changerLangue(context),
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: const Color(0x29FFFFFF),
+            shape: const StadiumBorder(side: BorderSide(color: Color(0x38FFFFFF))),
+            minimumSize: const Size(0, 38),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+          ),
+          icon: const Icon(Icons.translate, size: 18),
+          label: Text(langues.courante.value.nom),
         ),
-        padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 20, 20, 8),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(
-              child: Text(tr('Mon espace'),
-                  style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-            ),
-            // Toujours lisible : le nom de la langue est écrit dans la langue elle-même.
-            TextButton.icon(
-              onPressed: () => changerLangue(context),
-              style: TextButton.styleFrom(foregroundColor: Colors.white, backgroundColor: const Color(0x29FFFFFF)),
-              icon: const Icon(Icons.translate, size: 20),
-              label: Text(langues.courante.value.nom),
-            ),
-          ]),
-          const SizedBox(height: 4),
-          Text(tr('Réservations, alertes, rappels de traitement et favoris.'),
-              style: TextStyle(color: Color(0xD9FFFFFF), fontSize: 13.5)),
+        bas: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           const _EtatNotifications(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           TabBar(
             controller: _onglets,
             isScrollable: true,
             tabAlignment: TabAlignment.start,
-            labelColor: Colors.white,
-            unselectedLabelColor: const Color(0xB3FFFFFF),
-            indicatorColor: const Color(0xFFFDE68A),
-            indicatorWeight: 3,
+            labelColor: Couleurs.emeraudeFonce,
+            unselectedLabelColor: const Color(0xD9FFFFFF),
+            indicator: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicatorPadding: const EdgeInsets.symmetric(vertical: 6),
+            labelPadding: const EdgeInsets.symmetric(horizontal: 14),
             dividerColor: Colors.transparent,
-            labelStyle: const TextStyle(fontWeight: FontWeight.w700),
+            overlayColor: const WidgetStatePropertyAll(Color(0x14FFFFFF)),
+            splashBorderRadius: BorderRadius.circular(12),
             tabs: [
               Tab(child: _LibelleOnglet(tr('Réservations'), actives)),
               Tab(child: _LibelleOnglet(tr('Alertes'), declenchees)),
@@ -174,7 +171,7 @@ class EcranEspaceState extends State<EcranEspace> with SingleTickerProviderState
     if (_erreur != null && elements == null) {
       return EtatIllustre(illustration: 'hors_ligne', titre: tr('Connexion impossible'), texte: _erreur, action: rafraichir);
     }
-    if (elements == null) return const Center(child: CircularProgressIndicator());
+    if (elements == null) return const Chargement();
     return RefreshIndicator(
       onRefresh: rafraichir,
       child: elements.isEmpty
@@ -252,9 +249,17 @@ class EcranEspaceState extends State<EcranEspace> with SingleTickerProviderState
             const SizedBox(height: 10),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Couleurs.fond, borderRadius: BorderRadius.circular(10)),
-              child: Text('« ${r.messagePharmacie} »', style: const TextStyle(fontStyle: FontStyle.italic)),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Couleurs.menthePale,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Couleurs.menthe),
+              ),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Icon(Icons.chat_bubble_outline_rounded, size: 16, color: Couleurs.emeraude),
+                const SizedBox(width: 8),
+                Expanded(child: Text('« ${r.messagePharmacie} »', style: const TextStyle(fontStyle: FontStyle.italic))),
+              ]),
             ),
           ],
           if (r.estLivraison) ...[
@@ -417,9 +422,9 @@ class _LibelleOnglet extends StatelessWidget {
         const SizedBox(width: 6),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-          decoration: BoxDecoration(color: const Color(0xFFFDE68A), borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(color: Couleurs.ambre, borderRadius: BorderRadius.circular(10)),
           child: Text('$nombre',
-              style: const TextStyle(color: Couleurs.emeraudeFonce, fontSize: 12, fontWeight: FontWeight.w800)),
+              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
         ),
       ],
     ]);
@@ -442,27 +447,24 @@ class _EtatNotifications extends StatelessWidget {
           EtatNotifications.refusees => (Icons.notifications_off, tr('Notifications refusées : autorisez-les dans les réglages du téléphone')),
           _ => (Icons.notifications_off, tr('Notifications non activées')),
         };
-        const style = TextStyle(color: Color(0xD9FFFFFF), fontSize: 12.5);
-        return Padding(
-          padding: const EdgeInsets.only(top: 6),
-          child: Row(children: [
-            Icon(icone, color: Colors.white, size: 16),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(texte, style: style),
-                if (etat == EtatNotifications.erreur && notificationsPush.erreur != null)
-                  SelectableText(notificationsPush.erreur!, style: style.copyWith(fontSize: 11), maxLines: 3),
-              ]),
+        const style = TextStyle(color: Color(0xD9FFFFFF), fontSize: 12.5, fontWeight: FontWeight.w500);
+        return Row(children: [
+          Icon(icone, color: Couleurs.soleil, size: 16),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(texte, style: style),
+              if (etat == EtatNotifications.erreur && notificationsPush.erreur != null)
+                SelectableText(notificationsPush.erreur!, style: style.copyWith(fontSize: 11), maxLines: 3),
+            ]),
+          ),
+          if (etat == EtatNotifications.erreur || etat == EtatNotifications.refusees)
+            TextButton(
+              onPressed: notificationsPush.activer,
+              style: TextButton.styleFrom(foregroundColor: Colors.white, visualDensity: VisualDensity.compact),
+              child: Text(tr('Réessayer')),
             ),
-            if (etat == EtatNotifications.erreur || etat == EtatNotifications.refusees)
-              TextButton(
-                onPressed: notificationsPush.activer,
-                style: TextButton.styleFrom(foregroundColor: Colors.white, visualDensity: VisualDensity.compact),
-                child: Text(tr('Réessayer')),
-              ),
-          ]),
-        );
+        ]);
       },
     );
   }

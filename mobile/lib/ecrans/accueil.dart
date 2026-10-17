@@ -88,14 +88,17 @@ class _AccueilState extends State<Accueil> {
         ),
       ]),
       bottomNavigationBar: DecoratedBox(
-        decoration: const BoxDecoration(border: Border(top: BorderSide(color: Couleurs.bordure))),
+        decoration: const BoxDecoration(
+          border: Border(top: BorderSide(color: Couleurs.bordure)),
+          boxShadow: [BoxShadow(color: Color(0x0F064E3B), blurRadius: 20, offset: Offset(0, -4))],
+        ),
         child: NavigationBar(
           selectedIndex: _onglet,
           onDestinationSelected: _allerA,
           destinations: [
             NavigationDestination(
-              icon: Icon(Icons.search),
-              selectedIcon: Icon(Icons.search, color: Couleurs.emeraudeFonce),
+              icon: Icon(Icons.search_rounded),
+              selectedIcon: Icon(Icons.search_rounded, color: Couleurs.emeraudeFonce),
               label: tr('Rechercher'),
             ),
             NavigationDestination(
@@ -112,9 +115,9 @@ class _AccueilState extends State<Accueil> {
               icon: Badge(
                 isLabelVisible: _alertesDeclenchees > 0,
                 label: Text('$_alertesDeclenchees'),
-                child: const Icon(Icons.person_outline),
+                child: const Icon(Icons.person_outline_rounded),
               ),
-              selectedIcon: const Icon(Icons.person, color: Couleurs.emeraudeFonce),
+              selectedIcon: const Icon(Icons.person_rounded, color: Couleurs.emeraudeFonce),
               label: tr('Mon espace'),
             ),
           ],

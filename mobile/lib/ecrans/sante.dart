@@ -19,12 +19,6 @@ const _filtres = <(String libelle, String? type, bool urgences)>[
   ('Maternités', 'maternite', false),
 ];
 
-const _degradeSante = LinearGradient(
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-  colors: [Color(0xFF0EA5E9), Color(0xFF0369A1), Color(0xFF0C4A6E)],
-);
-
 IconData _iconeType(String type) => switch (type) {
       'hopital' => Icons.local_hospital_outlined,
       'clinique' => Icons.medical_services_outlined,
@@ -70,10 +64,10 @@ class _EcranSanteState extends State<EcranSante> {
     return Column(children: [
       _EnTete(),
       SizedBox(
-        height: 56,
+        height: 64,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
           itemCount: _filtres.length,
           separatorBuilder: (_, _) => const SizedBox(width: 6),
           itemBuilder: (_, i) => ChoiceChip(
@@ -96,7 +90,7 @@ class _EcranSanteState extends State<EcranSante> {
       return EtatIllustre(illustration: 'hors_ligne', titre: tr('Connexion impossible'), texte: _erreur, action: _charger);
     }
     final liste = _etablissements;
-    if (liste == null) return const Center(child: CircularProgressIndicator());
+    if (liste == null) return const Chargement();
     if (liste.isEmpty) {
       return EtatIllustre(illustration: 'recherche_vide', titre: tr('Aucun établissement dans cette catégorie'));
     }
@@ -118,29 +112,11 @@ class _EcranSanteState extends State<EcranSante> {
 class _EnTete extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: _degradeSante,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
-      ),
-      padding: EdgeInsets.fromLTRB(20, MediaQuery.paddingOf(context).top + 20, 12, 20),
-      child: Stack(clipBehavior: Clip.none, children: [
-        const Positioned(right: -6, bottom: -10, child: Illustration('hopital', hauteur: 100)),
-        Row(children: [
-          SizedBox(
-            width: 180,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(tr('Annuaire\nsanté'),
-                  style: TextStyle(color: Colors.white, fontSize: 26, height: 1.1,
-                      fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-              SizedBox(height: 8),
-              Text(tr('Hôpitaux, cliniques, laboratoires près de vous.'),
-                  style: TextStyle(color: Color(0xCCFFFFFF), fontSize: 13.5)),
-            ]),
-          ),
-        ]),
-      ]),
+    return EnTeteEcran(
+      titre: tr('Annuaire\nsanté'),
+      sousTitre: tr('Hôpitaux, cliniques, laboratoires près de vous.'),
+      degrade: Couleurs.degradeSante,
+      illustration: 'hopital',
     );
   }
 }
@@ -185,7 +161,7 @@ class _CarteEtablissement extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            IconeTeintee(_iconeType(e.type), couleur: const Color(0xFF0369A1), taille: 48),
+            IconeTeintee(_iconeType(e.type), couleur: Couleurs.ciel, taille: 48),
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -215,7 +191,7 @@ class _CarteEtablissement extends StatelessWidget {
             if (e.telephone.isNotEmpty) ...[
               Expanded(
                 child: FilledButton.icon(
-                  style: FilledButton.styleFrom(backgroundColor: const Color(0xFF0369A1)),
+                  style: FilledButton.styleFrom(backgroundColor: Couleurs.ciel),
                   onPressed: () => appeler(context, e.telephone),
                   icon: const Icon(Icons.call, size: 18),
                   label: Text(tr('Appeler')),
