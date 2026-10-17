@@ -87,7 +87,7 @@ const sw = <String, String>{
   'Vérifiez l\'orthographe de « {terme} » ou essayez le nom de la molécule.': 'Hakiki tahajia ya « {terme} » au jaribu jina la kiambato.',
   '{n} médicaments': 'Dawa {n}',
   '{n} médicament': 'Dawa {n}',
-  'Votre médicament,\nà deux pas.': 'Dawa yako,\nkaribu nawe.',
+  'Uzima, la santé\nprès de chez vous.': 'Uzima, afya\nkaribu nawe.',
   'Disponibilité, prix et distance\ndes pharmacies autour de vous.': 'Upatikanaji, bei na umbali wa maduka ya dawa karibu nawe.',
   'Sur ordonnance': 'Kwa cheti cha daktari',
   'Pharmacies de garde': 'Maduka ya dawa ya zamu',

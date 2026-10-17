@@ -87,7 +87,7 @@ const en = <String, String>{
   'Vérifiez l\'orthographe de « {terme} » ou essayez le nom de la molécule.': 'Check the spelling of "{terme}" or try the active ingredient name.',
   '{n} médicaments': '{n} medicines',
   '{n} médicament': '{n} medicine',
-  'Votre médicament,\nà deux pas.': 'Your medicine,\nclose to you.',
+  'Uzima, la santé\nprès de chez vous.': 'Uzima, health\nclose to home.',
   'Disponibilité, prix et distance\ndes pharmacies autour de vous.': 'Availability, price and distance of pharmacies near you.',
   'Sur ordonnance': 'Prescription only',
   'Pharmacies de garde': 'Duty pharmacies',

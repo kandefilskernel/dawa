@@ -362,7 +362,7 @@ class _EnTete extends StatelessWidget {
                     Expanded(
                       flex: 5,
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(tr('Votre médicament,\nà deux pas.'),
+                        Text(tr('Uzima, la santé\nprès de chez vous.'),
                             style: TextStyle(color: Colors.white, fontSize: 26, height: 1.15,
                                 fontWeight: FontWeight.w800, letterSpacing: -0.6)),
                         SizedBox(height: 8),
