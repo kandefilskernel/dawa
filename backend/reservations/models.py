@@ -1,8 +1,10 @@
+import uuid
 from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.urls import reverse
 from django.utils import timezone
 
 from catalogue.models import Medicament
@@ -26,12 +28,21 @@ class Livreur(models.Model):
     nom = models.CharField(max_length=100)
     telephone = models.CharField(max_length=20)
     actif = models.BooleanField(default=True)
+    # Secret du lien personnel /livreur/<jeton>/ (page où il partage sa position), sans mot de passe.
+    jeton = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
 
     class Meta:
         ordering = ["nom"]
 
     def __str__(self):
         return f"{self.nom} ({self.telephone})"
+
+    @property
+    def lien_page(self):
+        return reverse("livreur:page", kwargs={"jeton": self.jeton})
+
+    def courses_en_cours(self):
+        return self.courses.filter(statut=Reservation.Statut.EN_LIVRAISON, expire_le__gt=timezone.now())
 
 
 class Reservation(models.Model):
@@ -135,6 +146,24 @@ class Reservation(models.Model):
             # Le client a de nouveau 2 heures (retrait), ou la course doit partir dans ce délai.
             self.expire_le = timezone.now() + DUREE_RESERVATION
         self.save(update_fields=["statut", "message_pharmacie", "expire_le", "livreur"])
+        if nouveau == self.Statut.LIVREE:
+            # Course terminée : on ne garde pas le parcours du livreur.
+            self.positions.all().delete()
         from notifications.envoi import notifier_reservation
 
         notifier_reservation(self)
+
+
+class PositionLivreur(models.Model):
+    """Position envoyée par le téléphone du livreur pendant une course (supprimée à la livraison)."""
+
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="positions")
+    position = models.PointField(geography=True, srid=4326)
+    vitesse_kmh = models.FloatField(null=True, blank=True, help_text="Vitesse donnée par le GPS.")
+    precision_m = models.FloatField(null=True, blank=True)
+    recue_le = models.DateTimeField(default=timezone.now, db_index=True)
+
+    class Meta:
+        ordering = ["recue_le"]
+        verbose_name = "position du livreur"
+        verbose_name_plural = "positions des livreurs"

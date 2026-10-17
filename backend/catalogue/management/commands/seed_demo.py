@@ -14,6 +14,7 @@ from django.utils import timezone
 from catalogue.models import Medicament
 from pharmacies.models import Garde, Pharmacie
 from portail.models import Pharmacien
+from reservations.models import Livreur
 from verification.models import Lot
 from sante.models import Etablissement
 from stock.models import Stock
@@ -146,6 +147,15 @@ class Command(BaseCommand):
                         "source": Stock.Source.ADMIN,
                     },
                 )
+
+        # Un livreur pour les trois premières pharmacies : la livraison à moto est proposée.
+        for i, pharmacie in enumerate(pharmacies[:3]):
+            livreur, _ = Livreur.objects.get_or_create(
+                pharmacie=pharmacie, nom=f"Livreur Démo {pharmacie.quartier}",
+                defaults={"telephone": f"+24398000{i:04d}"},
+            )
+            if i == 0:
+                self.stdout.write(f"Page du livreur de démo : /livreur/{livreur.jeton}/")
 
         # Deux pharmacies de garde, de maintenant à demain 8h.
         maintenant = timezone.localtime()

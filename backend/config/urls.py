@@ -32,6 +32,7 @@ urlpatterns = [
     path("portail/", include("portail.urls")),
     path("dawa/", include("gestion.urls")),
     path("etablissement/", include("sante.urls")),
+    path("livreur/", include("reservations.urls_livreur")),
     path("api/appareil/jeton/", JetonAppareilView.as_view(), name="jeton_appareil"),
     path("api/appareil/notifications/", AppareilPushView.as_view(), name="appareil_notifications"),
     path("api/itineraire/", ItineraireView.as_view(), name="itineraire"),

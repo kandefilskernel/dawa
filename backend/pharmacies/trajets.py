@@ -144,6 +144,17 @@ def trajets(depart, arrivees):
     return resultat
 
 
+def distance_route_km(depart, arrivee, mode):
+    """(distance par la route en km, "route"), ou l'estimation si le serveur ne répond pas."""
+    depart, arrivee = _arrondi(depart), _arrondi(arrivee)
+    distance = None
+    if settings.ROUTAGE_URL:
+        distance = _distances_route(PROFILS[mode], depart, [arrivee])[0]
+    if distance is None:
+        return estimation(depart, arrivee, mode).distance_km, "estimation"
+    return distance, "route"
+
+
 def itineraire(depart, arrivee, mode):
     """Tracé du trajet : {"points": [[lat, lng], …], "distance_km", "minutes", "source"}."""
     depart, arrivee = _arrondi(depart), _arrondi(arrivee)

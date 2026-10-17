@@ -13,6 +13,7 @@ import '../widgets/pharmacie_carte.dart';
 import 'choix_langue.dart';
 import 'fiche_pharmacie.dart';
 import 'resultats.dart';
+import 'suivi_livraison.dart';
 import 'traitements.dart';
 import '../widgets/image_medicament.dart';
 
@@ -256,7 +257,35 @@ class EcranEspaceState extends State<EcranEspace> with SingleTickerProviderState
               child: Text('« ${r.messagePharmacie} »', style: const TextStyle(fontStyle: FontStyle.italic)),
             ),
           ],
-          if (r.statut.estActive) ...[
+          if (r.estLivraison) ...[
+            const SizedBox(height: 10),
+            Row(children: [
+              const Icon(Icons.two_wheeler, size: 16, color: Couleurs.texteDoux),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  [
+                    tr('Livraison : {adresse}', {'adresse': r.adresseLivraison}),
+                    if (r.fraisLivraison != null) formatPrix(r.fraisLivraison!),
+                  ].join(' · '),
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+            ]),
+          ],
+          if (r.statut == StatutReservation.enLivraison) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(backgroundColor: Couleurs.indigo),
+                onPressed: () => ouvrirSuiviLivraison(context, r).then((_) => rafraichir()),
+                icon: const Icon(Icons.location_searching, size: 18),
+                label: Text(tr('Suivre le livreur sur la carte')),
+              ),
+            ),
+          ],
+          if (r.statut.estActive && r.statut != StatutReservation.enLivraison) ...[
             const SizedBox(height: 12),
             Row(children: [
               Expanded(
@@ -360,6 +389,8 @@ class EcranEspaceState extends State<EcranEspace> with SingleTickerProviderState
         StatutReservation.enAttente => (const Color(0xFFB45309), Icons.hourglass_top),
         StatutReservation.acceptee => (Couleurs.emeraude, Icons.thumb_up_alt_outlined),
         StatutReservation.prete => (Couleurs.emeraude, Icons.check_circle),
+        StatutReservation.enLivraison => (Couleurs.indigo, Icons.two_wheeler),
+        StatutReservation.livree => (Couleurs.texteDoux, Icons.done_all),
         StatutReservation.retiree => (Couleurs.texteDoux, Icons.done_all),
         StatutReservation.refusee => (Couleurs.rouge, Icons.block),
         StatutReservation.annulee => (Couleurs.texteDoux, Icons.close),

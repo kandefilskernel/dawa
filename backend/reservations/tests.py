@@ -160,3 +160,105 @@ class LivraisonTests(TestCase):
         res.changer_statut("livree")
         donnees = self.client.get("/api/reservations/", HTTP_AUTHORIZATION=entete_authorization(self.client_id)).json()[0]
         self.assertEqual((donnees["statut"], donnees["livreur"]["nom"]), ("livree", "Moto 1"))
+
+
+class SuiviLivreurTests(TestCase):
+    """Le livreur partage sa position depuis sa page ; le patient le voit avancer."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.med = Medicament.objects.create(dci="Amoxicilline", nom_commercial="Amoxil", dosage="500 mg")
+        cls.pharmacie = pharmacie("Pharma livraison")
+        Stock.objects.create(pharmacie=cls.pharmacie, medicament=cls.med, prix=5000)
+
+    def setUp(self):
+        from .models import Livreur
+
+        self.client_id = uuid.uuid4()
+        self.livreur = Livreur.objects.create(pharmacie=self.pharmacie, nom="Jean", telephone="+243990000009")
+        self.reservation = Reservation.objects.create(
+            client_id=self.client_id, nom="Client", telephone="+243990000001", pharmacie=self.pharmacie,
+            medicament=self.med, mode=Reservation.Mode.LIVRAISON, adresse_livraison="Av. Test 12",
+            position_livraison=Point(27.479, -11.700, srid=4326), statut=Reservation.Statut.PRETE,
+        )
+
+    def partir(self):
+        self.reservation.changer_statut(Reservation.Statut.EN_LIVRAISON, livreur=self.livreur)
+
+    def envoyer(self, lat, lng=27.479, jeton=None, **extra):
+        return self.client.post(f"/livreur/{jeton or self.livreur.jeton}/position/",
+                                {"lat": lat, "lng": lng, **extra}, content_type="application/json")
+
+    def suivi(self):
+        return self.client.get(f"/api/reservations/{self.reservation.pk}/suivi/",
+                               HTTP_AUTHORIZATION=entete_authorization(str(self.client_id)))
+
+    def test_page_du_livreur(self):
+        page = self.client.get(f"/livreur/{self.livreur.jeton}/")
+        self.assertContains(page, "Aucune course en cours")
+        self.partir()
+        page = self.client.get(f"/livreur/{self.livreur.jeton}/")
+        self.assertContains(page, "Av. Test 12")
+        self.assertContains(page, "Partager ma position")
+        self.assertEqual(self.client.get(f"/livreur/{uuid.uuid4()}/").status_code, 404)
+
+    def test_position_sans_course_ignoree(self):
+        self.assertEqual(self.envoyer(-11.67).json(), {"courses": 0, "enregistrees": 0})
+        self.assertEqual(self.envoyer(-11.67, jeton=uuid.uuid4()).status_code, 404)
+        self.partir()
+        self.assertEqual(self.envoyer(200).status_code, 400)
+
+    def test_arrivee_selon_vitesse_reelle(self):
+        from .models import PositionLivreur
+
+        self.partir()
+        self.assertEqual(self.envoyer(-11.664, vitesse=8.0, precision=12).json()["enregistrees"], 1)
+        self.assertEqual(self.envoyer(-11.6645).json()["enregistrees"], 0)  # moins de 3 s : ignorée
+        d = self.suivi().json()
+        self.assertEqual(d["statut"], "en_livraison")
+        self.assertEqual(d["livreur"]["nom"], "Jean")
+        self.assertFalse(d["vitesse_mesuree"])  # une seule position : vitesse habituelle d'une moto
+        self.assertEqual(d["vitesse_kmh"], 22.0)
+
+        # 2 minutes plus tard, le livreur a parcouru ~1,1 km vers le sud : ~33 km/h mesurés.
+        premiere = PositionLivreur.objects.get()
+        PositionLivreur.objects.filter(pk=premiere.pk).update(recue_le=timezone.now() - timedelta(minutes=2))
+        self.envoyer(-11.674)
+        d = self.suivi().json()
+        self.assertTrue(d["vitesse_mesuree"])
+        self.assertAlmostEqual(d["vitesse_kmh"], 33.4, delta=1)
+        self.assertEqual(d["position"]["lat"], -11.674)
+        self.assertEqual(len(d["trace"]), 2)
+        # Reste ~2,9 km × 1,35 (détour estimé) ≈ 3,9 km à 33 km/h ≈ 7 min.
+        self.assertAlmostEqual(d["distance_restante_km"], 3.9, delta=0.2)
+        self.assertEqual(d["minutes_restantes"], 7)
+
+    def test_livree_efface_le_parcours(self):
+        self.partir()
+        self.envoyer(-11.68)
+        r = self.client.post(f"/livreur/{self.livreur.jeton}/course/{self.reservation.pk}/livree/")
+        self.assertEqual(r.status_code, 302)
+        self.reservation.refresh_from_db()
+        self.assertEqual(self.reservation.statut, Reservation.Statut.LIVREE)
+        self.assertEqual(self.reservation.positions.count(), 0)
+        d = self.suivi().json()
+        self.assertEqual((d["statut"], d["position"], d["trace"]), ("livree", None, []))
+
+    def test_suivi_reserve_au_patient_et_aux_livraisons(self):
+        autre = self.client.get(f"/api/reservations/{self.reservation.pk}/suivi/",
+                                HTTP_AUTHORIZATION=entete_authorization(str(uuid.uuid4())))
+        self.assertEqual(autre.status_code, 400)
+        Reservation.objects.filter(pk=self.reservation.pk).update(mode=Reservation.Mode.RETRAIT)
+        self.assertEqual(self.suivi().status_code, 400)
+
+    def test_lien_du_livreur_dans_le_portail(self):
+        from django.contrib.auth import get_user_model
+
+        from portail.models import Pharmacien
+
+        utilisateur = get_user_model().objects.create_user("pharma-liv", password="mdp-test-123")
+        Pharmacien.objects.create(utilisateur=utilisateur, pharmacie=self.pharmacie)
+        self.client.login(username="pharma-liv", password="mdp-test-123")
+        self.assertContains(self.client.get("/portail/profil/"), f"/livreur/{self.livreur.jeton}/")
+        self.partir()
+        self.assertContains(self.client.get("/portail/reservations/?onglet=en_cours"), "sa page de course")

@@ -25,7 +25,8 @@
             🛵 <strong>Livraison</strong> · {{ r.adresse_livraison }}
             {% if r.frais_livraison %} · frais {{ r.frais_livraison }} FC{% endif %}
             {% if r.position_livraison %} · <a href="https://www.google.com/maps/dir/?api=1&destination={{ r.position_livraison.y }},{{ r.position_livraison.x }}" target="_blank" rel="noopener">voir sur la carte</a>{% endif %}
-            {% if r.livreur %}<br>Livreur : {{ r.livreur.nom }} ({{ r.livreur.telephone }}){% endif %}
+            {% if r.livreur %}<br>Livreur : {{ r.livreur.nom }} ({{ r.livreur.telephone }})
+              {% if r.statut_effectif == Statut.EN_LIVRAISON %} · <a href="{{ r.livreur.lien_page }}" target="_blank" rel="noopener">sa page de course</a>{% endif %}{% endif %}
           </div>
         {% endif %}
       </div>

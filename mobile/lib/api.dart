@@ -154,16 +154,32 @@ class Api {
     required int quantite,
     required String nom,
     required String telephone,
+    String? adresseLivraison,
+    Position? positionLivraison,
   }) async {
+    final livraison = adresseLivraison != null && positionLivraison != null;
     final json = await _requete('POST', '/api/reservations/', corps: {
       'pharmacie_id': pharmacie.id,
       'medicament_id': medicament.id,
       'quantite': quantite,
       'nom': nom,
       'telephone': telephone,
+      if (livraison) ...{
+        'mode': 'livraison',
+        'adresse_livraison': adresseLivraison,
+        'lat_livraison': positionLivraison.lat,
+        'lng_livraison': positionLivraison.lng,
+      },
     });
     return Reservation.fromJson(json);
   }
+
+  Future<DevisLivraison> devisLivraison(Pharmacie pharmacie, Position position) async =>
+      DevisLivraison.fromJson(await _requete('GET', '/api/livraison/devis/',
+          params: {'pharmacie': '${pharmacie.id}', ..._position(position)}));
+
+  Future<SuiviLivraison> suiviLivraison(int reservationId) async =>
+      SuiviLivraison.fromJson(await _requete('GET', '/api/reservations/$reservationId/suivi/'));
 
   Future<List<Reservation>> reservations() async {
     final json = await _requete('GET', '/api/reservations/');

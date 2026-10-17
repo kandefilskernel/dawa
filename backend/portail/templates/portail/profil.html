@@ -40,7 +40,14 @@
       {% for l in livreurs %}
         <li>
           <span class="icone-carre">🛵</span>
-          <div class="grow"><div class="nom">{{ l.nom }}</div><div class="sous">{{ l.telephone }}</div></div>
+          <div class="grow"><div class="nom">{{ l.nom }}</div><div class="sous">{{ l.telephone }}</div>
+            {% with lien=request.scheme|add:"://"|add:request.get_host|add:l.lien_page %}
+              <div class="sous" style="margin-top:4px">Lien du livreur (partage de position pendant les courses) :
+                <a href="{{ lien }}" target="_blank" rel="noopener">ouvrir</a> ·
+                <a href="https://wa.me/?text={{ "Uzima – vos livraisons de "|add:request.pharmacie.nom|add:" : "|add:lien|urlencode }}" target="_blank" rel="noopener">envoyer par WhatsApp</a>
+              </div>
+            {% endwith %}
+          </div>
           <form method="post" action="{% url 'portail:livreurs' %}">{% csrf_token %}
             <input type="hidden" name="action" value="retirer"><input type="hidden" name="livreur" value="{{ l.pk }}">
             <button class="btn danger" type="submit">Retirer</button>

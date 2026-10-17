@@ -12,6 +12,7 @@ from stock.models import Stock
 
 from .models import Reservation
 from .serializers import ReservationSerializer, devis_livraison
+from .suivi import suivi
 
 
 class ReservationViewSet(
@@ -49,6 +50,17 @@ class ReservationViewSet(
         return Reservation.objects.select_related("pharmacie", "medicament", "livreur").get(
             pk=self.kwargs["pk"], client_id=client_id(self.request)
         )
+
+    @action(detail=True)
+    def suivi(self, request, pk=None):
+        """Position du livreur et heure d'arrivée estimée (livraison en cours)."""
+        try:
+            reservation = self.get_object()
+        except Reservation.DoesNotExist:
+            raise ValidationError("Réservation introuvable.")
+        if not reservation.est_livraison:
+            raise ValidationError("Cette réservation n'est pas une livraison.")
+        return Response(suivi(reservation))
 
     @action(detail=True, methods=["post"])
     def annuler(self, request, pk=None):

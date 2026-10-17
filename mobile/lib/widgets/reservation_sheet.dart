@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../langue.dart';
 import '../api.dart';
 import '../models.dart';
+import '../position.dart';
 import '../stockage.dart';
 import '../theme.dart';
 import 'pharmacie_carte.dart';
@@ -43,19 +44,55 @@ class _FormulaireReservationState extends State<_FormulaireReservation> {
   final _formulaire = GlobalKey<FormState>();
   late final _nom = TextEditingController(text: stockage.nom);
   late final _telephone = TextEditingController(text: stockage.telephone);
+  final _adresse = TextEditingController();
   int _quantite = 1;
   bool _envoi = false;
   String? _erreur;
+
+  // Livraison à moto (si la pharmacie a un livreur) : à l'adresse où se trouve le téléphone.
+  bool _livraison = false;
+  Position? _positionLivraison;
+  DevisLivraison? _devis;
+  String? _erreurLivraison;
 
   @override
   void dispose() {
     _nom.dispose();
     _telephone.dispose();
+    _adresse.dispose();
     super.dispose();
   }
 
+  Future<void> _choisirLivraison(bool livraison) async {
+    setState(() {
+      _livraison = livraison;
+      _erreurLivraison = null;
+    });
+    if (!livraison || _devis != null) return;
+    final position = await positionActuelle();
+    if (!mounted) return;
+    if (position.approximative) {
+      setState(() => _erreurLivraison = tr('Activez la localisation : le livreur a besoin de savoir où vous êtes.'));
+      return;
+    }
+    try {
+      final devis = await api.devisLivraison(widget.pharmacie, position);
+      if (!mounted) return;
+      setState(() {
+        _positionLivraison = position;
+        _devis = devis;
+        if (!devis.possible) _erreurLivraison = tr('Vous êtes trop loin de cette pharmacie pour être livré.');
+      });
+    } on ApiException catch (e) {
+      if (mounted) setState(() => _erreurLivraison = e.message);
+    }
+  }
+
+  bool get _livraisonPrete => _devis?.possible == true && _positionLivraison != null;
+
   Future<void> _envoyer() async {
     if (!_formulaire.currentState!.validate()) return;
+    if (_livraison && !_livraisonPrete) return;
     setState(() {
       _envoi = true;
       _erreur = null;
@@ -69,6 +106,8 @@ class _FormulaireReservationState extends State<_FormulaireReservation> {
         quantite: _quantite,
         nom: nom,
         telephone: telephone,
+        adresseLivraison: _livraison ? _adresse.text.trim() : null,
+        positionLivraison: _livraison ? _positionLivraison : null,
       );
       await stockage.memoriserCoordonnees(nom, telephone);
       if (mounted) Navigator.of(context).pop(reservation);
@@ -83,7 +122,8 @@ class _FormulaireReservationState extends State<_FormulaireReservation> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final m = widget.medicament;
-    final total = widget.prix == null ? null : widget.prix! * _quantite;
+    final frais = _livraison ? _devis?.frais : null;
+    final total = widget.prix == null ? null : widget.prix! * _quantite + (frais ?? 0);
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
@@ -100,8 +140,23 @@ class _FormulaireReservationState extends State<_FormulaireReservation> {
               const SizedBox(height: 16),
               Text(tr('Réserver'), style: theme.textTheme.titleLarge),
               const SizedBox(height: 4),
-              Text(tr('La pharmacie met le médicament de côté pendant 2 heures.'),
+              Text(
+                  _livraison
+                      ? tr("La pharmacie prépare la commande et un livreur vous l'apporte à moto.")
+                      : tr('La pharmacie met le médicament de côté pendant 2 heures.'),
                   style: theme.textTheme.bodySmall),
+              if (widget.pharmacie.livraison) ...[
+                const SizedBox(height: 12),
+                SegmentedButton<bool>(
+                  showSelectedIcon: false,
+                  segments: [
+                    ButtonSegment(value: false, icon: const Icon(Icons.storefront_outlined, size: 18), label: Text(tr('Je passe la prendre'))),
+                    ButtonSegment(value: true, icon: const Icon(Icons.two_wheeler, size: 18), label: Text(tr('Livraison'))),
+                  ],
+                  selected: {_livraison},
+                  onSelectionChanged: (s) => _choisirLivraison(s.first),
+                ),
+              ],
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(14),
@@ -124,7 +179,9 @@ class _FormulaireReservationState extends State<_FormulaireReservation> {
               if (m.ordonnanceRequise) ...[
                 const SizedBox(height: 12),
                 _Avertissement(
-                  tr('Médicament sur ordonnance : présentez votre ordonnance au retrait.'),
+                  _livraison
+                      ? tr('Médicament sur ordonnance : montrez votre ordonnance au livreur.')
+                      : tr('Médicament sur ordonnance : présentez votre ordonnance au retrait.'),
                 ),
               ],
               const SizedBox(height: 16),
@@ -143,20 +200,40 @@ class _FormulaireReservationState extends State<_FormulaireReservation> {
                     ? tr('Numéro invalide')
                     : null,
               ),
+              if (_livraison) ...[
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _adresse,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: _decoration(tr('Adresse (avenue, numéro, repère)'), Icons.home_outlined),
+                  validator: (v) => (v ?? '').trim().length < 5 ? tr("Indiquez l'adresse de livraison (avenue, numéro, repère).") : null,
+                ),
+                const SizedBox(height: 8),
+                if (_erreurLivraison != null)
+                  Text(_erreurLivraison!, style: const TextStyle(color: Couleurs.rouge, fontWeight: FontWeight.w600))
+                else if (_devis == null)
+                  const LinearProgressIndicator(minHeight: 2)
+                else
+                  Text(
+                    tr('Livraison : {frais} ({distance})',
+                        {'frais': formatPrix(_devis!.frais), 'distance': formatDistance(_devis!.distanceKm)}),
+                    style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+              ],
               if (_erreur != null) ...[
                 const SizedBox(height: 12),
                 Text(_erreur!, style: const TextStyle(color: Couleurs.rouge, fontWeight: FontWeight.w600)),
               ],
               const SizedBox(height: 20),
               FilledButton(
-                onPressed: _envoi ? null : _envoyer,
+                onPressed: _envoi || (_livraison && !_livraisonPrete) ? null : _envoyer,
                 child: _envoi
                     ? const SizedBox(width: 20, height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                     : Text(total == null ? tr('Confirmer la réservation') : tr('Réserver · {prix}', {'prix': formatPrix(total)})),
               ),
               const SizedBox(height: 8),
-              Text(tr('Paiement à la pharmacie, au moment du retrait.'),
+              Text(_livraison ? tr('Paiement au livreur, à la livraison.') : tr('Paiement à la pharmacie, au moment du retrait.'),
                   textAlign: TextAlign.center, style: theme.textTheme.bodySmall),
             ]),
           ),

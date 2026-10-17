@@ -47,6 +47,9 @@ class Pharmacie {
   final double? distanceKm;
   final bool deGarde;
 
+  /// La pharmacie a au moins un livreur : la livraison à moto est proposée.
+  final bool livraison;
+
   /// JSON d'origine, conservé pour le stockage local (favoris, cache hors ligne).
   final Map<String, dynamic> json;
 
@@ -61,7 +64,8 @@ class Pharmacie {
         lat = _double(json['lat'])!,
         lng = _double(json['lng'])!,
         distanceKm = _double(json['distance_km']),
-        deGarde = json['de_garde'] ?? false;
+        deGarde = json['de_garde'] ?? false,
+        livraison = json['livraison'] ?? false;
 }
 
 /// Façon de se rendre à la pharmacie (codes de l'API : pied, moto, voiture).
@@ -169,6 +173,8 @@ enum StatutReservation {
   enAttente('en_attente'),
   acceptee('acceptee'),
   prete('prete'),
+  enLivraison('en_livraison'),
+  livree('livree'),
   retiree('retiree'),
   refusee('refusee'),
   annulee('annulee'),
@@ -180,7 +186,7 @@ enum StatutReservation {
   static StatutReservation depuis(String code) =>
       values.firstWhere((s) => s.code == code, orElse: () => expiree);
 
-  bool get estActive => this == enAttente || this == acceptee || this == prete;
+  bool get estActive => this == enAttente || this == acceptee || this == prete || this == enLivraison;
 }
 
 class Reservation {
@@ -194,6 +200,11 @@ class Reservation {
   final int? prixUnitaire;
   final DateTime creeLe;
   final DateTime expireLe;
+  final bool estLivraison;
+  final String adresseLivraison;
+  final int? fraisLivraison;
+  final String? livreurNom;
+  final String? livreurTelephone;
 
   Reservation.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -205,9 +216,64 @@ class Reservation {
         messagePharmacie = json['message_pharmacie'] ?? '',
         prixUnitaire = json['prix_unitaire'],
         creeLe = _date(json['cree_le'])!,
-        expireLe = _date(json['expire_le'])!;
+        expireLe = _date(json['expire_le'])!,
+        estLivraison = json['mode'] == 'livraison',
+        adresseLivraison = json['adresse_livraison'] ?? '',
+        fraisLivraison = json['frais_livraison'],
+        livreurNom = json['livreur']?['nom'],
+        livreurTelephone = json['livreur']?['telephone'];
 
   int? get total => prixUnitaire == null ? null : prixUnitaire! * quantite;
+}
+
+/// Frais de livraison annoncés avant de réserver.
+class DevisLivraison {
+  final double distanceKm;
+  final int frais;
+  final bool possible;
+
+  DevisLivraison.fromJson(Map<String, dynamic> json)
+      : distanceKm = _double(json['distance_km'])!,
+        frais = json['frais'],
+        possible = json['possible'] ?? false;
+}
+
+/// Où est le livreur, et quand arrive-t-il ? (rafraîchi toutes les quelques secondes)
+class SuiviLivraison {
+  final StatutReservation statut;
+  final String? livreurNom;
+  final String? livreurTelephone;
+  final (double, double) pharmacie;
+  final (double, double)? destination;
+
+  /// Dernière position connue du livreur (null tant qu'il n'a rien envoyé).
+  final (double, double)? position;
+  final DateTime? positionRecueLe;
+  final bool positionAncienne;
+  final List<(double, double)> trace;
+  final double? distanceRestanteKm;
+  final double? vitesseKmh;
+  final bool vitesseMesuree;
+  final int? minutesRestantes;
+  final DateTime? arriveeEstimee;
+
+  static (double, double)? _point(dynamic p) => p == null ? null : (_double(p['lat'])!, _double(p['lng'])!);
+
+  SuiviLivraison.fromJson(Map<String, dynamic> json)
+      : statut = StatutReservation.depuis(json['statut']),
+        livreurNom = json['livreur']?['nom'],
+        livreurTelephone = json['livreur']?['telephone'],
+        pharmacie = _point(json['pharmacie'])!,
+        destination = _point(json['destination']),
+        position = _point(json['position']),
+        positionRecueLe = _date(json['position']?['recue_le']),
+        positionAncienne = json['position']?['ancienne'] ?? false,
+        trace = [for (final p in json['trace'] as List) (_double(p[0])!, _double(p[1])!)],
+        distanceRestanteKm = _double(json['distance_restante_km']),
+        vitesseKmh = _double(json['vitesse_kmh']),
+        vitesseMesuree = json['vitesse_mesuree'] ?? false,
+        minutesRestantes = json['minutes_restantes'],
+        arriveeEstimee = _date(json['arrivee_estimee']);
 }
 
 class Alerte {

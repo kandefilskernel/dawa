@@ -1,0 +1,126 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b8f6a">
+  <meta name="robots" content="noindex">
+  {% if not courses %}<meta http-equiv="refresh" content="30">{% endif %}
+  <title>Livraisons · Uzima</title>
+  <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
+  <style>
+    .page-livreur { min-height: 100vh; padding: 16px; background: var(--degrade); }
+    .page-livreur main { max-width: 480px; margin: 0 auto; }
+    .page-livreur h1 { color: #fff; font-size: 1.3rem; margin: 4px 0 2px; }
+    .page-livreur .intro { color: rgba(255,255,255,.85); margin: 0 0 14px; font-size: .9rem; }
+    #partage { width: 100%; font-size: 1.05rem; padding: 14px; }
+    #etat { margin: 10px 0 0; font-size: .88rem; color: var(--texte-doux); text-align: center; }
+    #etat.ok { color: var(--emeraude); font-weight: 600; }
+    #etat.erreur { color: var(--rouge); font-weight: 600; }
+    .course .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .course .actions > * { flex: 1 1 120px; text-align: center; }
+  </style>
+</head>
+<body class="page-livreur">
+<main>
+  <h1>Bonjour {{ livreur.nom }}</h1>
+  <p class="intro">Livraisons de {{ livreur.pharmacie.nom }}. Gardez cette page ouverte pendant la course :
+    le client vous voit arriver sur la carte de l'app Uzima.</p>
+
+  {% if courses %}
+    <div class="carte">
+      <button id="partage" class="btn" type="button">🛵 Partager ma position</button>
+      <p id="etat" aria-live="polite">Votre position n'est pas encore partagée.</p>
+    </div>
+    {% for c in courses %}
+      <article class="carte course">
+        <div class="nom" style="font-weight:700">{{ c.medicament.nom_commercial }} {{ c.medicament.dosage }} × {{ c.quantite }}</div>
+        <ul class="liste" style="margin-top:10px">
+          <li><div class="grow"><div class="nom">{{ c.nom }}</div>
+            <div class="sous"><a href="tel:{{ c.telephone }}">{{ c.telephone }}</a></div></div></li>
+          <li><div class="grow"><div class="nom">Adresse</div><div class="sous">{{ c.adresse_livraison }}</div></div></li>
+        </ul>
+        <div class="actions">
+          {% if c.position_livraison %}
+            <a class="btn secondaire" target="_blank" rel="noopener"
+               href="https://www.google.com/maps/dir/?api=1&travelmode=two-wheeler&destination={{ c.position_livraison.y }},{{ c.position_livraison.x }}">Itinéraire</a>
+          {% endif %}
+          <form method="post" action="{% url 'livreur:livree' livreur.jeton c.pk %}"
+                onsubmit="return confirm('Confirmer : commande remise au client ?')">
+            <button class="btn" type="submit" style="width:100%">✓ Livrée</button>
+          </form>
+        </div>
+      </article>
+    {% endfor %}
+  {% else %}
+    <div class="carte">
+      <p style="margin:0"><strong>Aucune course en cours.</strong></p>
+      <p class="aide" style="margin-bottom:0">Quand la pharmacie vous confie une commande, elle apparaît ici
+        (la page se met à jour toute seule).</p>
+    </div>
+  {% endif %}
+</main>
+
+{% if courses %}
+<script>
+(() => {
+  const url = "{% url 'livreur:position' livreur.jeton %}";
+  const bouton = document.getElementById("partage");
+  const etat = document.getElementById("etat");
+  const INTERVALLE_MS = 5000;
+  let suivi = null, dernierEnvoi = 0, verrou = null;
+
+  function afficher(texte, classe) { etat.textContent = texte; etat.className = classe || ""; }
+
+  async function envoyer(p) {
+    if (Date.now() - dernierEnvoi < INTERVALLE_MS) return;
+    dernierEnvoi = Date.now();
+    try {
+      const r = await fetch(url, {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({lat: p.coords.latitude, lng: p.coords.longitude,
+                              vitesse: p.coords.speed, precision: p.coords.accuracy}),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.erreur || r.status);
+      if (d.courses === 0) { location.reload(); return; }
+      const heure = new Date().toLocaleTimeString("fr-FR");
+      afficher(`Position envoyée à ${heure} (précision ${Math.round(p.coords.accuracy)} m)`, "ok");
+    } catch (e) {
+      afficher("Envoi impossible (réseau ?). Nouvel essai dans quelques secondes.", "erreur");
+    }
+  }
+
+  async function garderEcranAllume() {
+    try { verrou = await navigator.wakeLock?.request("screen"); } catch (e) { /* facultatif */ }
+  }
+
+  function demarrer() {
+    if (!navigator.geolocation) { afficher("Ce téléphone ne donne pas sa position.", "erreur"); return; }
+    afficher("Recherche de votre position…");
+    suivi = navigator.geolocation.watchPosition(envoyer, (e) => {
+      afficher(e.code === 1 ? "Autorisez la localisation pour ce site dans le navigateur."
+                            : "Position introuvable. Allez à découvert et réessayez.", "erreur");
+    }, {enableHighAccuracy: true, maximumAge: 5000, timeout: 20000});
+    garderEcranAllume();
+    bouton.textContent = "⏸ Arrêter le partage";
+  }
+
+  function arreter() {
+    navigator.geolocation.clearWatch(suivi); suivi = null;
+    verrou?.release(); verrou = null;
+    afficher("Partage arrêté : le client ne vous voit plus avancer.");
+    bouton.textContent = "🛵 Partager ma position";
+  }
+
+  bouton.addEventListener("click", () => (suivi === null ? demarrer() : arreter()));
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && suivi !== null) garderEcranAllume();
+  });
+  // Autorisation déjà donnée : le partage reprend tout seul à l'ouverture de la page.
+  navigator.permissions?.query({name: "geolocation"}).then((p) => { if (p.state === "granted") demarrer(); });
+})();
+</script>
+{% endif %}
+</body>
+</html>
