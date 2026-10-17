@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import compte, pharmacie as ph
+from . import compte, etablissement, pharmacie as ph
 
 app_name = "pro_api"
 
@@ -35,4 +35,8 @@ urlpatterns = [
     path("pharmacie/commandes/<int:pk>/", ph.CommandeView.as_view()),
     path("pharmacie/grossistes/<int:pk>/", ph.GrossisteView.as_view()),
     path("pharmacie/dossier/", ph.DossierView.as_view()),
+
+    # Espace des établissements de santé
+    path("etablissement/", etablissement.EspaceView.as_view()),
+    path("etablissement/dossier/", etablissement.DossierView.as_view()),
 ]
