@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="icon" type="image/svg+xml" href="{% static 'uzima_admin/icone.svg' %}">
+<meta name="theme-color" content="#0B8F6A">
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="preload" href="{% static 'uzima_admin/polices/plus-jakarta-sans-latin.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{% static 'uzima_admin/uzima.css' %}">
+{% endblock %}
+
+{% block branding %}
+<a class="uzima-marque" href="{% url 'admin:index' %}">
+  {% include "admin/uzima_logo.html" with taille=38 %}
+  <span class="uzima-marque-texte">
+    <span id="site-name">Uzima</span>
+    <span class="uzima-marque-sous-titre">Administration</span>
+  </span>
+</a>
+{% if user.is_anonymous %}
+  {% include "admin/color_theme_toggle.html" %}
+{% endif %}
+{% endblock %}
+
+{% block welcome-msg %}
+<span class="uzima-utilisateur">
+  <span class="uzima-avatar" aria-hidden="true">{% firstof user.get_short_name user.get_username as nom %}{{ nom|slice:":1"|upper }}</span>
+  <strong>{% firstof user.get_short_name user.get_username %}</strong>
+</span>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block footer %}
+<div class="uzima-pied">Uzima · trouver son médicament à Lubumbashi</div>
+{% endblock %}

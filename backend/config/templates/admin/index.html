@@ -1,0 +1,11 @@
+{% extends "admin/index.html" %}
+
+{% block nav-breadcrumbs %}
+<section class="uzima-accueil">
+  <div>
+    <p class="uzima-accueil-sur-titre">Tableau de bord</p>
+    <h1>Bonjour {% firstof user.get_short_name user.get_username %}</h1>
+    <p>Gérez les pharmacies, le catalogue de médicaments, les demandes des patients et les comptes professionnels d'Uzima.</p>
+  </div>
+</section>
+{% endblock %}

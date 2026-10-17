@@ -56,7 +56,8 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        # Gabarits de l'admin Django aux couleurs Uzima (config/templates/admin/).
+        "DIRS": [BASE_DIR / "config" / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -95,6 +96,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+# Thème Uzima de l'admin (CSS, logo, police) : config/static/uzima_admin/.
+STATICFILES_DIRS = [BASE_DIR / "config" / "static"]
 
 AUTHENTICATION_BACKENDS = ["config.securite.ConnexionLimitee"]
 # Vrai derrière Caddy : l'IP du client est lue dans X-Forwarded-For (limites de tentatives).
