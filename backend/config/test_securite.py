@@ -117,4 +117,4 @@ class AlerteErreurTests(TestCase):
                                                   extra={"status_code": 500, "request": requete})
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("alertes@exemple.cd", mail.outbox[0].to)
-        self.assertTrue(mail.outbox[0].subject.startswith("[Dawa]"))
+        self.assertTrue(mail.outbox[0].subject.startswith("[Uzima]"))

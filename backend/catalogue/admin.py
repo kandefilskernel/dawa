@@ -35,7 +35,7 @@ class MedicamentAdmin(admin.ModelAdmin):
         if "image" in form.changed_data and obj.image:
             obj.image = preparer_photo(obj.image, nom_fichier(obj))
             obj.image_est_illustration = False
-            obj.image_envoyee_par = None  # Photo validée par l'équipe Dawa.
+            obj.image_envoyee_par = None  # Photo validée par l'équipe Uzima.
             if "image_credit" not in form.changed_data:
                 obj.image_credit = ""  # Le crédit de l'ancienne photo ne vaut pas pour la nouvelle.
         super().save_model(request, obj, form, change)

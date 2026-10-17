@@ -160,7 +160,7 @@ class _CarteQuestion extends StatelessWidget {
                 Row(children: [
                   const Icon(Icons.local_pharmacy, size: 16, color: Couleurs.emeraude),
                   const SizedBox(width: 6),
-                  Text(q.reponduPar ?? tr('Pharmacien Dawa'),
+                  Text(q.reponduPar ?? tr('Pharmacien Uzima'),
                       style: const TextStyle(fontWeight: FontWeight.w700, color: Couleurs.emeraudeFonce)),
                 ]),
                 const SizedBox(height: 6),

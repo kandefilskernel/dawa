@@ -45,7 +45,7 @@ def _incrementer(cle, duree):
 
 
 class ConnexionLimitee(ModelBackend):
-    """ModelBackend avec blocage temporaire après trop d'échecs (portail, espace Dawa et admin)."""
+    """ModelBackend avec blocage temporaire après trop d'échecs (portail, espace Uzima et admin)."""
 
     def authenticate(self, request, username=None, password=None, **kwargs):
         if request is None:

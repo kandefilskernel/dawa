@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+  <!-- Icône adaptative Android : dessin dans la zone sûre (cercle de 66 au centre) -->
+  <g transform="translate(54 54) scale(0.86) translate(-62.5 -58)">
+    <path d="M60 24c20 8 30 24 30 40 0 18-13 31-30 31S30 82 30 64c0-16 10-32 30-40z" fill="#FFFFFF"/>
+    <path d="M54 44h12v12h12v12H66v12H54V68H42V56h12z" fill="#10B981"/>
+    <circle cx="86" cy="30" r="9" fill="#FCD34D"/>
+  </g>
+</svg>

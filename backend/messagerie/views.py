@@ -34,7 +34,7 @@ class MessageEntrantView(APIView):
 
         pharmacie = pharmacie_par_numero(expediteur)
         if pharmacie is None:
-            reponse = "Dawa : ce numéro n'est rattaché à aucune pharmacie partenaire."
+            reponse = "Uzima : ce numéro n'est rattaché à aucune pharmacie partenaire."
         else:
             reponse = traiter_message(pharmacie, texte)
         MessageEntrant.objects.create(

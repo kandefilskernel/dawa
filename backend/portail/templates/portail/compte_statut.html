@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b8f6a">
-  <title>Mon compte · Dawa Pharmacie</title>
+  <title>Mon compte · Uzima Pharmacie</title>
   <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
 </head>
 <body class="page-connexion">
@@ -17,20 +17,20 @@
     {% if pharmacien.statut == "en_attente" %}
       <p class="intro"><span class="pastille p-attente">Demande en cours de vérification</span></p>
       {% if dossier.manquantes %}
-        <p><strong>Dernière étape :</strong> envoyez les justificatifs ci-dessous. L'équipe Dawa vérifie que la
+        <p><strong>Dernière étape :</strong> envoyez les justificatifs ci-dessous. L'équipe Uzima vérifie que la
           pharmacie est bien enregistrée avant de l'afficher dans l'app.</p>
       {% else %}
-        <p>Merci ! Votre dossier est complet. L'équipe Dawa vérifie vos documents et l'emplacement de la
+        <p>Merci ! Votre dossier est complet. L'équipe Uzima vérifie vos documents et l'emplacement de la
           pharmacie ; vous aurez accès au portail dès la validation.</p>
       {% endif %}
     {% elif pharmacien.statut == "refuse" %}
       <p class="intro"><span class="pastille p-refus">Demande refusée</span></p>
       {% if pharmacien.motif %}<p><strong>Motif :</strong> {{ pharmacien.motif }}</p>{% endif %}
-      <p>Pour toute question, contactez l'équipe Dawa.</p>
+      <p>Pour toute question, contactez l'équipe Uzima.</p>
     {% else %}
       <p class="intro"><span class="pastille p-refus">Compte suspendu</span></p>
       {% if pharmacien.motif %}<p><strong>Motif :</strong> {{ pharmacien.motif }}</p>{% endif %}
-      <p>Votre pharmacie n'apparaît plus dans l'app. Contactez l'équipe Dawa pour la réactiver.</p>
+      <p>Votre pharmacie n'apparaît plus dans l'app. Contactez l'équipe Uzima pour la réactiver.</p>
     {% endif %}
 
     {% if dossier and pharmacien.statut != "refuse" %}

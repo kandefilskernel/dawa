@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <!-- usesCleartextTraffic : API de démo en HTTP sur le réseau local. À retirer une fois l'API en HTTPS. -->
     <application
-        android:label="Dawa"
+        android:label="Uzima"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">

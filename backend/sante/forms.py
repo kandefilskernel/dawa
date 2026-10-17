@@ -10,12 +10,12 @@ from .models import Etablissement, ResponsableEtablissement
 
 
 class InscriptionEtablissementForm(UserCreationForm):
-    """Inscription d'un hôpital, d'une clinique… : compte + fiche, en attente de validation Dawa."""
+    """Inscription d'un hôpital, d'une clinique… : compte + fiche, en attente de validation Uzima."""
 
     nom = forms.CharField(label="Nom de l'établissement", max_length=150)
     type = forms.ChoiceField(label="Type", choices=Etablissement.Type.choices)
     numero_agrement = forms.CharField(label="Numéro d'autorisation de fonctionnement", max_length=50,
-                                      help_text="Délivré par la Division provinciale de la santé. Dawa le vérifie.")
+                                      help_text="Délivré par la Division provinciale de la santé. Uzima le vérifie.")
     telephone = forms.CharField(label="Téléphone", max_length=20)
     adresse = forms.CharField(label="Adresse", max_length=255)
     quartier = forms.CharField(label="Quartier", max_length=100, required=False)
@@ -45,7 +45,7 @@ class InscriptionEtablissementForm(UserCreationForm):
     def clean_numero_agrement(self):
         numero = self.cleaned_data["numero_agrement"].strip()
         if Etablissement.objects.filter(numero_agrement__iexact=numero).exists():
-            raise forms.ValidationError("Un établissement avec ce numéro est déjà inscrit. Contactez l'équipe Dawa.")
+            raise forms.ValidationError("Un établissement avec ce numéro est déjà inscrit. Contactez l'équipe Uzima.")
         return numero
 
     def clean(self):

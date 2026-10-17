@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b8f6a">
-  <title>Mon établissement · Dawa Santé</title>
+  <title>Mon établissement · Uzima Santé</title>
   <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
 </head>
 <body class="page-connexion">
@@ -20,9 +20,9 @@
       <p><span class="pastille p-attente">Demande en cours de vérification</span></p>
       {% if dossier.manquantes %}
         <p><strong>Dernière étape :</strong> envoyez les justificatifs ci-dessous. L'établissement apparaîtra dans
-          l'annuaire santé de l'app dès que l'équipe Dawa les aura vérifiés.</p>
+          l'annuaire santé de l'app dès que l'équipe Uzima les aura vérifiés.</p>
       {% else %}
-        <p>Merci ! Votre dossier est complet. L'équipe Dawa vérifie vos documents.</p>
+        <p>Merci ! Votre dossier est complet. L'équipe Uzima vérifie vos documents.</p>
       {% endif %}
     {% elif responsable.statut == "refuse" %}
       <p><span class="pastille p-refus">Demande refusée</span></p>
@@ -30,7 +30,7 @@
     {% elif responsable.statut == "suspendu" %}
       <p><span class="pastille p-refus">Compte suspendu</span></p>
       {% if responsable.motif %}<p><strong>Motif :</strong> {{ responsable.motif }}</p>{% endif %}
-      <p>L'établissement n'apparaît plus dans l'app. Contactez l'équipe Dawa.</p>
+      <p>L'établissement n'apparaît plus dans l'app. Contactez l'équipe Uzima.</p>
     {% else %}
       <p><span class="pastille p-ok">Vérifié · visible dans l'app</span></p>
     {% endif %}

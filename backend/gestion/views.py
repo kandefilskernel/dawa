@@ -1,5 +1,5 @@
 """
-Espace Dawa : l'équipe valide les inscriptions, gère la visibilité des pharmacies,
+Espace Uzima : l'équipe valide les inscriptions, gère la visibilité des pharmacies,
 active les abonnements payés et traite les signalements. Réservé aux comptes « équipe » (is_staff).
 """
 import logging
@@ -229,7 +229,7 @@ def lien_mot_de_passe(request, pk):
     }))
     journal_securite.warning("Lien de mot de passe créé par %s pour %s", request.user, utilisateur)
     numero = "".join(c for c in (getattr(structure, "whatsapp", "") or structure.telephone) if c.isdigit())
-    texte = (f"Dawa : pour choisir un nouveau mot de passe du compte « {utilisateur.get_username()} », "
+    texte = (f"Uzima : pour choisir un nouveau mot de passe du compte « {utilisateur.get_username()} », "
              f"ouvrez ce lien (valable 24 h) : {lien}")
     return render(request, "gestion/lien_mot_de_passe.html", {
         "onglet": "pharmacies" if hasattr(compte, "pharmacie") else "etablissements",

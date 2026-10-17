@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Affiche Dawa captures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --emeraude: #0B8F6A; --emeraude-fonce: #064E3B; --nuit: #022C22; --menthe: #D1FAE5; --ambre: #F59E0B; --texte: #0F172A; --doux: #475569; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; }
+  body { font-family: "Plus Jakarta Sans", system-ui, sans-serif; background: #F3F7F5; color: var(--texte); }
+  .affiche { position: relative; width: 1080px; height: 1350px; overflow: hidden; }
+
+  /* Fond vert qui passe derrière le haut des téléphones */
+  .fond {
+    position: absolute; inset: 0 0 auto 0; height: 860px;
+    background: linear-gradient(155deg, #10B981 0%, #0B8F6A 42%, #064E3B 100%);
+    border-radius: 0 0 80px 80px;
+  }
+  .fond::before, .fond::after { content: ""; position: absolute; border-radius: 50%; background: #fff; }
+  .fond::before { width: 700px; height: 700px; right: -260px; top: -280px; opacity: .07; }
+  .fond::after { width: 460px; height: 460px; left: -200px; top: 380px; opacity: .05; }
+
+  .entete { position: relative; z-index: 2; padding: 54px 64px 0; color: #fff; display: flex; align-items: center; gap: 16px; }
+  .entete svg { width: 64px; height: 64px; filter: drop-shadow(0 8px 16px rgba(2,44,34,.25)); }
+  .entete b { font-size: 40px; font-weight: 800; letter-spacing: -1px; }
+  .entete .ville svg { width: 18px; height: 18px; filter: none; }
+  .ville { margin-left: auto; padding: 9px 18px; border-radius: 999px; background: rgba(255,255,255,.16); border: 1.5px solid rgba(255,255,255,.28); font-size: 20px; font-weight: 700; }
+
+  .titre { position: relative; z-index: 2; text-align: center; color: #fff; margin-top: 26px; }
+  .titre h1 { font-size: 62px; font-weight: 800; letter-spacing: -2.2px; line-height: 1.02; }
+  .titre h1 span { color: #FDE68A; }
+  .titre p { margin-top: 12px; font-size: 24px; font-weight: 500; color: rgba(255,255,255,.88); }
+
+  /* Téléphones */
+  .tel { position: absolute; z-index: 3; background: #0F172A; padding: 10px; border-radius: 46px; box-shadow: 0 40px 70px rgba(2,44,34,.40), 0 0 0 2px rgba(255,255,255,.10); }
+  .tel .ecran { width: 100%; height: 100%; border-radius: 37px; overflow: hidden; background: #F3F7F5; }
+  .tel img { width: 100%; display: block; }
+  .tel .encoche { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 78px; height: 20px; background: #0F172A; border-radius: 14px; }
+  .gauche { left: 58px; top: 420px; width: 280px; height: 600px; transform: rotate(-7deg); z-index: 2; }
+  .droite { right: 58px; top: 420px; width: 280px; height: 600px; transform: rotate(7deg); z-index: 2; }
+  .centre { left: 50%; top: 372px; width: 330px; height: 680px; margin-left: -170px; z-index: 4; }
+
+  /* Notification flottante (réservation prête) */
+  .notif {
+    position: absolute; z-index: 6; left: 50%; top: 900px; width: 560px; margin-left: -280px;
+    display: flex; gap: 16px; align-items: center; padding: 18px 22px; border-radius: 24px;
+    background: rgba(255,255,255,.97); box-shadow: 0 24px 50px rgba(15,23,42,.28); border: 1px solid #E2E8F0;
+  }
+  .notif svg { flex: none; width: 52px; height: 52px; }
+  .notif .haut { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: var(--doux); }
+  .notif b { display: block; margin-top: 3px; font-size: 21px; font-weight: 800; }
+  .notif p { margin-top: 2px; font-size: 17px; font-weight: 500; color: var(--doux); }
+
+  /* Légendes */
+  .legendes { position: absolute; z-index: 5; top: 1082px; left: 0; right: 0; display: flex; justify-content: center; gap: 14px; }
+  .legende { display: flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 999px; background: #fff; border: 1px solid #E2E8F0; box-shadow: 0 8px 20px rgba(15,23,42,.07); font-size: 19px; font-weight: 700; }
+  .legende i { font-style: normal; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; color: #fff; font-size: 16px; font-weight: 800; }
+
+  .bas {
+    position: absolute; z-index: 5; left: 56px; right: 56px; bottom: 46px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding: 26px 34px; border-radius: 30px; background: var(--ambre); color: #451A03;
+    box-shadow: 0 16px 34px rgba(245,158,11,.35);
+  }
+  .bas .gros { font-size: 32px; font-weight: 800; letter-spacing: -.6px; }
+  .bas .petit { margin-top: 4px; font-size: 18.5px; font-weight: 600; }
+  .bas .langues { padding: 12px 18px; border-radius: 18px; background: #fff; color: var(--emeraude-fonce); font-size: 17px; font-weight: 800; text-align: center; line-height: 1.35; }
+  .credit { position: absolute; z-index: 5; bottom: 14px; right: 60px; font-size: 12px; font-weight: 600; color: #94A3B8; }
+</style>
+</head>
+<body>
+<div class="affiche">
+  <div class="fond"></div>
+
+  <header class="entete">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="18" fill="#FFFFFF"/>
+      <path d="M26 14h12v12h12v12H38v12H26V38H14V26h12z" fill="#10B981"/>
+      <circle cx="44" cy="44" r="9" fill="#F59E0B"/><circle cx="44" cy="44" r="3.5" fill="#FFFFFF"/>
+    </svg>
+    <b>Dawa</b>
+    <div class="ville"><svg width="18" height="18" viewBox="0 0 24 24" fill="#FDE68A" style="vertical-align:-3px;margin-right:6px"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>Lubumbashi</div>
+  </header>
+
+  <div class="titre">
+    <h1>Cherchez. Réservez.<br><span>Récupérez.</span></h1>
+    <p>Le bon médicament, dans la pharmacie la plus proche.</p>
+  </div>
+
+  <div class="tel gauche"><div class="ecran"><img src="captures/3-carte.jpg" alt=""></div></div>
+  <div class="tel droite"><div class="ecran"><img src="captures/4-garde.jpg" alt=""></div></div>
+  <div class="tel centre"><div class="ecran"><img src="captures/2-resultats.jpg" alt=""></div></div>
+
+  <div class="notif">
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <rect width="64" height="64" rx="16" fill="#10B981"/>
+      <path d="M26 14h12v12h12v12H38v12H26V38H14V26h12z" fill="#FFFFFF"/>
+      <circle cx="44" cy="44" r="9" fill="#F59E0B"/><circle cx="44" cy="44" r="3.5" fill="#FFFFFF"/>
+    </svg>
+    <div style="flex:1">
+      <div class="haut"><span>Dawa</span><span>maintenant</span></div>
+      <b>Votre médicament est prêt ✓</b>
+      <p>Amoxicilline 500 mg vous attend pendant 2 heures.</p>
+    </div>
+  </div>
+
+  <div class="legendes">
+    <div class="legende"><i style="background:#F59E0B">1</i>Sur la carte</div>
+    <div class="legende"><i style="background:#0B8F6A">2</i>Prix et distance</div>
+    <div class="legende"><i style="background:#4338CA">3</i>De garde la nuit</div>
+  </div>
+
+  <section class="bas">
+    <div>
+      <div class="gros">Bientôt disponible sur Android</div>
+      <div class="petit">Gratuit pour les patients · Partagez autour de vous !</div>
+    </div>
+    <div class="langues">Français<br>Kiswahili · English</div>
+  </section>
+  <div class="credit">Captures de l'application · données d'exemple · carte © OpenStreetMap</div>
+</div>
+</body>
+</html>

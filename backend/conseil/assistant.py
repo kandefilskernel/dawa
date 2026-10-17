@@ -14,7 +14,7 @@ from django.conf import settings
 journal = logging.getLogger(__name__)
 
 CONSIGNES = """Tu aides un pharmacien d'officine de Lubumbashi (RD Congo) à répondre aux questions \
-simples envoyées par des patients via l'application Dawa (notice, prise, conservation, interactions courantes).
+simples envoyées par des patients via l'application Uzima (notice, prise, conservation, interactions courantes).
 
 Tu rédiges un BROUILLON que le pharmacien relira et corrigera avant envoi.
 

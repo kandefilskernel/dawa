@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Noms et icônes</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; height: 900px; overflow: hidden; }
+  body { font-family: "Plus Jakarta Sans", system-ui, sans-serif; background: #F3F7F5; color: #0F172A; padding: 48px 56px; }
+  h1 { font-size: 40px; font-weight: 800; letter-spacing: -1px; }
+  .sous { margin-top: 8px; font-size: 20px; color: #475569; font-weight: 500; }
+  .grille { margin-top: 36px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .carte { background: #fff; border: 1px solid #E2E8F0; border-radius: 28px; padding: 30px 22px 26px; text-align: center; box-shadow: 0 10px 24px rgba(15,23,42,.06); }
+  .carte svg { width: 150px; height: 150px; filter: drop-shadow(0 12px 18px rgba(15,23,42,.18)); }
+  .lettre { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #0F172A; color: #fff; font-weight: 800; font-size: 20px; margin-bottom: 18px; }
+  .nom { margin-top: 18px; font-size: 32px; font-weight: 800; letter-spacing: -.6px; }
+  .sens { margin-top: 8px; font-size: 16.5px; line-height: 1.4; color: #475569; font-weight: 500; min-height: 70px; }
+  .slogan { margin-top: 12px; padding: 10px 12px; border-radius: 14px; background: #F3F7F5; font-size: 15.5px; font-weight: 700; color: #064E3B; }
+  /* Aperçu écran d'accueil du téléphone */
+  .ecran { margin-top: 30px; display: flex; gap: 22px; align-items: center; padding: 22px 30px; border-radius: 28px;
+    background: linear-gradient(135deg, #1E293B, #0F172A); color: #fff; }
+  .ecran .titre { font-size: 17px; font-weight: 700; color: #94A3B8; width: 150px; line-height: 1.3; }
+  .appli { text-align: center; width: 120px; }
+  .appli svg { width: 72px; height: 72px; }
+  .appli span { display: block; margin-top: 8px; font-size: 15px; font-weight: 600; }
+  .gris { opacity: .45; }
+</style>
+</head>
+<body>
+  <h1>Nouveau nom et nouvelle icône</h1>
+  <div class="sous">Les 4 noms sont libres sur le Play Store (vérifié le 17/10/2026). Choisissez un nom et une icône : on peut les mélanger.</div>
+
+  <div class="grille">
+    <!-- A. Uzima : feuille + croix, la vie et la santé -->
+    <div class="carte">
+      <div class="lettre">A</div><br>
+      <svg viewBox="0 0 120 120" id="icone-a">
+        <defs><linearGradient id="ga" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#065F46"/></linearGradient></defs>
+        <rect width="120" height="120" rx="30" fill="url(#ga)"/>
+        <path d="M60 24c20 8 30 24 30 40 0 18-13 31-30 31S30 82 30 64c0-16 10-32 30-40z" fill="#FFFFFF"/>
+        <path d="M54 44h12v12h12v12H66v12H54V68H42V56h12z" fill="#10B981"/>
+        <circle cx="86" cy="30" r="9" fill="#FCD34D"/>
+      </svg>
+      <div class="nom">Uzima</div>
+      <div class="sens">« La vie, la pleine santé » en swahili. Court, doux, facile à dire en français et en anglais.</div>
+      <div class="slogan">Uzima, la santé près de chez vous</div>
+    </div>
+
+    <!-- B. Afyapo : épingle de carte + croix, « la santé est là » -->
+    <div class="carte">
+      <div class="lettre">B</div><br>
+      <svg viewBox="0 0 120 120" id="icone-b">
+        <defs><linearGradient id="gb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBBF24"/><stop offset="1" stop-color="#F59E0B"/></linearGradient></defs>
+        <rect width="120" height="120" rx="30" fill="url(#gb)"/>
+        <path d="M60 18c-18 0-32 14-32 31 0 24 32 53 32 53s32-29 32-53c0-17-14-31-32-31z" fill="#064E3B"/>
+        <circle cx="60" cy="49" r="20" fill="#FFFFFF"/>
+        <path d="M55 37h10v7h7v10h-7v7H55v-7h-7V44h7z" fill="#10B981"/>
+      </svg>
+      <div class="nom">Afyapo</div>
+      <div class="sens">« Afya » (la santé) + « po » (c'est là) : la santé est là, près de vous.</div>
+      <div class="slogan">Afyapo ? Oui, c'est tout près !</div>
+    </div>
+
+    <!-- C. DawaIpo : gélule + coche, « le médicament est disponible » -->
+    <div class="carte">
+      <div class="lettre">C</div><br>
+      <svg viewBox="0 0 120 120" id="icone-c">
+        <defs><linearGradient id="gc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4338CA"/><stop offset="1" stop-color="#1E1B4B"/></linearGradient></defs>
+        <rect width="120" height="120" rx="30" fill="url(#gc)"/>
+        <g transform="rotate(-40 60 60)">
+          <rect x="26" y="44" width="68" height="32" rx="16" fill="#FFFFFF"/>
+          <path d="M60 44h18a16 16 0 0 1 0 32H60z" fill="#34D399"/>
+        </g>
+        <circle cx="86" cy="86" r="17" fill="#FCD34D"/>
+        <path d="m78 86 6 6 11-12" fill="none" stroke="#1E1B4B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="nom">Dawa Ipo</div>
+      <div class="sens">« Dawa ipo ? » : « Le médicament est disponible ? » La question que tout le monde pose.</div>
+      <div class="slogan">Dawa ipo ? Dawa ipo !</div>
+    </div>
+
+    <!-- D. Pharmalo : bulle « allô » + croix, le côté appel/rapide -->
+    <div class="carte">
+      <div class="lettre">D</div><br>
+      <svg viewBox="0 0 120 120" id="icone-d">
+        <defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14B8A6"/><stop offset="1" stop-color="#0E7490"/></linearGradient></defs>
+        <rect width="120" height="120" rx="30" fill="url(#gd)"/>
+        <path d="M30 32h60a10 10 0 0 1 10 10v32a10 10 0 0 1-10 10H54L38 98V84h-8a10 10 0 0 1-10-10V42a10 10 0 0 1 10-10z" fill="#FFFFFF"/>
+        <path d="M54 42h12v10h10v12H66v10H54V64H44V52h10z" fill="#14B8A6"/>
+      </svg>
+      <div class="nom">Pharmalo</div>
+      <div class="sens">« Pharma » + « allô » : on trouve sa pharmacie aussi vite qu'un coup de fil.</div>
+      <div class="slogan">Pharmalo, votre pharmacie en un clic</div>
+    </div>
+  </div>
+
+  <div class="ecran">
+    <div class="titre">Sur l'écran du téléphone</div>
+    <div class="appli gris"><svg viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#475569"/></svg><span>WhatsApp</span></div>
+    <div class="appli"><svg viewBox="0 0 120 120"><use href="#icone-a"/></svg><span>Uzima</span></div>
+    <div class="appli"><svg viewBox="0 0 120 120"><use href="#icone-b"/></svg><span>Afyapo</span></div>
+    <div class="appli"><svg viewBox="0 0 120 120"><use href="#icone-c"/></svg><span>Dawa Ipo</span></div>
+    <div class="appli"><svg viewBox="0 0 120 120"><use href="#icone-d"/></svg><span>Pharmalo</span></div>
+    <div class="appli gris"><svg viewBox="0 0 120 120"><rect width="120" height="120" rx="30" fill="#475569"/></svg><span>Photos</span></div>
+  </div>
+</body>
+</html>

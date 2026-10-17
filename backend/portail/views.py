@@ -49,7 +49,7 @@ def pharmacien_requis(vue):
         pharmacien = getattr(request.user, "pharmacien", None)
         if pharmacien is None:
             if request.user.is_staff:
-                return redirect("gestion:tableau")  # équipe Dawa : vers l'espace de gestion
+                return redirect("gestion:tableau")  # équipe Uzima : vers l'espace de gestion
             if hasattr(request.user, "responsable_etablissement"):
                 return redirect("etablissement:espace")
             return render(request, "portail/acces_refuse.html", status=403)
@@ -83,7 +83,7 @@ def dossier(request):
         formulaire = PieceForm(request.POST, request.FILES)
         if formulaire.is_valid():
             formulaire.enregistrer(pharmacie=pharmacien.pharmacie)
-            messages.success(request, "Document envoyé. L'équipe Dawa va le vérifier.")
+            messages.success(request, "Document envoyé. L'équipe Uzima va le vérifier.")
             return redirect("portail:dossier")
         messages.error(request, " ".join(e for erreurs in formulaire.errors.values() for e in erreurs))
     if not pharmacien.actif:
@@ -109,7 +109,7 @@ class MotDePasseOublie(PasswordResetView):
 
 
 def inscription(request):
-    """Inscription en ligne d'une pharmacie : compte créé en attente de validation par l'équipe Dawa."""
+    """Inscription en ligne d'une pharmacie : compte créé en attente de validation par l'équipe Uzima."""
     if request.user.is_authenticated:
         return redirect("portail:tableau")
     formulaire = InscriptionForm(request.POST or None)
@@ -319,7 +319,7 @@ def envoyer_photo(request, medicament_id):
     medicament = get_object_or_404(Medicament, pk=medicament_id)
     fichier = request.FILES.get("photo")
     if medicament.image and not medicament.image_est_illustration:
-        messages.error(request, f"{medicament} a déjà une photo. Contactez l'équipe Dawa pour la changer.")
+        messages.error(request, f"{medicament} a déjà une photo. Contactez l'équipe Uzima pour la changer.")
     elif fichier is None:
         messages.error(request, "Aucune photo reçue.")
     elif fichier.size > TAILLE_MAX_PHOTO:
@@ -445,7 +445,7 @@ def abonnement(request):
         if formule not in Abonnement.Formule.values or mois not in (1, 3, 6, 12):
             messages.error(request, "Formule ou durée invalide.")
         elif p.abonnements.filter(statut=Abonnement.Statut.EN_ATTENTE).exists():
-            messages.warning(request, "Une demande attend déjà son paiement : réglez-la ou contactez Dawa.")
+            messages.warning(request, "Une demande attend déjà son paiement : réglez-la ou contactez Uzima.")
         else:
             reference = f"DAWA-{p.pk}-{timezone.now():%y%m%d%H%M}"
             Abonnement.objects.create(
@@ -553,5 +553,5 @@ def tester_sms(request):
         canal="simulation", expediteur=request.pharmacie.telephone, texte=texte,
         pharmacie=request.pharmacie, reponse=reponse, simulation=True,
     )
-    messages.info(request, f"Réponse Dawa : {reponse}")
+    messages.info(request, f"Réponse Uzima : {reponse}")
     return redirect("portail:profil")

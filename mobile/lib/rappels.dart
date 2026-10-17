@@ -203,7 +203,7 @@ class Rappels {
     for (final t in traitements.value.where((t) => !t.estTermine)) {
       for (var i = 0; i < t.heures.length; i++) {
         final minutes = t.heures[i];
-        final titre = 'Dawa · ${t.nom}';
+        final titre = 'Uzima · ${t.nom}';
         final corps = t.dose.isEmpty
             ? tr('C\'est l\'heure de votre prise.')
             : tr('C\'est l\'heure de votre prise : {dose}.', {'dose': t.dose});

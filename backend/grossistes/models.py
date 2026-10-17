@@ -70,7 +70,7 @@ class Commande(models.Model):
             for l in self.lignes.select_related("medicament")
         )
         texte = (
-            f"Bonjour, commande Dawa n° {self.pk} de {self.pharmacie.nom} ({self.pharmacie.telephone}) :\n"
+            f"Bonjour, commande Uzima n° {self.pk} de {self.pharmacie.nom} ({self.pharmacie.telephone}) :\n"
             f"{lignes}\nTotal estimé : {self.total} FC."
             + (f"\nNote : {self.note}" if self.note else "")
         )

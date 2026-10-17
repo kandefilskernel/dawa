@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b8f6a">
-  <title>Inscription · Dawa Santé</title>
+  <title>Inscription · Uzima Santé</title>
   <link rel="stylesheet" href="{% static 'portail/portail.css' %}">
 </head>
 <body class="page-connexion">
@@ -32,7 +32,7 @@
         {% if champ.name == "urgences_24h" %}
           <div class="champ">
             <button class="btn secondaire bloc" type="button" id="ma-position">Je suis à l'établissement : utiliser ma position</button>
-            <div class="aide" id="etat-position" role="status" aria-live="polite">{% if form.latitude.value %}Position enregistrée.{% else %}Facultatif : sinon, l'équipe Dawa placera l'établissement sur la carte.{% endif %}</div>
+            <div class="aide" id="etat-position" role="status" aria-live="polite">{% if form.latitude.value %}Position enregistrée.{% else %}Facultatif : sinon, l'équipe Uzima placera l'établissement sur la carte.{% endif %}</div>
           </div>
         {% endif %}
       {% endfor %}
@@ -50,7 +50,7 @@
         document.getElementById("id_latitude").value = p.coords.latitude.toFixed(6);
         document.getElementById("id_longitude").value = p.coords.longitude.toFixed(6);
         etat.textContent = "Position enregistrée.";
-      }, () => { etat.textContent = "Position refusée ou introuvable. L'équipe Dawa la complétera."; },
+      }, () => { etat.textContent = "Position refusée ou introuvable. L'équipe Uzima la complétera."; },
       {enableHighAccuracy: true, timeout: 15000});
     });
   </script>

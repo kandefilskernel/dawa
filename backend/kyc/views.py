@@ -7,7 +7,7 @@ from .models import Piece
 
 @equipe_requise
 def telecharger_piece(request, pk):
-    """Pièce justificative : visible uniquement par l'équipe Dawa (stockage privé, hors /media/)."""
+    """Pièce justificative : visible uniquement par l'équipe Uzima (stockage privé, hors /media/)."""
     piece = Piece.objects.filter(pk=pk).first()
     if piece is None or not piece.fichier.storage.exists(piece.fichier.name):
         raise Http404

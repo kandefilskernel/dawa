@@ -24,8 +24,8 @@ router.register("etablissements", EtablissementViewSet, basename="etablissement"
 router.register("signalements", SignalementViewSet, basename="signalement")
 router.register("questions", QuestionViewSet, basename="question")
 
-admin.site.site_header = "Dawa — administration"
-admin.site.site_title = "Dawa"
+admin.site.site_header = "Uzima — administration"
+admin.site.site_title = "Uzima"
 
 urlpatterns = [
     path("admin/", admin.site.urls),

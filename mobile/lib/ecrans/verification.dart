@@ -91,7 +91,7 @@ class _EcranVerificationState extends State<EcranVerification> {
         const SizedBox(height: 28),
         Text(tr('Un produit vous semble suspect ?'), style: theme.textTheme.titleMedium),
         const SizedBox(height: 6),
-        Text(tr('Emballage mal imprimé, comprimés d\'aspect inhabituel, prix anormalement bas, lot inconnu… Signalez-le : l\'équipe Dawa transmet aux autorités.'), style: theme.textTheme.bodySmall),
+        Text(tr('Emballage mal imprimé, comprimés d\'aspect inhabituel, prix anormalement bas, lot inconnu… Signalez-le : l\'équipe Uzima transmet aux autorités.'), style: theme.textTheme.bodySmall),
         const SizedBox(height: 12),
         OutlinedButton.icon(
           onPressed: () => ouvrirSignalement(context, numeroLot: _lot.text.trim(), medicament: _resultat?.medicament),
@@ -221,7 +221,7 @@ class _FormulaireSignalementState extends State<_FormulaireSignalement> {
       if (!mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(tr('Merci, votre signalement a été transmis à l\'équipe Dawa.')),
+        content: Text(tr('Merci, votre signalement a été transmis à l\'équipe Uzima.')),
       ));
     } on ApiException catch (e) {
       if (mounted) setState(() => _erreur = e.message);

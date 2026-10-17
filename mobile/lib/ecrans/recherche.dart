@@ -254,7 +254,7 @@ class _EcranRechercheState extends State<EcranRecherche> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              tr('Dawa vous informe et vous oriente. Pour tout conseil sur un traitement, demandez à votre pharmacien ou à votre médecin.'),
+              tr('Uzima vous informe et vous oriente. Pour tout conseil sur un traitement, demandez à votre pharmacien ou à votre médecin.'),
               style: theme.textTheme.bodySmall,
             ),
           ),
@@ -322,7 +322,7 @@ class _EnTete extends StatelessWidget {
         Row(children: [
           const Illustration('logo', hauteur: 36),
           const SizedBox(width: 10),
-          const Text('Dawa',
+          const Text('Uzima',
               style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800, letterSpacing: -0.5)),
           const Spacer(),
           Container(

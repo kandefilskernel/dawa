@@ -42,7 +42,7 @@ class VueTraitements extends StatelessWidget {
             EtatIllustre(
               illustration: 'reservation_vide',
               titre: tr('Aucun traitement suivi'),
-              texte: tr('Ajoutez votre traitement : Dawa vous rappelle chaque prise et le renouvellement.'),
+              texte: tr('Ajoutez votre traitement : Uzima vous rappelle chaque prise et le renouvellement.'),
             )
           else ...[
             Text(tr('Aujourd\'hui'), style: Theme.of(context).textTheme.titleMedium),
@@ -276,7 +276,7 @@ class _FormulaireTraitementState extends State<_FormulaireTraitement> {
             const SizedBox(height: 20),
             FilledButton(onPressed: _enregistrer, child: Text(tr('Enregistrer et activer les rappels'))),
             const SizedBox(height: 8),
-            Text(tr('Dawa ne remplace pas l\'avis de votre médecin ou pharmacien.'),
+            Text(tr('Uzima ne remplace pas l\'avis de votre médecin ou pharmacien.'),
                 textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodySmall),
           ]),
         ),

@@ -12,7 +12,7 @@ def normaliser_lot(numero):
 
 class Lot(models.Model):
     """
-    Lot de fabrication connu. Alimenté par l'équipe Dawa à partir des sources officielles
+    Lot de fabrication connu. Alimenté par l'équipe Uzima à partir des sources officielles
     (autorité pharmaceutique, alertes de rappel, déclarations des fabricants et grossistes).
     """
 
@@ -58,7 +58,7 @@ class Signalement(models.Model):
     pharmacie = models.ForeignKey(
         Pharmacie, null=True, blank=True, on_delete=models.SET_NULL, help_text="Lieu d'achat"
     )
-    lieu_achat = models.CharField(max_length=150, blank=True, help_text="Si ce n'est pas une pharmacie Dawa")
+    lieu_achat = models.CharField(max_length=150, blank=True, help_text="Si ce n'est pas une pharmacie Uzima")
     description = models.TextField(max_length=1000)
     photo = models.ImageField(upload_to="signalements/", blank=True)
     telephone = models.CharField(max_length=20, blank=True, help_text="Pour être recontacté (facultatif)")

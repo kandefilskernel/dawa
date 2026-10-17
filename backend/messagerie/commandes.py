@@ -17,7 +17,7 @@ from pharmacies.models import Pharmacie
 from stock.models import Stock
 
 AIDE = (
-    "Dawa - commandes :\n"
+    "Uzima - commandes :\n"
     "DISPO nom [prix]\nRUPTURE nom\nPRIX nom prix\nOK = stock à jour\n"
     "Ex : DISPO doliprane 4500"
 )

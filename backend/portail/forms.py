@@ -27,11 +27,11 @@ class ProfilForm(forms.ModelForm):
 
 
 class InscriptionForm(UserCreationForm):
-    """Inscription d'une pharmacie : compte + fiche de l'officine, en attente de validation Dawa."""
+    """Inscription d'une pharmacie : compte + fiche de l'officine, en attente de validation Uzima."""
 
     nom = forms.CharField(label="Nom de la pharmacie", max_length=150)
     numero_agrement = forms.CharField(label="Numéro d'autorisation d'ouverture", max_length=50,
-                                      help_text="Délivré par l'Inspection provinciale de la santé. Dawa le vérifie.")
+                                      help_text="Délivré par l'Inspection provinciale de la santé. Uzima le vérifie.")
     telephone = forms.CharField(label="Téléphone", max_length=20)
     whatsapp = forms.CharField(label="WhatsApp", max_length=20, required=False)
     adresse = forms.CharField(label="Adresse", max_length=255)
@@ -63,7 +63,7 @@ class InscriptionForm(UserCreationForm):
     def clean_numero_agrement(self):
         numero = self.cleaned_data["numero_agrement"].strip()
         if Pharmacie.objects.filter(numero_agrement__iexact=numero).exists():
-            raise forms.ValidationError("Une pharmacie avec ce numéro est déjà inscrite. Contactez l'équipe Dawa.")
+            raise forms.ValidationError("Une pharmacie avec ce numéro est déjà inscrite. Contactez l'équipe Uzima.")
         return numero
 
     def clean(self):
@@ -84,7 +84,7 @@ class InscriptionForm(UserCreationForm):
             nom=d["nom"].strip(), numero_agrement=d["numero_agrement"], telephone=d["telephone"].strip(),
             whatsapp=d["whatsapp"].strip(), adresse=d["adresse"].strip(), quartier=d["quartier"].strip(),
             commune=d["commune"].strip(), horaires=d["horaires"].strip(), est_validee=False,
-            # Sans position, centre-ville : l'équipe Dawa la corrige avant de valider.
+            # Sans position, centre-ville : l'équipe Uzima la corrige avant de valider.
             position=Point(lng, lat, srid=4326) if position_fournie else Point(*CENTRE_LUBUMBASHI, srid=4326),
         )
         return Pharmacien.objects.create(utilisateur=utilisateur, pharmacie=pharmacie,

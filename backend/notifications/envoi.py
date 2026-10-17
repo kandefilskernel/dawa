@@ -37,9 +37,9 @@ MESSAGES = {
         "en": ("Courier on the way", "{medicament} is coming from {pharmacie}."),
     },
     "reservation_refusee": {
-        "fr": ("Réservation refusée", "{pharmacie} ne peut pas vous servir {medicament}. Cherchez une autre pharmacie dans Dawa."),
-        "sw": ("Oda imekataliwa", "{pharmacie} haiwezi kukupa {medicament}. Tafuta duka lingine la dawa kwenye Dawa."),
-        "en": ("Reservation declined", "{pharmacie} can't supply {medicament}. Find another pharmacy in Dawa."),
+        "fr": ("Réservation refusée", "{pharmacie} ne peut pas vous servir {medicament}. Cherchez une autre pharmacie dans Uzima."),
+        "sw": ("Oda imekataliwa", "{pharmacie} haiwezi kukupa {medicament}. Tafuta duka lingine la dawa kwenye Uzima."),
+        "en": ("Reservation declined", "{pharmacie} can't supply {medicament}. Find another pharmacy in Uzima."),
     },
     "alerte": {
         "fr": ("{medicament} est disponible", "Disponible maintenant à {pharmacie}."),
@@ -47,9 +47,9 @@ MESSAGES = {
         "en": ("{medicament} is available", "Now available at {pharmacie}."),
     },
     "question": {
-        "fr": ("Un pharmacien vous a répondu", "Ouvrez Dawa pour lire la réponse."),
-        "sw": ("Mfamasia amekujibu", "Fungua Dawa usome jibu."),
-        "en": ("A pharmacist has replied", "Open Dawa to read the answer."),
+        "fr": ("Un pharmacien vous a répondu", "Ouvrez Uzima pour lire la réponse."),
+        "sw": ("Mfamasia amekujibu", "Fungua Uzima usome jibu."),
+        "en": ("A pharmacist has replied", "Open Uzima to read the answer."),
     },
 }
 

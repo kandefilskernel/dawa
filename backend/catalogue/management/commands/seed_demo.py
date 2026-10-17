@@ -169,7 +169,7 @@ class Command(BaseCommand):
             utilisateur.save()
             Pharmacien.objects.update_or_create(utilisateur=utilisateur, defaults={"pharmacie": pharmacies[0]})
             self.stdout.write(f"Compte portail « pharmacie-centre » → {pharmacies[0].nom}")
-            # Compte équipe pour l'espace Dawa (/dawa/) : validations, visibilité, abonnements.
+            # Compte équipe pour l'espace Uzima (/dawa/) : validations, visibilité, abonnements.
             equipe, _ = get_user_model().objects.get_or_create(username="equipe-dawa")
             equipe.is_staff = True
             equipe.set_password(mot_de_passe)

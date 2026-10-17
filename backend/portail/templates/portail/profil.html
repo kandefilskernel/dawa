@@ -7,7 +7,7 @@
 
 {% block contenu %}
 <a class="carte" href="{% url 'portail:dossier' %}" style="display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;margin-bottom:14px">
-  <div style="flex:1"><div style="font-weight:700">Justificatifs (vérification Dawa)</div>
+  <div style="flex:1"><div style="font-weight:700">Justificatifs (vérification Uzima)</div>
     <div class="aide">Autorisation d'ouverture, carte de l'Ordre, pièce d'identité, photo de la façade.</div></div>
   {% if request.dossier_incomplet %}<span class="pastille p-attente">À compléter</span>{% else %}<span class="pastille p-ok">Envoyés</span>{% endif %}
 </a>
@@ -22,7 +22,7 @@
     </div>
   {% endfor %}
   <button class="btn bloc" type="submit">Enregistrer</button>
-  <p class="aide" style="margin-top:12px">Pour changer le nom ou la position sur la carte, contactez l'équipe Dawa.</p>
+  <p class="aide" style="margin-top:12px">Pour changer le nom ou la position sur la carte, contactez l'équipe Uzima.</p>
 </form>
 
 <a class="carte" href="{% url 'portail:abonnement' %}" style="display:flex;align-items:center;gap:12px;color:inherit;margin-top:14px">
@@ -95,6 +95,6 @@
   {% else %}
     <div class="vide">{% include "portail/icones/lune.html" %}<p>Aucune garde planifiée.</p></div>
   {% endif %}
-  <p class="aide" style="margin-top:12px">Le planning des gardes est établi par l'Ordre des pharmaciens et saisi par l'équipe Dawa.</p>
+  <p class="aide" style="margin-top:12px">Le planning des gardes est établi par l'Ordre des pharmaciens et saisi par l'équipe Uzima.</p>
 </div>
 {% endblock %}

@@ -1,11 +1,11 @@
 {
-    "name": "dawa",
-    "short_name": "dawa",
+    "name": "Uzima",
+    "short_name": "Uzima",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0B8F6A",
+    "theme_color": "#0B8F6A",
+    "description": "Trouvez votre médicament dans la pharmacie la plus proche à Lubumbashi.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

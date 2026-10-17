@@ -27,7 +27,7 @@ class EcranChoixLangue extends StatelessWidget {
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 const Illustration('logo', hauteur: 72),
                 const SizedBox(height: 12),
-                const Text('Dawa',
+                const Text('Uzima',
                     style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 24),
                 for (final l in Langue.values)

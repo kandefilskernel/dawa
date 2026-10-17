@@ -1,5 +1,6 @@
 import json
 import uuid
+from pathlib import Path
 from unittest import mock
 
 from django.contrib.gis.geos import Point
@@ -127,7 +128,8 @@ class EnvoiTests(TestCase):
             r.changer_statut(Reservation.Statut.ACCEPTEE)
         self.envoyer.assert_not_called()
 
-    @override_settings(FIREBASE_COMPTE_SERVICE="")
+    # Fichier inexistant : le vrai compte de service éventuellement présent dans cles/ est ignoré.
+    @override_settings(FIREBASE_COMPTE_SERVICE="", FIREBASE_COMPTE_SERVICE_FICHIER=Path("/inexistant/firebase.json"))
     def test_sans_firebase_rien_n_est_envoye(self):
         with self.captureOnCommitCallbacks(execute=True):
             self.reservation().changer_statut(Reservation.Statut.ACCEPTEE)

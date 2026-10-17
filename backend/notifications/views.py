@@ -23,7 +23,7 @@ class AppareilPushView(APIView):
         appareil = client_id(request)
         donnees = EnregistrementSerializer(data=request.data)
         donnees.is_valid(raise_exception=True)
-        # Un jeton FCM appartient à un seul téléphone : s'il change d'appareil Dawa, on le rattache au nouveau.
+        # Un jeton FCM appartient à un seul téléphone : s'il change d'appareil Uzima, on le rattache au nouveau.
         _, cree = AppareilPush.objects.update_or_create(
             jeton=donnees.validated_data["jeton"],
             defaults={"client_id": appareil, "langue": donnees.validated_data["langue"]},

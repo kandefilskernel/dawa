@@ -28,7 +28,7 @@ class DawaApp extends StatelessWidget {
     return ValueListenableBuilder<Langue>(
       valueListenable: langues.courante,
       builder: (_, langue, _) => MaterialApp(
-        title: 'Dawa',
+        title: 'Uzima',
         debugShowCheckedModeBanner: false,
         theme: construireTheme(),
         // Boutons, calendriers et horloges d'Android dans la langue choisie.

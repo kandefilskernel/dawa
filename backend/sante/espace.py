@@ -37,7 +37,7 @@ def espace(request):
         form_piece = PieceForm(request.POST, request.FILES)
         if form_piece.is_valid():
             form_piece.enregistrer(etablissement=etablissement)
-            messages.success(request, "Document envoyé. L'équipe Dawa va le vérifier.")
+            messages.success(request, "Document envoyé. L'équipe Uzima va le vérifier.")
             return redirect("etablissement:espace")
         messages.error(request, " ".join(e for erreurs in form_piece.errors.values() for e in erreurs))
     elif request.method == "POST" and responsable.actif:

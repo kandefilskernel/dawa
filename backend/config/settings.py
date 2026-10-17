@@ -142,7 +142,7 @@ LIVRAISON_DISTANCE_MAX_KM = 15
 
 # Abonnements des pharmacies (montants mensuels en FC, à ajuster après le terrain).
 ABONNEMENT_PRIX_FC = {"essentiel": 30_000, "visibilite": 75_000}
-# Numéro mobile money Dawa où les pharmacies paient leur abonnement.
+# Numéro mobile money Uzima où les pharmacies paient leur abonnement.
 DAWA_NUMERO_PAIEMENT = os.environ.get("DAWA_NUMERO_PAIEMENT", "à configurer")
 # Nombre maximum de résultats sponsorisés en tête d'une recherche.
 MAX_RESULTATS_SPONSORISES = 2
@@ -190,8 +190,8 @@ EMAIL_USE_TLS = os.environ.get("EMAIL_TLS", "1") == "1"
 EMAIL_TIMEOUT = 15
 EMAIL_BACKEND = ("django.core.mail.backends.smtp.EmailBackend" if EMAIL_HOST
                  else "django.core.mail.backends.console.EmailBackend")
-DEFAULT_FROM_EMAIL = SERVER_EMAIL = os.environ.get("EMAIL_EXPEDITEUR", "Dawa <ne-pas-repondre@localhost>")
-EMAIL_SUBJECT_PREFIX = "[Dawa] "
+DEFAULT_FROM_EMAIL = SERVER_EMAIL = os.environ.get("EMAIL_EXPEDITEUR", "Uzima <ne-pas-repondre@localhost>")
+EMAIL_SUBJECT_PREFIX = "[Uzima] "
 # Destinataires des alertes d'erreur serveur (500), ex. « Équipe:equipe@dawa.cd,Autre:autre@dawa.cd ».
 ADMINS = [tuple(a.split(":", 1)) for a in os.environ.get("DAWA_ALERTES_EMAILS", "").split(",") if ":" in a]
 

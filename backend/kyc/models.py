@@ -2,7 +2,7 @@
 Vérification d'identité des structures (KYC) : comptes à valider et pièces justificatives.
 
 Les pièces sont stockées HORS du dossier media public (settings.KYC_RACINE) et ne sont
-téléchargeables que par l'équipe Dawa, via une vue protégée.
+téléchargeables que par l'équipe Uzima, via une vue protégée.
 """
 import uuid
 from pathlib import Path
@@ -25,7 +25,7 @@ stockage_prive = _StockagePrive()
 
 
 class CompteValidable(models.Model):
-    """Compte d'une structure (pharmacie, établissement) validé manuellement par l'équipe Dawa."""
+    """Compte d'une structure (pharmacie, établissement) validé manuellement par l'équipe Uzima."""
 
     class Statut(models.TextChoices):
         EN_ATTENTE = "en_attente", "En attente de validation"
@@ -33,7 +33,7 @@ class CompteValidable(models.Model):
         REFUSE = "refuse", "Refusé"
         SUSPENDU = "suspendu", "Suspendu"
 
-    # Comptes créés par l'équipe Dawa : actifs d'emblée. Inscriptions en ligne : en attente.
+    # Comptes créés par l'équipe Uzima : actifs d'emblée. Inscriptions en ligne : en attente.
     statut = models.CharField(max_length=12, choices=Statut.choices, default=Statut.ACTIF)
     motif = models.CharField(max_length=255, blank=True, help_text="Raison du refus ou de la suspension")
     cree_le = models.DateTimeField(default=timezone.now)
