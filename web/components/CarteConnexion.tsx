@@ -1,18 +1,46 @@
-// Mise en page des écrans sans compte (connexion, mot de passe) : carte blanche sur fond émeraude.
+// Mise en page des écrans sans espace (connexion, mot de passe, inscription, statut du compte) :
+// panneau aux couleurs d'Uzima (à gauche sur ordinateur, en haut sur téléphone) et carte du formulaire.
 import type { ReactNode } from "react";
 
 import { Logo } from "./Icones";
 
-export function CarteConnexion({ titre, intro, children }: { titre: string; intro?: string; children: ReactNode }) {
+const ATOUTS = [
+  ["💊", "Votre stock visible par les patients de Lubumbashi, en temps réel"],
+  ["🛵", "Réservations et livraisons à moto suivies jusqu'au client"],
+  ["🛡️", "Pharmacies et établissements vérifiés par l'équipe Uzima"],
+];
+
+export function PageMarque({ large = false, children }: { large?: boolean; children: ReactNode }) {
   return (
     <div className="page-connexion">
-      <main className="carte">
-        <div className="logo"><Logo /></div>
-        <h1>{titre}</h1>
-        {intro && <p className="intro">{intro}</p>}
-        {children}
-      </main>
+      <section className="panneau-marque">
+        <div className="titre-marque">
+          <span className="logo"><Logo /></span>
+          <span>Uzima Pro<small>Pharmacies · Santé · Équipe Uzima</small></span>
+        </div>
+        <div className="accroche">
+          <h2>Le bon médicament, au bon endroit, au plus vite.</h2>
+          <ul>{ATOUTS.map(([icone, texte]) => <li key={texte}><span aria-hidden="true">{icone}</span>{texte}</li>)}</ul>
+          <p className="pied">« Dawa » veut dire médicament en swahili.</p>
+        </div>
+      </section>
+      <main className={large ? "large" : undefined}>{children}</main>
     </div>
+  );
+}
+
+export function CarteConnexion({ titre, intro, large, children }: {
+  titre: string;
+  intro?: string;
+  large?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <PageMarque large={large}>
+      <h1>{titre}</h1>
+      {intro ? <p className="intro">{intro}</p> : <div style={{ height: 18 }} />}
+      {children}
+    </PageMarque>
   );
 }
 
@@ -27,5 +55,5 @@ export function Messages({ succes, erreur }: { succes?: string; erreur?: string 
 }
 
 export function Chargement({ texte = "Chargement…" }: { texte?: string }) {
-  return <div className="chargement">{texte}</div>;
+  return <div className="chargement" role="status">{texte}</div>;
 }

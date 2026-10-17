@@ -81,7 +81,7 @@ export function FormulaireInscription({ titre, intro, chemin, champs, ici, ou }:
   }
 
   return (
-    <CarteConnexion titre={titre} intro={intro}>
+    <CarteConnexion titre={titre} intro={intro} large>
       <form onSubmit={envoyer} noValidate>
         <Messages erreur={erreur} />
         {/* Piège à robots : invisible pour les humains. */}

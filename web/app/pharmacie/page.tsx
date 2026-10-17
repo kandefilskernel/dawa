@@ -72,7 +72,7 @@ export default function TableauDeBord() {
                       {d.image
                         // eslint-disable-next-line @next/next/no-img-element
                         ? <img className="vignette" src={d.image} alt="" width={48} height={48} loading="lazy" />
-                        : <span className="icone-carre" style={{ background: "#fef3c7", color: "#b45309" }}><IconeTendance /></span>}
+                        : <span className="icone-carre" style={{ background: "var(--ambre-clair)", color: "var(--ambre-texte)" }}><IconeTendance /></span>}
                       <div className="grow">
                         <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
                           <span className="nom">{d.nom} {d.dosage}</span>

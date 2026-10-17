@@ -6,9 +6,8 @@ import { useDeconnexion } from "@/lib/compte";
 import type { DossierKyc as Dossier } from "@/lib/pharmacie";
 import { useDonnees } from "@/lib/useDonnees";
 
-import { Chargement, Messages } from "./CarteConnexion";
+import { Chargement, Messages, PageMarque } from "./CarteConnexion";
 import { DossierKyc } from "./DossierKyc";
-import { Logo } from "./Icones";
 
 type Reponse = { statut: string; motif: string; nom: string; dossier: Dossier };
 
@@ -19,13 +18,11 @@ export function CompteStatut({ chemin, genre }: { chemin: string; genre: "pharma
   const la = genre === "pharmacie" ? "la pharmacie" : "l'établissement";
   const espace = genre === "pharmacie" ? "au portail" : "à votre espace";
 
-  if (!donnees) return <div className="page-connexion"><main className="carte"><Chargement /></main></div>;
+  if (!donnees) return <PageMarque><Chargement /></PageMarque>;
   const { statut, motif, dossier } = donnees;
 
   return (
-    <div className="page-connexion">
-      <main className="carte" style={{ maxWidth: 520 }}>
-        <div className="logo"><Logo /></div>
+    <PageMarque large>
         <h1>{donnees.nom}</h1>
         <Messages succes={message} />
         {statut === "en_attente" && (
@@ -65,7 +62,6 @@ export function CompteStatut({ chemin, genre }: { chemin: string; genre: "pharma
         <button className="btn secondaire bloc" type="button" style={{ marginTop: 18 }} onClick={seDeconnecter}>
           Se déconnecter
         </button>
-      </main>
-    </div>
+    </PageMarque>
   );
 }

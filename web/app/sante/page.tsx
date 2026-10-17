@@ -2,11 +2,10 @@
 // Espace d'un hôpital, d'une clinique, d'un centre de santé… : statut, fiche affichée aux patients, justificatifs.
 import { useState, type FormEvent } from "react";
 
-import { Chargement, Messages } from "@/components/CarteConnexion";
+import { Chargement, Messages, PageMarque } from "@/components/CarteConnexion";
 import { Champ } from "@/components/Champ";
 import { DossierKyc } from "@/components/DossierKyc";
 import { EspaceProtege } from "@/components/EspaceProtege";
-import { Logo } from "@/components/Icones";
 import { api, ErreurApi } from "@/lib/api";
 import { useDeconnexion } from "@/lib/compte";
 import type { DossierKyc as Dossier } from "@/lib/pharmacie";
@@ -75,9 +74,7 @@ function Espace() {
   const seDeconnecter = useDeconnexion();
 
   return (
-    <div className="page-connexion">
-      <main className="carte" style={{ maxWidth: 560 }}>
-        <div className="logo"><Logo /></div>
+    <PageMarque large>
         {!e ? <Chargement /> : (
           <>
             <h1>{e.nom}</h1>
@@ -127,8 +124,7 @@ function Espace() {
         <button className="btn secondaire bloc" type="button" style={{ marginTop: 18 }} onClick={seDeconnecter}>
           Se déconnecter
         </button>
-      </main>
-    </div>
+    </PageMarque>
   );
 }
 

@@ -5,6 +5,7 @@ import { createContext, useContext, type ReactNode } from "react";
 
 import { Entete } from "@/components/Entete";
 import { IconeProfil, IconeQuestion, IconeReservations, IconeStock, IconeTableau } from "@/components/Icones";
+import { useCompte } from "@/lib/compte";
 import type { Resume } from "@/lib/pharmacie";
 
 export const ContexteResume = createContext<{ resume: Resume | null; rafraichir: () => void }>({
@@ -21,6 +22,7 @@ export function Cadre({ titre, intro, avecBandeau = true, children }: {
   children: ReactNode;
 }) {
   const { resume } = useResume();
+  const { compte } = useCompte();
   const liens = [
     { href: "/pharmacie", libelle: "Accueil", icone: <IconeTableau />, exact: true },
     { href: "/pharmacie/reservations", libelle: "Réservations", icone: <IconeReservations />, pastille: resume?.nb_a_traiter },
@@ -30,7 +32,8 @@ export function Cadre({ titre, intro, avecBandeau = true, children }: {
   ];
   return (
     <>
-      <Entete titre={resume?.pharmacie.nom ?? "Pharmacie"} sousTitre="Portail Uzima" liens={liens}>
+      <Entete titre={resume?.pharmacie.nom ?? "Pharmacie"} sousTitre="Portail Uzima" liens={liens}
+        compte={compte?.connecte ? compte.identifiant : undefined}>
         <h1>{titre}</h1>
         {intro && <p>{intro}</p>}
       </Entete>

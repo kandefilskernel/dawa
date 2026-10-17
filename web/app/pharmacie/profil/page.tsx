@@ -158,7 +158,7 @@ export default function PageProfil() {
 
           <Link className="carte" href="/pharmacie/abonnement"
             style={{ display: "flex", alignItems: "center", gap: 12, color: "inherit", marginTop: 14 }}>
-            <span className="icone-carre" style={{ background: "#fef3c7", color: "#b45309" }}>★</span>
+            <span className="icone-carre" style={{ background: "var(--ambre-clair)", color: "var(--ambre-texte)" }}>★</span>
             <div className="grow"><div className="nom">Abonnement et mise en avant</div>
               <div className="sous">Apparaissez en tête des recherches de votre quartier.</div></div>
             <span aria-hidden="true">›</span>
@@ -191,7 +191,7 @@ export default function PageProfil() {
               <ul className="liste">
                 {donnees.gardes.map((g) => (
                   <li key={g.debut}>
-                    <span className="icone-carre" style={{ background: "#e0e7ff", color: "#4338ca" }}><IconeLune /></span>
+                    <span className="icone-carre" style={{ background: "var(--indigo-clair)", color: "var(--indigo)" }}><IconeLune /></span>
                     <div className="grow">
                       <div className="nom" style={{ textTransform: "capitalize" }}>{jourLong(g.debut)}</div>
                       <div className="sous">de {heure(g.debut)} au {jourLong(g.fin)} à {heure(g.fin)}</div>

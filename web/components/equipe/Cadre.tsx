@@ -25,7 +25,7 @@ export function Cadre({ titre, intro, children }: { titre: string; intro?: strin
   ];
   return (
     <>
-      <Entete titre="Espace Uzima" sousTitre={`${tableau?.identifiant ?? ""} · équipe`} liens={liens}>
+      <Entete titre="Espace Uzima" sousTitre="Équipe Uzima" compte={tableau?.identifiant} liens={liens}>
         <h1>{titre}</h1>
         {intro && <p>{intro}</p>}
       </Entete>

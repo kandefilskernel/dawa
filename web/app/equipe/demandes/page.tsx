@@ -38,7 +38,7 @@ function CarteDemande({ d, onPiece, onDecision }: {
         <li>
           <div className="grow"><div className="sous">Position sur la carte</div>
             {s.position_a_verifier
-              ? <div className="nom" style={{ color: "#b45309" }}>Non fournie : à placer avant de valider</div>
+              ? <div className="nom" style={{ color: "var(--ambre-texte)" }}>Non fournie : à placer avant de valider</div>
               : <div className="nom">{s.position.lat.toFixed(5)}, {s.position.lng.toFixed(5)}</div>}</div>
           <a className="btn secondaire" href={s.admin}>{s.position_a_verifier ? "Placer" : "Modifier"}</a>
         </li>

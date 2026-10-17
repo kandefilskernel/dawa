@@ -75,7 +75,7 @@ export function LigneStock({ ligne, onPhoto }: {
             {m.dci} · {m.forme}
             {m.ordonnance_requise && <> · <span style={{ color: "var(--rouge)" }}>ordonnance</span></>}
             {!stock ? <> · <em>non référencé</em></>
-              : ligne.a_confirmer && etat.classe !== "ok" ? <> · <span style={{ color: "#b45309" }}>à confirmer</span></>
+              : ligne.a_confirmer && etat.classe !== "ok" ? <> · <span style={{ color: "var(--ambre-texte)" }}>à confirmer</span></>
                 : <> · maj {jourHeure(stock.mis_a_jour_le)}</>}
           </div>
         </div>

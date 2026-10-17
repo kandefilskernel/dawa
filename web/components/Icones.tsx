@@ -10,12 +10,19 @@ function Trait({ children }: { children: ReactNode }) {
   );
 }
 
-export function Logo() {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
-      <path d="M12 3.6c4.4 1.8 6.6 5.3 6.6 8.8 0 4-2.9 6.8-6.6 6.8s-6.6-2.8-6.6-6.8c0-3.5 2.2-7 6.6-8.8z" fill="#10B981" />
-      <path d="M10.8 8.6h2.4V11h2.4v2.4h-2.4v2.4h-2.4v-2.4H8.4V11h2.4z" fill="#FFFFFF" />
-      <circle cx="18.4" cy="5" r="2" fill="#F59E0B" />
+/** Logo Uzima (communication/icone/) : goutte verte et croix blanche sur fond clair, ou l'inverse sur le dégradé. */
+export function Logo({ inverse = false }: { inverse?: boolean }) {
+  return inverse ? (
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <path d="M60 24c20 8 30 24 30 40 0 18-13 31-30 31S30 82 30 64c0-16 10-32 30-40z" fill="#FFFFFF" />
+      <path d="M54 44h12v12h12v12H66v12H54V68H42V56h12z" fill="#10B981" />
+      <circle cx="86" cy="30" r="9" fill="#FCD34D" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M32 11c11.5 4.6 17 13.8 17 23 0 10.3-7.4 17.8-17 17.8S15 44.3 15 34c0-9.2 5.6-18.4 17-23z" fill="#10B981" />
+      <path d="M28.6 25h6.8v6.8h6.8v6.8h-6.8v6.8h-6.8v-6.8h-6.8v-6.8h6.8z" fill="#FFFFFF" />
+      <circle cx="47" cy="15" r="5" fill="#F59E0B" />
     </svg>
   );
 }
@@ -40,5 +47,8 @@ export const IconeHorloge = () => <Trait><circle cx="12" cy="12" r="9" /><path d
 export const IconeLune = () => <Trait><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></Trait>;
 export const IconeTelephone = () => (
   <Trait><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z" /></Trait>
+);
+export const IconeSortie = () => (
+  <Trait><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3" /><path d="M10 17l-5-5 5-5" /><path d="M5 12h11" /></Trait>
 );
 export const IconeTendance = () => <Trait><path d="M3 3v18h18" /><path d="m7 14 4-4 3 3 5-6" /></Trait>;
