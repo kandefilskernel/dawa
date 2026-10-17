@@ -1,4 +1,3 @@
-from datetime import timedelta
 from functools import wraps
 
 from django.conf import settings
@@ -6,38 +5,29 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordResetView
-from django.contrib.gis.measure import D
 from django.core.paginator import Paginator
-from django.db import transaction
-from django.db.models import Count
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
-from PIL import Image, UnidentifiedImageError
 
 from abonnements.models import Abonnement
-from catalogue.images import nom_fichier, preparer_photo
 from catalogue.models import Medicament
 from catalogue.search import rechercher_medicaments
 from config.securite import compter, limite_atteinte
 from conseil.assistant import AssistantIndisponible, assistant_actif, suggerer_reponse
 from conseil.models import Question
-from notifications.envoi import notifier_reponse
-from grossistes.models import Commande, Grossiste, LigneCommande, Offre
+from grossistes.models import Commande, Grossiste
 from kyc.dossier import Dossier, PieceForm
-from messagerie.commandes import traiter_message
-from messagerie.models import MessageEntrant
 from reservations.models import Livreur, Reservation
-from stock.models import Recherche, Stock
 
+from . import services
 from .forms import InscriptionForm, ProfilForm
+from .services import JOURS_DEMANDE, RAYON_DEMANDE_KM, ActionImpossible
 
-RAYON_DEMANDE_KM = 5
 MAX_INSCRIPTIONS_PAR_HEURE = 5
-JOURS_DEMANDE = 30
 
 
 def pharmacien_requis(vue):
@@ -131,12 +121,8 @@ def _rediriger(request, defaut):
     return redirect(defaut)
 
 
-def _reservations_actives(pharmacie):
-    return pharmacie.reservations.filter(statut__in=Reservation.ACTIFS, expire_le__gt=timezone.now())
-
-
-def _limite_fraicheur():
-    return timezone.now() - timedelta(hours=settings.STOCK_FRAICHEUR_HEURES)
+_reservations_actives = services.reservations_actives
+_limite_fraicheur = services.limite_fraicheur
 
 
 @pharmacien_requis
@@ -144,20 +130,7 @@ def tableau_de_bord(request):
     p = request.pharmacie
     actives = _reservations_actives(p)
     stocks = p.stocks.all()
-
-    # Médicaments recherchés autour de la pharmacie qu'elle n'a pas en stock.
-    disponibles = stocks.filter(disponible=True).values("medicament_id")
-    demande = (
-        Recherche.objects.filter(
-            cree_le__gte=timezone.now() - timedelta(days=JOURS_DEMANDE),
-            medicament__isnull=False,
-            zone__dwithin=(p.position, D(km=RAYON_DEMANDE_KM)),
-        )
-        .exclude(medicament_id__in=disponibles)
-        .values("medicament_id", "medicament__nom_commercial", "medicament__dosage", "medicament__image")
-        .annotate(nb=Count("id"))
-        .order_by("-nb")[:8]
-    )
+    demande = services.demande_proche(p)
 
     return render(request, "portail/tableau.html", {
         "onglet": "tableau",
@@ -279,34 +252,21 @@ def stock(request):
 def modifier_stock(request, medicament_id):
     medicament = get_object_or_404(Medicament, pk=medicament_id)
     disponible = request.POST.get("disponible") == "1"
-    prix_brut = request.POST.get("prix", "").replace(" ", "").strip()
-    erreur = None
-    prix = None
-    if prix_brut:
-        if prix_brut.isdigit() and 0 < int(prix_brut) < 10_000_000:
-            prix = int(prix_brut)
-        else:
-            erreur = "Prix invalide (nombre entier en FC)."
-
-    if erreur is None:
-        Stock.objects.update_or_create(
-            pharmacie=request.pharmacie,
-            medicament=medicament,
-            defaults={"disponible": disponible, "prix": prix, "source": Stock.Source.PORTAIL},
-        )
+    erreur = stock = None
+    try:
+        stock = services.modifier_stock(request.pharmacie, medicament, disponible, request.POST.get("prix", ""))
+    except ActionImpossible as e:
+        erreur = str(e)
 
     if request.headers.get("X-Requested-With") == "fetch":
         if erreur:
             return JsonResponse({"ok": False, "erreur": erreur}, status=400)
-        return JsonResponse({"ok": True, "disponible": disponible, "prix": prix})
+        return JsonResponse({"ok": True, "disponible": disponible, "prix": stock.prix})
     if erreur:
         messages.error(request, erreur)
     else:
         messages.success(request, f"{medicament} : mis à jour.")
     return _rediriger(request, "portail:stock")
-
-
-TAILLE_MAX_PHOTO = 10 * 1024 * 1024
 
 
 @pharmacien_requis
@@ -317,29 +277,11 @@ def envoyer_photo(request, medicament_id):
     La photo remplace une illustration, jamais une vraie photo déjà en place.
     """
     medicament = get_object_or_404(Medicament, pk=medicament_id)
-    fichier = request.FILES.get("photo")
-    if medicament.image and not medicament.image_est_illustration:
-        messages.error(request, f"{medicament} a déjà une photo. Contactez l'équipe Uzima pour la changer.")
-    elif fichier is None:
-        messages.error(request, "Aucune photo reçue.")
-    elif fichier.size > TAILLE_MAX_PHOTO:
-        messages.error(request, "Photo trop lourde (10 Mo maximum).")
-    else:
-        try:
-            Image.open(fichier).verify()
-            fichier.seek(0)
-            photo = preparer_photo(fichier, nom_fichier(medicament))
-        except (UnidentifiedImageError, OSError, SyntaxError):
-            messages.error(request, "Ce fichier n'est pas une image valide.")
-        else:
-            if medicament.image:
-                medicament.image.delete(save=False)
-            medicament.image.save(photo.name, photo, save=False)
-            medicament.image_est_illustration = False
-            medicament.image_envoyee_par = request.pharmacie
-            medicament.image_credit = ""
-            medicament.save(update_fields=["image", "image_est_illustration", "image_envoyee_par", "image_credit"])
-            messages.success(request, f"Merci ! La photo de {medicament} est en ligne pour tous les patients.")
+    try:
+        services.envoyer_photo(request.pharmacie, medicament, request.FILES.get("photo"))
+        messages.success(request, f"Merci ! La photo de {medicament} est en ligne pour tous les patients.")
+    except ActionImpossible as e:
+        messages.error(request, str(e))
     return _rediriger(request, "portail:stock")
 
 
@@ -347,7 +289,7 @@ def envoyer_photo(request, medicament_id):
 @require_POST
 def confirmer_stock(request):
     """« Mon stock est à jour » : rafraîchit la date de tous les produits disponibles."""
-    nb = request.pharmacie.stocks.filter(disponible=True).update(mis_a_jour_le=timezone.now())
+    nb = services.confirmer_stock(request.pharmacie)
     messages.success(request, f"{nb} produit(s) confirmé(s) disponibles. Merci !")
     return _rediriger(request, "portail:stock")
 
@@ -357,15 +299,13 @@ def confirmer_stock(request):
 def livreurs(request):
     """Ajouter ou désactiver un livreur de la pharmacie."""
     if request.POST.get("action") == "ajouter":
-        nom = request.POST.get("nom", "").strip()
-        telephone = request.POST.get("telephone", "").strip()
-        if len(nom) < 2 or len("".join(c for c in telephone if c.isdigit())) < 9:
-            messages.error(request, "Indiquez le nom et un numéro de téléphone valide du livreur.")
-        else:
-            Livreur.objects.create(pharmacie=request.pharmacie, nom=nom, telephone=telephone)
-            messages.success(request, f"{nom} ajouté : vos clients peuvent maintenant choisir la livraison.")
+        try:
+            livreur = services.ajouter_livreur(request.pharmacie, request.POST.get("nom"), request.POST.get("telephone"))
+            messages.success(request, f"{livreur.nom} ajouté : vos clients peuvent maintenant choisir la livraison.")
+        except ActionImpossible as e:
+            messages.error(request, str(e))
     elif request.POST.get("action") == "retirer":
-        Livreur.objects.filter(pk=request.POST.get("livreur"), pharmacie=request.pharmacie).update(actif=False)
+        services.retirer_livreur(request.pharmacie, request.POST.get("livreur"))
         messages.success(request, "Livreur retiré.")
     return redirect("portail:profil")
 
@@ -416,20 +356,13 @@ def suggerer_reponse_question(request, pk):
 @pharmacien_requis
 @require_POST
 def repondre_question(request, pk):
-    reponse = request.POST.get("reponse", "").strip()
-    if len(reponse) < 5:
-        messages.error(request, "La réponse est trop courte.")
+    try:
+        enregistree = services.repondre_question(request.pharmacie, pk, request.POST.get("reponse", ""),
+                                                 request.POST.get("orienter") == "1")
+    except ActionImpossible as e:
+        messages.error(request, str(e))
         return redirect("portail:questions")
-    # Mise à jour atomique et conditionnelle : si un confrère a répondu entre-temps, on ne l'écrase pas.
-    orienter = request.POST.get("orienter") == "1"
-    nb = Question.objects.filter(pk=pk, statut=Question.Statut.EN_ATTENTE).update(
-        reponse=reponse[:2000],
-        repondu_par=request.pharmacie,
-        repondu_le=timezone.now(),
-        statut=Question.Statut.ORIENTEE if orienter else Question.Statut.REPONDUE,
-    )
-    if nb:
-        notifier_reponse(Question.objects.get(pk=pk))
+    if enregistree:
         messages.success(request, "Réponse envoyée au patient. Merci !")
     else:
         messages.warning(request, "Un confrère a déjà répondu à cette question.")
@@ -440,18 +373,11 @@ def repondre_question(request, pk):
 def abonnement(request):
     p = request.pharmacie
     if request.method == "POST":
-        formule = request.POST.get("formule")
-        mois = int(request.POST.get("mois", "1")) if request.POST.get("mois", "1").isdigit() else 1
-        if formule not in Abonnement.Formule.values or mois not in (1, 3, 6, 12):
-            messages.error(request, "Formule ou durée invalide.")
-        elif p.abonnements.filter(statut=Abonnement.Statut.EN_ATTENTE).exists():
-            messages.warning(request, "Une demande attend déjà son paiement : réglez-la ou contactez Uzima.")
-        else:
-            reference = f"DAWA-{p.pk}-{timezone.now():%y%m%d%H%M}"
-            Abonnement.objects.create(
-                pharmacie=p, formule=formule, mois=mois, montant=Abonnement.prix(formule, mois), reference=reference
-            )
-            messages.success(request, f"Demande enregistrée. Payez avec la référence {reference}.")
+        try:
+            demande = services.demander_abonnement(p, request.POST.get("formule"), request.POST.get("mois", "1"))
+            messages.success(request, f"Demande enregistrée. Payez avec la référence {demande.reference}.")
+        except ActionImpossible as e:
+            messages.error(request, str(e))
         return redirect("portail:abonnement")
 
     actif = Abonnement.objects.actifs().filter(pharmacie=p).order_by("-fin").first()
@@ -460,11 +386,7 @@ def abonnement(request):
         "actif": actif,
         "en_attente": p.abonnements.filter(statut=Abonnement.Statut.EN_ATTENTE).first(),
         "historique": p.abonnements.all()[:12],
-        "formules": [
-            {"code": code, "libelle": libelle.split(" — ")[0], "detail": libelle.split(" — ")[1],
-             "prix": Abonnement.prix(code)}
-            for code, libelle in Abonnement.Formule.choices
-        ],
+        "formules": services.formules_abonnement(),
         "numero_paiement": settings.DAWA_NUMERO_PAIEMENT,
     })
 
@@ -491,22 +413,11 @@ def nouvelle_commande(request, grossiste_id):
         for cle, valeur in request.POST.items():
             if cle.startswith("qte_") and valeur.strip().isdigit() and int(valeur) > 0:
                 quantites[int(cle[4:])] = min(int(valeur), 10_000)
-        choisies = list(grossiste.offres.filter(pk__in=quantites, disponible=True).select_related("medicament"))
-        total = sum(o.prix * quantites[o.pk] for o in choisies)
-        if not choisies:
-            messages.error(request, "Indiquez au moins une quantité.")
-        elif total < grossiste.minimum_commande:
-            messages.error(request, f"Minimum de commande chez {grossiste} : {grossiste.minimum_commande} FC (actuel : {total} FC).")
+        try:
+            commande = services.creer_commande(request.pharmacie, grossiste, quantites, request.POST.get("note", ""))
+        except ActionImpossible as e:
+            messages.error(request, str(e))
         else:
-            with transaction.atomic():
-                commande = Commande.objects.create(
-                    pharmacie=request.pharmacie, grossiste=grossiste, note=request.POST.get("note", "").strip()[:255]
-                )
-                LigneCommande.objects.bulk_create([
-                    LigneCommande(commande=commande, medicament=o.medicament, quantite=quantites[o.pk],
-                                  prix_unitaire=o.prix, conditionnement=o.conditionnement)
-                    for o in choisies
-                ])
             messages.success(request, f"Commande n° {commande.pk} enregistrée. Envoyez-la au grossiste par WhatsApp.")
             return redirect("portail:commande", pk=commande.pk)
 
@@ -525,15 +436,11 @@ def nouvelle_commande(request, grossiste_id):
 def commande(request, pk):
     commande = get_object_or_404(Commande.objects.select_related("grossiste"), pk=pk, pharmacie=request.pharmacie)
     if request.method == "POST":
-        action = request.POST.get("action")
-        if action == "annuler" and commande.statut == Commande.Statut.ENVOYEE:
-            commande.statut = Commande.Statut.ANNULEE
-        elif action == "recue" and commande.statut in (Commande.Statut.ENVOYEE, Commande.Statut.CONFIRMEE):
-            commande.statut = Commande.Statut.LIVREE
-        else:
-            messages.error(request, "Action impossible pour cette commande.")
+        try:
+            services.changer_commande(commande, request.POST.get("action"))
+        except ActionImpossible as e:
+            messages.error(request, str(e))
             return redirect("portail:commande", pk=pk)
-        commande.save(update_fields=["statut"])
         messages.success(request, f"Commande n° {pk} : {commande.get_statut_display().lower()}.")
         return redirect("portail:commande", pk=pk)
     return render(request, "portail/commande.html", {
@@ -547,11 +454,6 @@ def commande(request, pk):
 @require_POST
 def tester_sms(request):
     """Simulateur : applique un message comme s'il avait été reçu par SMS (les changements sont réels)."""
-    texte = request.POST.get("texte", "")[:1600]
-    reponse = traiter_message(request.pharmacie, texte)
-    MessageEntrant.objects.create(
-        canal="simulation", expediteur=request.pharmacie.telephone, texte=texte,
-        pharmacie=request.pharmacie, reponse=reponse, simulation=True,
-    )
+    reponse = services.simuler_sms(request.pharmacie, request.POST.get("texte", ""))
     messages.info(request, f"Réponse Uzima : {reponse}")
     return redirect("portail:profil")

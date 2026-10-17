@@ -11,6 +11,8 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from config.securite import compter, limite_atteinte
+from portail.forms import InscriptionForm
+from sante.forms import InscriptionEtablissementForm
 
 from .base import VueWeb, compte_structure, erreur, erreur_formulaire, role
 
@@ -85,6 +87,39 @@ class MotDePasseOublieView(VueWeb):
                 extra_email_context={"adresse_web": settings.UZIMA_WEB_URL},
             )
         return Response({"message": "Si un compte utilise cette adresse, un lien vient d'y être envoyé."})
+
+
+class InscriptionView(VueWeb):
+    """
+    Inscription en ligne d'une structure : compte créé en attente de validation par l'équipe Uzima,
+    puis connexion directe pour envoyer les justificatifs. Mêmes formulaires que les pages Django.
+    """
+
+    formulaire = None
+
+    def post(self, request):
+        from portail.views import MAX_INSCRIPTIONS_PAR_HEURE
+
+        if request.user.is_authenticated:
+            raise erreur("Vous êtes déjà connecté : déconnectez-vous pour inscrire une autre structure.")
+        champs = list(self.formulaire.base_fields) + ["password1", "password2"]
+        formulaire = self.formulaire({c: request.data.get(c, "") for c in champs})
+        if limite_atteinte(request, "inscription", MAX_INSCRIPTIONS_PAR_HEURE):
+            raise erreur("Trop d'inscriptions depuis cette connexion. Réessayez dans une heure.")
+        if not formulaire.is_valid():
+            raise erreur_formulaire(formulaire)
+        compte = formulaire.save()
+        compter(request, "inscription")
+        login(request._request, compte.utilisateur, backend="config.securite.ConnexionLimitee")
+        return Response(description_compte(compte.utilisateur), status=status.HTTP_201_CREATED)
+
+
+class InscriptionPharmacieView(InscriptionView):
+    formulaire = InscriptionForm
+
+
+class InscriptionEtablissementView(InscriptionView):
+    formulaire = InscriptionEtablissementForm
 
 
 def _utilisateur_du_lien(uid, jeton):
