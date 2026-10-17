@@ -225,7 +225,7 @@ class _CarteEtablissement extends StatelessWidget {
             ],
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => itineraire(context, e.lat, e.lng),
+                onPressed: () => itineraire(context, e.lat, e.lng, nom: e.nom),
                 icon: const Icon(Icons.directions_outlined, size: 18),
                 label: Text(tr('Itinéraire')),
               ),

@@ -137,7 +137,7 @@ class _FichePharmacieState extends State<FichePharmacie> {
                 Expanded(
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(backgroundColor: Colors.white),
-                    onPressed: () => itineraire(context, p.lat, p.lng),
+                    onPressed: () => itineraire(context, p.lat, p.lng, nom: p.nom),
                     icon: const Icon(Icons.directions_outlined, size: 18),
                     label: Text(tr('Itinéraire')),
                   ),

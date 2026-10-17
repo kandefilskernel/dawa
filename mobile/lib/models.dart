@@ -89,6 +89,22 @@ class Trajet {
         parLaRoute = json['source'] == 'route';
 }
 
+/// Tracé d'un trajet par la route (ou ligne droite si le routage est indisponible).
+class Itineraire {
+  final ModeTrajet mode;
+  final List<(double, double)> points;
+  final double distanceKm;
+  final int minutes;
+  final bool parLaRoute;
+
+  Itineraire.fromJson(Map<String, dynamic> json)
+      : mode = ModeTrajet.depuis(json['mode']),
+        points = [for (final p in json['points'] as List) (_double(p[0])!, _double(p[1])!)],
+        distanceKm = _double(json['distance_km'])!,
+        minutes = json['minutes'],
+        parLaRoute = json['source'] == 'route';
+}
+
 /// Trajets et délai pour obtenir le médicament dans une pharmacie (calculés par le serveur).
 class Acces {
   /// null : horaires inconnus.

@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../langue.dart';
 import '../ecrans/fiche_pharmacie.dart';
+import '../ecrans/itineraire.dart';
 import '../models.dart';
 import '../theme.dart';
 import 'communs.dart';
@@ -32,7 +33,12 @@ Future<void> _ouvrir(BuildContext context, Uri uri, String echec) async {
 Future<void> appeler(BuildContext context, String telephone) =>
     _ouvrir(context, Uri(scheme: 'tel', path: telephone), tr('Impossible d\'appeler {telephone}', {'telephone': telephone}));
 
-Future<void> itineraire(BuildContext context, double lat, double lng) => _ouvrir(
+/// Trajet tracé sur la carte de l'app, avec distance et durée.
+Future<void> itineraire(BuildContext context, double lat, double lng, {required String nom}) =>
+    ouvrirItineraire(context, nom: nom, lat: lat, lng: lng);
+
+/// Itinéraire dans Google Maps (navigation guidée).
+Future<void> itineraireExterne(BuildContext context, double lat, double lng) => _ouvrir(
       context,
       Uri.https('www.google.com', '/maps/dir/', {'api': '1', 'destination': '$lat,$lng'}),
       tr('Impossible d\'ouvrir la carte'),
@@ -185,7 +191,7 @@ class _Actions extends StatelessWidget {
     final boutonItineraire = Tooltip(
       message: tr('Itinéraire'),
       child: OutlinedButton(
-        onPressed: () => itineraire(context, pharmacie.lat, pharmacie.lng),
+        onPressed: () => itineraire(context, pharmacie.lat, pharmacie.lng, nom: pharmacie.nom),
         style: OutlinedButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(52, 48)),
         child: Icon(Icons.directions_outlined, size: 22, semanticLabel: tr('Itinéraire')),
       ),
@@ -202,7 +208,7 @@ class _Actions extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: OutlinedButton.icon(
-            onPressed: () => itineraire(context, pharmacie.lat, pharmacie.lng),
+            onPressed: () => itineraire(context, pharmacie.lat, pharmacie.lng, nom: pharmacie.nom),
             icon: const Icon(Icons.directions_outlined, size: 18),
             label: Text(tr('Itinéraire')),
           ),

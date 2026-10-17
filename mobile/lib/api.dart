@@ -130,6 +130,14 @@ class Api {
     return ReponseRecherche.fromJson(json);
   }
 
+  Future<Itineraire> itineraire(Position depart, double versLat, double versLng, ModeTrajet mode) async =>
+      Itineraire.fromJson(await _requete('GET', '/api/itineraire/', params: {
+        ..._position(depart),
+        'vers_lat': versLat.toStringAsFixed(5),
+        'vers_lng': versLng.toStringAsFixed(5),
+        'mode': mode.code,
+      }));
+
   Future<List<Pharmacie>> pharmaciesDeGarde(Position position) async {
     final json = await _requete('GET', '/api/pharmacies/garde/', params: _position(position));
     return (json as List).map((p) => Pharmacie.fromJson(p)).toList();

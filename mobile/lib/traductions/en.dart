@@ -272,4 +272,7 @@ const en = <String, String>{
   '{n} j': '{n} d',
   '{n} min': '{n} min',
   "Fermée : disponible dans {duree} (à l'ouverture)": 'Closed: available in {duree} (when it opens)',
+  'Trajet exact indisponible : ligne droite et durée estimée.': 'Exact route unavailable: straight line and estimated time.',
+  'Position indisponible : départ du centre-ville.': 'Location unavailable: starting from the city centre.',
+  'Ouvrir dans Google Maps': 'Open in Google Maps',
 };

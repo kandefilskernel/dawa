@@ -29,6 +29,7 @@ MODES = tuple(VITESSES_KMH)
 MODE_DEFAUT = "moto"
 DELAI_OSRM = 4.0
 DUREE_CACHE = 6 * 3600
+PAUSE_APRES_PANNE = 5 * 60
 
 
 @dataclass
@@ -73,18 +74,30 @@ def _cle(*morceaux):
     return "trajet:" + hashlib.sha1(repr(morceaux).encode()).hexdigest()
 
 
+def _en_panne(profil):
+    return cache.get(f"trajet:panne:{profil}") is not None
+
+
+def _signaler_panne(profil, erreur):
+    """Après un échec, on n'attend plus ce serveur pendant quelques minutes."""
+    journal.info("Routage %s indisponible : %s", profil, erreur)
+    cache.set(f"trajet:panne:{profil}", True, PAUSE_APRES_PANNE)
+
+
 def _distances_route(profil, depart, arrivees):
     """Distances par la route (km) depuis `depart` vers chaque arrivée, None si inconnue."""
     cle = _cle("table", profil, depart, tuple(arrivees))
     en_cache = cache.get(cle)
     if en_cache is not None:
         return en_cache
+    if _en_panne(profil):
+        return [None] * len(arrivees)
     url = (f"{settings.ROUTAGE_URL}/{profil}/table/v1/driving/{_coordonnees([depart, *arrivees])}"
            f"?sources=0&annotations=distance")
     try:
         donnees = _get_json(url)
     except Exception as e:  # réseau, délai, réponse illisible : on estimera
-        journal.info("Routage %s indisponible : %s", profil, e)
+        _signaler_panne(profil, e)
         return [None] * len(arrivees)
     if donnees.get("code") != "Ok":
         return [None] * len(arrivees)
@@ -120,11 +133,42 @@ def trajets(depart, arrivees):
         for mode in MODES:
             distance = routes[PROFILS[mode]][i]
             if distance is None:
+                # Un seul profil a répondu : la distance par la route de l'autre reste plus juste
+                # qu'une estimation (à pied, on peut prendre les rues de la voiture, et inversement).
+                distance = next((d[i] for d in routes.values() if d[i] is not None), None)
+            if distance is None:
                 par_mode[mode] = estimation(depart, arrivee, mode)
             else:
                 par_mode[mode] = Trajet(distance, minutes_pour(distance, mode), "route")
         resultat.append(par_mode)
     return resultat
+
+
+def itineraire(depart, arrivee, mode):
+    """Tracé du trajet : {"points": [[lat, lng], …], "distance_km", "minutes", "source"}."""
+    depart, arrivee = _arrondi(depart), _arrondi(arrivee)
+    profil = PROFILS[mode]
+    cle = _cle("route", profil, depart, arrivee)
+    trace = cache.get(cle)
+    if trace is None and settings.ROUTAGE_URL and not _en_panne(profil):
+        url = (f"{settings.ROUTAGE_URL}/{profil}/route/v1/driving/{_coordonnees([depart, arrivee])}"
+               f"?overview=full&geometries=geojson")
+        try:
+            donnees = _get_json(url)
+            if donnees.get("code") == "Ok" and donnees.get("routes"):
+                route = donnees["routes"][0]
+                trace = {
+                    "points": [[lat, lng] for lng, lat in route["geometry"]["coordinates"]],
+                    "distance_km": route["distance"] / 1000,
+                }
+                cache.set(cle, trace, DUREE_CACHE)
+        except Exception as e:
+            _signaler_panne(profil, e)
+    if trace is None:
+        t = estimation(depart, arrivee, mode)
+        return {"points": [list(depart), list(arrivee)], **t.en_dict()}
+    t = Trajet(trace["distance_km"], minutes_pour(trace["distance_km"], mode), "route")
+    return {"points": trace["points"], **t.en_dict()}
 
 
 def mode_depuis(valeur):

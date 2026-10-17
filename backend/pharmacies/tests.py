@@ -3,6 +3,7 @@ from unittest import mock
 from zoneinfo import ZoneInfo
 
 from django.contrib.gis.geos import Point
+from django.core.cache import cache
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import timezone
 
@@ -63,11 +64,27 @@ class TrajetsTests(SimpleTestCase):
         self.assertEqual((t["pied"].distance_km, t["pied"].minutes, t["pied"].source), (3.0, 40, "route"))
         self.assertEqual((t["moto"].minutes, t["voiture"].minutes), (12, 16))
 
+    def setUp(self):
+        cache.clear()
+
     @override_settings(ROUTAGE_URL="http://osrm.test")
     def test_serveur_injoignable(self):
-        with mock.patch.object(trajets, "_get_json", side_effect=TimeoutError):
+        with mock.patch.object(trajets, "_get_json", side_effect=TimeoutError) as appel:
             t = trajets.trajets((-11.6642, 27.479), [(-11.67, 27.49)])[0]
+            trajets.trajets((-11.6642, 27.479), [(-11.68, 27.49)])
         self.assertEqual(t["moto"].source, "estimation")
+        self.assertEqual(appel.call_count, 2)  # en panne : pas de nouvel essai pendant quelques minutes
+
+    @override_settings(ROUTAGE_URL="http://osrm.test")
+    def test_un_seul_profil_repond(self):
+        def reponse(url):
+            if "routed-foot" in url:
+                raise TimeoutError
+            return {"code": "Ok", "distances": [[0, 4500]]}
+
+        with mock.patch.object(trajets, "_get_json", side_effect=reponse):
+            t = trajets.trajets((-11.6643, 27.479), [(-11.67, 27.49)])[0]
+        self.assertEqual((t["pied"].distance_km, t["pied"].minutes, t["pied"].source), (4.5, 60, "route"))
 
 
 class PlusRapideTests(TestCase):
@@ -111,3 +128,30 @@ class PlusRapideTests(TestCase):
 
     def test_mode_inconnu(self):
         self.assertEqual(self.rechercher(mode="avion")["mode"], "moto")
+
+
+class ItineraireTests(TestCase):
+    def setUp(self):
+        cache.clear()
+
+    params = {"lat": -11.664, "lng": 27.479, "vers_lat": -11.672, "vers_lng": 27.492, "mode": "pied"}
+
+    def test_sans_serveur_ligne_droite(self):
+        d = self.client.get("/api/itineraire/", self.params).json()
+        self.assertEqual(d["source"], "estimation")
+        self.assertEqual(d["points"], [[-11.664, 27.479], [-11.672, 27.492]])
+        self.assertEqual(d["mode"], "pied")
+        self.assertGreater(d["minutes"], 15)
+
+    @override_settings(ROUTAGE_URL="http://osrm.test")
+    def test_trace_par_la_route(self):
+        route = {"code": "Ok", "routes": [{"distance": 3810.0, "geometry": {
+            "coordinates": [[27.479, -11.664], [27.485, -11.668], [27.492, -11.672]]}}]}
+        with mock.patch.object(trajets, "_get_json", return_value=route) as appel:
+            d = self.client.get("/api/itineraire/", {**self.params, "mode": "moto"}).json()
+        self.assertIn("/routed-car/route/v1/", appel.call_args[0][0])
+        self.assertEqual(d["points"][1], [-11.668, 27.485])
+        self.assertEqual((d["distance_km"], d["minutes"], d["source"]), (3.81, 10, "route"))
+
+    def test_parametres_obligatoires(self):
+        self.assertEqual(self.client.get("/api/itineraire/", {"lat": 1, "lng": 2}).status_code, 400)

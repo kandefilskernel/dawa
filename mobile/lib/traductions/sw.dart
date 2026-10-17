@@ -272,4 +272,7 @@ const sw = <String, String>{
   '{n} j': 'siku {n}',
   '{n} min': 'dak. {n}',
   "Fermée : disponible dans {duree} (à l'ouverture)": 'Imefungwa: inapatikana baada ya {duree} (ikifunguliwa)',
+  'Trajet exact indisponible : ligne droite et durée estimée.': 'Njia kamili haipatikani: mstari wa moja kwa moja na muda wa makadirio.',
+  'Position indisponible : départ du centre-ville.': 'Mahali hapajulikani: kuanzia katikati ya mji.',
+  'Ouvrir dans Google Maps': 'Fungua kwenye Google Maps',
 };
