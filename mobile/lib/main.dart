@@ -25,22 +25,25 @@ class DawaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Langue>(
-      valueListenable: langues.courante,
-      builder: (_, langue, _) => MaterialApp(
-        title: 'Uzima',
-        debugShowCheckedModeBanner: false,
-        theme: construireTheme(),
-        // Boutons, calendriers et horloges d'Android dans la langue choisie.
-        locale: langue.locale,
-        supportedLocales: [for (final l in Langue.values) l.locale],
-        localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        // Nouvelle clé à chaque changement de langue : tous les écrans sont reconstruits.
-        home: KeyedSubtree(
-          key: ValueKey(langue),
-          child: langues.aChoisir ? const EcranChoixLangue() : const Accueil(),
-        ),
-      ),
+    return ListenableBuilder(
+      listenable: langues.changements,
+      builder: (_, _) {
+        final langue = langues.courante.value;
+        return MaterialApp(
+          title: 'Uzima',
+          debugShowCheckedModeBanner: false,
+          theme: construireTheme(),
+          // Boutons, calendriers et horloges d'Android dans la langue choisie.
+          locale: langue.locale,
+          supportedLocales: [for (final l in Langue.values) l.locale],
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          // Nouvelle clé à chaque changement de langue : tous les écrans sont reconstruits.
+          home: KeyedSubtree(
+            key: ValueKey(langue),
+            child: langues.aChoisir ? const EcranChoixLangue() : const Accueil(),
+          ),
+        );
+      },
     );
   }
 }

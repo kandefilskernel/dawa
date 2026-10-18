@@ -1,5 +1,7 @@
 import 'package:dawa/ecrans/choix_langue.dart';
 import 'package:dawa/langue.dart';
+import 'package:dawa/main.dart';
+import 'package:dawa/stockage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,5 +43,32 @@ void main() {
     expect(langues.aChoisir, isFalse);
     final prefs = await SharedPreferences.getInstance();
     expect(prefs.getString('langue'), 'sw');
+  });
+
+  test("choisir la langue déjà devinée prévient l'app (sinon l'écran de choix reste affiché)", () async {
+    // Téléphone en français : la langue devinée est déjà le français.
+    expect(langues.courante.value, Langue.fr);
+    var notifications = 0;
+    void compter() => notifications++;
+    langues.changements.addListener(compter);
+    addTearDown(() => langues.changements.removeListener(compter));
+
+    await langues.choisir(Langue.fr);
+
+    expect(notifications, greaterThan(0));
+    expect(langues.aChoisir, isFalse);
+  });
+
+  testWidgets("premier lancement sur un téléphone en français : « Français » ouvre l'accueil", (tester) async {
+    await stockage.init();
+    expect(langues.courante.value, Langue.fr);
+    await tester.pumpWidget(const DawaApp());
+    expect(find.byType(EcranChoixLangue), findsOneWidget);
+
+    await tester.tap(find.text('Français'));
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.byType(EcranChoixLangue), findsNothing);
   });
 }

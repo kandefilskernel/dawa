@@ -25,12 +25,21 @@ class Langues {
   late SharedPreferences _prefs;
   final courante = ValueNotifier<Langue>(Langue.fr);
 
+  /// Devient vrai quand la personne a choisi sa langue. Séparé de `courante` : choisir la langue
+  /// déjà devinée (français sur un téléphone en français) ne change pas `courante`, mais doit
+  /// quand même quitter l'écran de choix.
+  final choisie = ValueNotifier<bool>(false);
+
+  /// Ce que l'app écoute pour se reconstruire : changement de langue ou premier choix.
+  Listenable get changements => Listenable.merge([courante, choisie]);
+
   /// Vrai tant que la personne n'a jamais choisi sa langue (premier lancement).
-  bool get aChoisir => _prefs.getString('langue') == null;
+  bool get aChoisir => !choisie.value;
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
     final enregistree = _prefs.getString('langue');
+    choisie.value = enregistree != null;
     courante.value = Langue.values.firstWhere(
       (l) => l.name == (enregistree ?? PlatformDispatcher.instance.locale.languageCode),
       orElse: () => Langue.fr,
@@ -40,6 +49,7 @@ class Langues {
   Future<void> choisir(Langue langue) async {
     await _prefs.setString('langue', langue.name);
     courante.value = langue;
+    choisie.value = true;
   }
 }
 
