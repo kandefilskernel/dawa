@@ -5,6 +5,7 @@ import '../theme.dart';
 import '../widgets/communs.dart';
 
 /// Phrase d'accueil affichée dans chaque langue, pour que chacun reconnaisse la sienne sans savoir lire les autres.
+/// Pas encore de phrase en kiluba : elle sera ajoutée avec les traductions relues (traductions/lu.dart).
 const _bienvenue = {
   Langue.fr: 'Choisissez votre langue',
   Langue.sw: 'Chagua lugha yako',
@@ -41,7 +42,7 @@ class EcranChoixLangue extends StatelessWidget {
                     const Text('Uzima',
                         style: TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w800, letterSpacing: -1.2)),
                     const SizedBox(height: 24),
-                    for (final (i, l) in Langue.values.indexed)
+                    for (final (i, l) in Langue.values.where(_bienvenue.containsKey).indexed)
                       Text(_bienvenue[l]!,
                           textAlign: TextAlign.center,
                           style: TextStyle(

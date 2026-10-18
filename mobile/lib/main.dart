@@ -35,7 +35,7 @@ class DawaApp extends StatelessWidget {
           theme: construireTheme(),
           // Boutons, calendriers et horloges d'Android dans la langue choisie.
           locale: langue.locale,
-          supportedLocales: [for (final l in Langue.values) l.locale],
+          supportedLocales: {for (final l in Langue.values) l.locale}.toList(),
           localizationsDelegates: GlobalMaterialLocalizations.delegates,
           // Nouvelle clé à chaque changement de langue : tous les écrans sont reconstruits.
           home: KeyedSubtree(

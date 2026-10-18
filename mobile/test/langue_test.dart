@@ -34,6 +34,7 @@ void main() {
     expect(find.text('Français'), findsOneWidget);
     expect(find.text('Kiswahili'), findsOneWidget);
     expect(find.text('English'), findsOneWidget);
+    expect(find.text('Kiluba'), findsOneWidget);
     expect(find.text('Chagua lugha yako'), findsOneWidget);
 
     await tester.tap(find.text('Kiswahili'));
@@ -70,5 +71,15 @@ void main() {
     await tester.pump();
 
     expect(find.byType(EcranChoixLangue), findsNothing);
+  });
+
+  test("kiluba : tant que rien n'est relu, les textes restent en français", () {
+    langues.courante.value = Langue.lu;
+    expect(tr('Rechercher'), 'Rechercher');
+    expect(tr('Expire dans {duree}', {'duree': '1 h'}), 'Expire dans 1 h');
+    // Android et le serveur ne connaissent pas le kiluba : français pour eux.
+    expect(Langue.lu.locale.languageCode, 'fr');
+    expect(Langue.lu.codeServeur, 'fr');
+    expect(Langue.sw.codeServeur, 'sw');
   });
 }

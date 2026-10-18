@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'traductions/en.dart';
+import 'traductions/lu.dart';
 import 'traductions/sw.dart';
 
 /// Langues de l'app. Le français est la langue source : les textes du code sont en français
@@ -11,14 +12,19 @@ import 'traductions/sw.dart';
 enum Langue {
   fr('Français'),
   sw('Kiswahili'),
-  en('English');
+  en('English'),
+  lu('Kiluba');
 
   const Langue(this.nom);
 
   /// Nom de la langue dans la langue elle-même (affiché tel quel, sans traduction).
   final String nom;
 
-  Locale get locale => Locale(name);
+  /// Langue des boutons et calendriers d'Android. Android ne connaît pas le kiluba : français à la place.
+  Locale get locale => Locale(this == lu ? 'fr' : name);
+
+  /// Langue des notifications envoyées par le serveur, qui n'a pas encore de messages en kiluba.
+  String get codeServeur => this == lu ? 'fr' : name;
 }
 
 class Langues {
@@ -55,7 +61,7 @@ class Langues {
 
 final langues = Langues();
 
-const _tables = {Langue.sw: sw, Langue.en: en};
+const _tables = {Langue.sw: sw, Langue.en: en, Langue.lu: lu};
 
 /// Traduit un texte français dans la langue choisie.
 /// `{nom}` dans le texte est remplacé par `valeurs['nom']`.

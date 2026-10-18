@@ -1,0 +1,327 @@
+﻿N°;Priorité;Français (texte de l'app);Anglais (aide);Swahili (aide);Brouillon kiluba — À VÉRIFIER, peu fiable;KILUBA RELU (à remplir par le traducteur);Remarque
+13;SANTÉ — en premier;Urgence (difficulté à respirer, douleur forte, perte de connaissance, enfant très fiévreux) : allez immédiatement à l'hôpital. Ce service ne remplace pas une consultation.;Emergency (difficulty breathing, severe pain, loss of consciousness, child with a high fever): go to the hospital immediately. This service does not replace a medical consultation.;Dharura (kushindwa kupumua, maumivu makali, kupoteza fahamu, mtoto mwenye homa kali): nenda hospitali mara moja. Huduma hii haichukui nafasi ya kumwona daktari.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+15;SANTÉ — en premier;Prise, posologie, interactions, conservation, notice…;How to take it, dosage, interactions, storage, leaflet…;Jinsi ya kutumia, kipimo, mwingiliano wa dawa, uhifadhi, maelekezo…;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+81;SANTÉ — en premier;Uzima vous informe et vous oriente. Pour tout conseil sur un traitement, demandez à votre pharmacien ou à votre médecin.;Uzima informs and guides you. For any advice about a treatment, ask your pharmacist or doctor.;Uzima inakupa taarifa na kukuelekeza. Kwa ushauri wowote kuhusu matibabu, muulize mfamasia au daktari wako.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+88;SANTÉ — en premier;Sur ordonnance;Prescription only;Kwa cheti cha daktari;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+122;SANTÉ — en premier;Urgence vitale ? Rendez-vous immédiatement à l'hôpital le plus proche ouvert 24h/24, ou appelez-le en route.;Life-threatening emergency? Go immediately to the nearest hospital open 24/7, or call it on the way.;Dharura ya kuhatarisha maisha? Nenda mara moja kwenye hospitali iliyo karibu inayofunguliwa saa 24, au uipigie simu ukiwa njiani.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+128;SANTÉ — en premier;Sur ce support, les rappels s'affichent ici mais ne sonnent pas. Installez l'app Android pour recevoir une notification à chaque prise.;On this device, reminders appear here but do not ring. Install the Android app to get a notification for each dose.;Kwenye kifaa hiki, vikumbusho vinaonekana hapa lakini havilii. Sakinisha programu ya Android ili kupokea arifa kila wakati wa kumeza dawa.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+146;SANTÉ — en premier;Recopiez l'ordonnance ou les conseils de votre pharmacien.;Copy your prescription or your pharmacist's advice.;Nakili cheti cha daktari au ushauri wa mfamasia wako.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+155;SANTÉ — en premier;Uzima ne remplace pas l'avis de votre médecin ou pharmacien.;Uzima does not replace advice from your doctor or pharmacist.;Uzima haichukui nafasi ya ushauri wa daktari au mfamasia wako.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+158;SANTÉ — en premier;C'est l'heure de votre prise.;It's time to take your medicine.;Ni wakati wa kumeza dawa yako.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+159;SANTÉ — en premier;C'est l'heure de votre prise : {dose}.;It's time to take your medicine: {dose}.;Ni wakati wa kumeza dawa yako: {dose}.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+161;SANTÉ — en premier;Saisissez le numéro de lot imprimé sur la boîte (souvent « Lot » ou « LOT/BN ») pour savoir s'il a été rappelé ou signalé comme contrefait.;"Enter the batch number printed on the box (often ""Lot"" or ""LOT/BN"") to find out whether it has been recalled or reported as counterfeit.";Andika namba ya bechi iliyochapishwa kwenye boksi (mara nyingi « Lot » au « LOT/BN ») ili kujua kama imerudishwa au imeripotiwa kuwa bandia.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+166;SANTÉ — en premier;Emballage mal imprimé, comprimés d'aspect inhabituel, prix anormalement bas, lot inconnu… Signalez-le : l'équipe Uzima transmet aux autorités.;Badly printed packaging, unusual-looking tablets, abnormally low price, unknown batch… Report it: the Uzima team passes it on to the authorities.;Kifungashio kilichochapishwa vibaya, vidonge vyenye sura isiyo ya kawaida, bei ya chini mno, bechi isiyojulikana… Iripoti: timu ya Uzima itawajulisha mamlaka.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+168;SANTÉ — en premier;Lot conforme;Batch OK;Bechi iko sawa;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+169;SANTÉ — en premier;Produit périmé;Expired product;Bidhaa imepitwa na muda;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+170;SANTÉ — en premier;Lot rappelé;Batch recalled;Bechi imerudishwa;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+171;SANTÉ — en premier;Contrefaçon signalée;Reported as counterfeit;Imeripotiwa kuwa bandia;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+172;SANTÉ — en premier;Lot inconnu;Unknown batch;Bechi haijulikani;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+195;SANTÉ — en premier;Médicament sur ordonnance : présentez votre ordonnance au retrait.;Prescription medicine: show your prescription when you collect it.;Dawa ya cheti cha daktari: onyesha cheti chako unapoichukua.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+233;SANTÉ — en premier;Ce lot est enregistré comme conforme.;This batch is registered as compliant.;Bechi hii imesajiliwa kuwa iko sawa.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+234;SANTÉ — en premier;Ce lot est connu, mais sa date d'expiration est dépassée : ne l'utilisez pas.;This batch is known, but its expiry date has passed: do not use it.;Bechi hii inajulikana, lakini tarehe yake ya mwisho wa matumizi imepita: usiitumie.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+235;SANTÉ — en premier;Ce lot a fait l'objet d'un rappel : ne l'utilisez pas et rapportez-le à votre pharmacie.;This batch has been recalled: do not use it and take it back to your pharmacy.;Bechi hii imerudishwa: usiitumie na uirudishe kwenye duka lako la dawa.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+236;SANTÉ — en premier;Ce lot est signalé comme contrefait : ne l'utilisez pas et signalez-nous où vous l'avez acheté.;This batch is reported as counterfeit: do not use it and tell us where you bought it.;Bechi hii imeripotiwa kuwa bandia: usiitumie na utuambie ulipoinunua.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+237;SANTÉ — en premier;Ce numéro de lot n'est pas dans notre base. Cela ne veut pas dire que le produit est faux : notre base est encore incomplète. Vérifiez l'emballage et demandez conseil à votre pharmacien.;This batch number is not in our database. That does not mean the product is fake: our database is still incomplete. Check the packaging and ask your pharmacist for advice.;Namba hii ya bechi haipo kwenye kumbukumbu zetu. Hii haimaanishi kuwa bidhaa ni bandia: kumbukumbu zetu bado hazijakamilika. Kagua kifungashio na umwombe mfamasia wako ushauri.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+294;SANTÉ — en premier;Médicament sur ordonnance : montrez votre ordonnance au livreur.;Prescription medicine: show your prescription to the rider.;Dawa ya agizo la daktari: mwonyeshe msafirishaji agizo lako.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+298;SANTÉ — en premier;Ces signes demandent un médecin : allez tout de suite à l'hôpital ou dans un centre de santé.;These signs need a doctor: go to a hospital or health centre right away.;Dalili hizi zinahitaji daktari: nenda hospitali au kituo cha afya mara moja.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+307;SANTÉ — en premier;L'assistant vous aide à trouver un médicament, il ne donne pas d'avis médical. En cas d'urgence, allez à l'hôpital.;"The assistant helps you find a medicine; it does not give medical advice. In an emergency, go to the hospital.";Msaidizi anakusaidia kupata dawa, hatoi ushauri wa kitabibu. Ikiwa ni dharura, nenda hospitali.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+314;SANTÉ — en premier;{medicament} n'est signalé en stock dans aucune pharmacie proche. Créez une alerte depuis la recherche : vous serez prévenu dès qu'il est disponible.;{medicament} is not reported in stock at any nearby pharmacy. Create an alert from the search: you will be notified as soon as it is available.;{medicament} haipo kwenye famasia yoyote ya karibu. Weka tahadhari kutoka kwenye utafutaji: utaarifiwa ikipatikana.;;;Avertissement de santé : traduire avec une personne du métier, sans brouillon.
+0;normal;Erreur du serveur ({code}).;Server error ({code}).;Hitilafu ya seva ({code}).;Kilema kya seva ({code}).;;Garder tel quel ce qui est entre { } (ex. {prix}).
+1;normal;Le réseau est lent. Réessayez.;The network is slow. Please try again.;Mtandao ni wa polepole. Jaribu tena.;Ntambo ya intaneti ilēmēne. Esakai monka.;;
+2;normal;Pas de connexion internet, ou serveur injoignable.;No internet connection, or the server cannot be reached.;Hakuna intaneti, au seva haipatikani.;Kekudipo intaneti, nansha seva keimonekepo.;;
+3;normal;Requête refusée.;Request refused.;Ombi limekataliwa.;Kilombwa kyapelwa.;;
+4;normal;Le réseau est lent : la photo n'a pas pu être envoyée.;The network is slow: the photo could not be sent.;Mtandao ni wa polepole: picha haikuweza kutumwa.;Intaneti ilēmēne : kifwatulo kekyatumibwepo.;;
+5;normal;Connexion impossible;Cannot connect;Imeshindwa kuunganisha;Kekiketēlepo kwibwanya kulunga;;
+6;normal;Réessayer;Try again;Jaribu tena;Esakai monka;;
+7;normal;Rechercher;Search;Tafuta;Kimba;;
+8;normal;De garde;On duty;Za zamu;Ba mu kipindi;;
+9;normal;Santé;Health;Afya;Bukomo;;
+10;normal;Mon espace;My space;Ukurasa wangu;Kipindi kyami;;
+11;normal;Question envoyée. Un pharmacien va vous répondre.;Question sent. A pharmacist will answer you.;Swali limetumwa. Mfamasia atakujibu.;Kipangujo kyatumibwa. Mufamasyeni ukakulondolwela.;;
+12;normal;Demander à un pharmacien;Ask a pharmacist;Uliza mfamasia;Ipangula mufamasyeni;;
+14;normal;Votre question;Your question;Swali lako;Kipangujo kyobe;;
+16;normal;Ex. Puis-je donner du paracétamol sirop à un enfant de 3 ans ?;E.g. Can I give paracetamol syrup to a 3-year-old child?;Mf. Je, naweza kumpa mtoto wa miaka 3 shurubati ya paracetamol?;Kif. Le mbwanya kupa mwana wa myaka 3 paracétamol sirop ?;;
+17;normal;Envoyer;Send;Tuma;Tuma;;
+18;normal;Mes questions;My questions;Maswali yangu;Bipangujo byami;;
+19;normal;Vous n'avez pas encore posé de question.;You haven't asked a question yet.;Bado hujauliza swali.;Kokidi kwipangula nansha kipangujo kimo.;;
+20;normal;Pharmacien Uzima;Uzima pharmacist;Mfamasia wa Uzima;Mufamasyeni wa Uzima;;
+21;normal;Annuler la réservation ?;Cancel the reservation?;Ghairi uhifadhi?;Kuleka kubika ?;;
+22;normal;{medicament} chez {pharmacie};{medicament} at {pharmacie};{medicament} kwenye {pharmacie};{medicament} kwa {pharmacie};;Garder tel quel ce qui est entre { } (ex. {prix}).
+23;normal;Non;No;Hapana;Ne;;
+24;normal;Oui, annuler;Yes, cancel;Ndiyo, ghairi;Ee, leka;;
+25;normal;Réservations, alertes, rappels de traitement et favoris.;Reservations, alerts, treatment reminders and favourites.;Uhifadhi, arifa, vikumbusho vya matibabu na vipendwa.;Bibikwa, bidimbwilo, bivulukijo bya kutwela bwanga ne byo usanswe.;;
+26;normal;Réservations;Reservations;Uhifadhi;Bibikwa;;
+27;normal;Alertes;Alerts;Arifa;Bidimbwilo;;
+28;normal;Traitements;Treatments;Matibabu;Bwanga bwa kutwela;;
+29;normal;Favoris;Favourites;Vipendwa;Byo nsanswe;;
+30;normal;Aucune réservation;No reservations;Hakuna uhifadhi;Kekudipo kibikwa;;
+31;normal;Réservez un médicament depuis les résultats : la pharmacie le garde 2 heures.;Reserve a medicine from the results: the pharmacy keeps it for 2 hours.;Hifadhi dawa kutoka kwenye matokeo: duka la dawa litaiweka kwa saa 2.;Bika bwanga mu bitamba : famasi ikabulama myanda 2.;;
+32;normal;Aucune alerte;No alerts;Hakuna arifa;Kekudipo kidimbwilo;;
+33;normal;Quand un médicament est introuvable, appuyez sur « Me prévenir ».;"When a medicine cannot be found, tap ""Notify me when available"".";Dawa isipopatikana, bonyeza « Nijulishe ikipatikana ».;Shi bwanga kebumonekepo, tompa « Unsapwile ».;;
+34;normal;Aucune pharmacie favorite;No favourite pharmacies;Hakuna duka la dawa unalopenda;Kekudipo famasi yo usanswe;;
+35;normal;Touchez le cœur sur la fiche d'une pharmacie pour la retrouver ici.;Tap the heart on a pharmacy's page to find it here.;Gusa moyo kwenye ukurasa wa duka la dawa ili kulipata hapa.;Tompa mutyima pa famasi mwanda wa kwiyitana pano.;;
+36;normal;Expire dans {duree};Expires in {duree};Inaisha baada ya {duree};Ikapwa mu {duree};;Garder tel quel ce qui est entre { } (ex. {prix}).
+37;normal;Appeler;Call;Piga simu;Ita;;
+38;normal;Annuler;Cancel;Ghairi;Leka;;
+39;normal;Disponible chez {pharmacie} !;Available at {pharmacie}!;Inapatikana kwenye {pharmacie}!;Bwanga budi kwa {pharmacie} !;;Garder tel quel ce qui est entre { } (ex. {prix}).
+40;normal;On vous prévient dès qu'il est disponible à moins de {km} km.;We'll let you know as soon as it is available within {km} km.;Tutakujulisha itakapopatikana ndani ya km {km}.;Tukakusapwila bwanga bwamoneka kutwala ku {km} km.;;Garder tel quel ce qui est entre { } (ex. {prix}).
+41;normal;Supprimer l'alerte;Delete alert;Futa arifa;Kufundula kidimbwilo;;
+42;normal;Voir les pharmacies;See pharmacies;Ona maduka ya dawa;Tala bafamasi;;
+43;normal;Retirer des favoris;Remove from favourites;Ondoa kwenye vipendwa;Katula mu byo nsanswe;;
+44;normal;Ajouter aux favoris;Add to favourites;Ongeza kwenye vipendwa;Bika mu byo nsanswe;;
+45;normal;Itinéraire;Directions;Njia;Dishinda;;
+46;normal;Produits disponibles;Available products;Bidhaa zinazopatikana;Bwanga budi'po;;
+47;normal;Filtrer les produits;Filter products;Chuja bidhaa;Sobola bwanga;;
+48;normal;Produits indisponibles;Products unavailable;Bidhaa hazipatikani;Bwanga kebudipo;;
+49;normal;Aucun produit ne correspond.;No matching products.;Hakuna bidhaa inayolingana.;Kekudipo bwanga bufwene.;;
+50;normal;Réserver;Reserve;Hifadhi;Bika;;
+51;normal;Aucune garde enregistrée;No duty pharmacies recorded;Hakuna zamu iliyorekodiwa;Kekudipo ba mu kipindi basonekwa;;
+52;normal;Le planning de garde n'a pas encore été publié pour aujourd'hui.;Today's duty schedule has not been published yet.;Ratiba ya zamu ya leo bado haijatolewa.;Kipindi kya lelo kekidi kulupulwapo.;;
+53;normal;Actualiser;Refresh;Onyesha upya;Vudija;;
+54;normal;"Pharmacies
+de garde";"Duty
+pharmacies";"Maduka ya dawa
+ya zamu";Bafamasi / ba mu kipindi;;
+55;normal;Ouvertes en dehors des heures habituelles.;Open outside normal hours.;Yako wazi nje ya saa za kawaida.;Bashitulwa pa kitatyi kibulwe kya kingidila.;;
+56;normal;{n} ouvertes maintenant;{n} open now;{n} yako wazi sasa;{n} bashitulwa pano;;Garder tel quel ce qui est entre { } (ex. {prix}).
+57;normal;{n} ouverte maintenant;{n} open now;{n} liko wazi sasa;{n} washitulwa pano;;Garder tel quel ce qui est entre { } (ex. {prix}).
+58;normal;Hors ligne : liste enregistrée le {date} à {heure}. Tirez vers le bas pour actualiser.;Offline: list saved on {date} at {heure}. Pull down to refresh.;Nje ya mtandao: orodha iliyohifadhiwa tarehe {date} saa {heure}. Vuta chini ili kuonyesha upya.;Kekudipo intaneti : mulongo wa {date} pa {heure}. Kokela panshi mwanda wa kuvudija.;;Garder tel quel ce qui est entre { } (ex. {prix}).
+59;normal;Nom du médicament;Medicine name;Jina la dawa;Dijina dya bwanga;;
+60;normal;Chercher à la voix;Search by voice;Tafuta kwa sauti;Kimba na dīyi;;
+61;normal;Scanner la boîte;Scan the box;Skani boksi;Tala kiyombo kya bwanga;;
+62;normal;Effacer;Clear;Futa;Fundula;;
+63;normal;Recherches récentes;Recent searches;Ulichotafuta hivi karibuni;Bikimbwa bya panopano;;
+64;normal;Recherches fréquentes;Popular searches;Zinazotafutwa mara nyingi;Bikimbwa bivule;;
+65;normal;Services;Services;Huduma;Mingilo;;
+66;normal;Scanner une boîte;Scan a box;Skani boksi;Tala kiyombo;;
+67;normal;Code-barres;Barcode;Msimbo pau;Kodi-ba;;
+68;normal;Vérifier un lot;Check a batch;Hakiki namba ya bechi;Tala lot;;
+69;normal;Anti-contrefaçon;Anti-counterfeit;Kupambana na dawa bandia;Kulwa ne bwanga bwa bubela;;
+70;normal;Pharmacien en ligne;Online pharmacist;Mfamasia mtandaoni;Mufamasyeni pa intaneti;;
+71;normal;Posez une question;Ask a question;Uliza swali;Ipangula;;
+72;normal;Mes rappels;My reminders;Vikumbusho vyangu;Bivulukijo byami;;
+73;normal;Prises et renouvellement;Doses and refills;Wakati wa kumeza na kununua tena;Kutwela ne kupingakanya;;
+74;normal;Comment ça marche;How it works;Inavyofanya kazi;Bilongwa namani;;
+75;normal;Cherchez;Search;Tafuta;Kimba;;
+76;normal;Tapez ou dites le nom du médicament;Type or say the medicine name;Andika au taja jina la dawa;Soneka nansha nena dijina dya bwanga;;
+77;normal;Comparez;Compare;Linganisha;Diñanjija;;
+78;normal;Prix et distance;Price and distance;Bei na umbali;Mutengo ne bulampe;;
+79;normal;Appelez;Call;Piga simu;Ita;;
+80;normal;La pharmacie le garde;The pharmacy keeps it for you;Duka la dawa linaiweka;Famasi ikabulama;;
+82;normal;Aucun médicament trouvé;No medicine found;Hakuna dawa iliyopatikana;Kekudipo bwanga bwamonekele;;
+83;normal;Vérifiez l'orthographe de « {terme} » ou essayez le nom de la molécule.;"Check the spelling of ""{terme}"" or try the active ingredient name.";Hakiki tahajia ya « {terme} » au jaribu jina la kiambato.;Tala soneka ya « {terme} » nansha esaka dijina dya molekile.;;Garder tel quel ce qui est entre { } (ex. {prix}).
+84;normal;{n} médicaments;{n} medicines;Dawa {n};Bwanga {n};;Garder tel quel ce qui est entre { } (ex. {prix}).
+85;normal;{n} médicament;{n} medicine;Dawa {n};Bwanga {n};;Garder tel quel ce qui est entre { } (ex. {prix}).
+86;normal;"Uzima, la santé
+près de chez vous.";"Uzima, health
+close to home.";"Uzima, afya
+karibu nawe.";Uzima, bukomo / kubwipi na kobe.;;
+87;normal;"Disponibilité, prix et distance
+des pharmacies autour de vous.";Availability, price and distance of pharmacies near you.;Upatikanaji, bei na umbali wa maduka ya dawa karibu nawe.;Bwanga budi'po, mutengo ne bulampe / bya bafamasi ba kubwipi.;;
+89;normal;Pharmacies de garde;Duty pharmacies;Maduka ya dawa ya zamu;Bafamasi ba mu kipindi;;
+90;normal;Ouvertes la nuit et le dimanche, près de chez vous.;Open at night and on Sundays, near you.;Yako wazi usiku na Jumapili, karibu nawe.;Bashitulwa bufuku ne dya Lumingu, kubwipi na kobe.;;
+91;normal;Voir la liste;See the list;Ona orodha;Tala mulongo;;
+92;normal;La recherche à la voix n'est pas disponible sur ce téléphone. Autorisez le micro ou tapez le nom.;Voice search is not available on this phone. Allow the microphone or type the name.;Kutafuta kwa sauti hakupatikani kwenye simu hii. Ruhusu kipaza sauti au andika jina.;Kukimba na dīyi kekudipo pa telefone uno. Itabija maikolofone nansha sonekai dijina.;;
+93;normal;Dites le nom du médicament;Say the medicine name;Taja jina la dawa;Nena dijina dya bwanga;;
+94;normal;Je n'ai pas compris;I didn't understand;Sijaelewa;Kentewilepo;;
+95;normal;Arrêter l'écoute;Stop listening;Acha kusikiliza;Leka kuteja;;
+96;normal;Parler à nouveau;Speak again;Ongea tena;Nena monka;;
+97;normal;Je vous écoute…;I'm listening…;Ninakusikiliza…;Ndi mu kukuteja…;;
+98;normal;Touchez le micro pour réessayer.;Tap the microphone to try again.;Gusa kipaza sauti ili ujaribu tena.;Tompa maikolofone mwanda wa kwesaka monka.;;
+99;normal;Alerte créée : vous la retrouverez dans « Mon espace ».;"Alert created: you will find it in ""My space"".";Arifa imewekwa: utaipata kwenye « Ukurasa wangu ».;Kidimbwilo kyalongwa : ukakimona mu « Kipindi kyami ».;;
+100;normal;Résultats;Results;Matokeo;Bitamba;;
+101;normal;Position indisponible : distances depuis le centre-ville.;Location unavailable: distances from the city centre.;Mahali ulipo hapajulikani: umbali unahesabiwa kutoka katikati ya mji.;Kifuko kyobe kekimonekepo : bulampe kutamba ku kibundi.;;
+102;normal;Liste;List;Orodha;Mulongo;;
+103;normal;Carte;Map;Ramani;Mapa;;
+104;normal;Pas en stock dans un rayon de {km} km;Not in stock within {km} km;Haipatikani ndani ya km {km};Kekudipo mu {km} km;;Garder tel quel ce qui est entre { } (ex. {prix}).
+105;normal;Les pharmacies proches n'ont pas signalé ce médicament.;Nearby pharmacies have not reported this medicine.;Maduka ya dawa ya karibu hayajaripoti dawa hii.;Bafamasi ba kubwipi kebalupwilepo bwanga buno.;;
+106;normal;Alerte activée;Alert on;Arifa imewashwa;Kidimbwilo kyashitulwa;;
+107;normal;Me prévenir quand il est disponible;Notify me when available;Nijulishe ikipatikana;Unsapwile bwanga bwamoneka;;
+108;normal;Chercher jusqu'à {km} km;Search up to {km} km;Tafuta hadi km {km};Kimba kufika ku {km} km;;Garder tel quel ce qui est entre { } (ex. {prix}).
+109;normal;{n} pharmacies;{n} pharmacies;Maduka {n} ya dawa;Bafamasi {n};;Garder tel quel ce qui est entre { } (ex. {prix}).
+110;normal;{n} pharmacie;{n} pharmacy;Duka {n} la dawa;Famasi {n};;Garder tel quel ce qui est entre { } (ex. {prix}).
+111;normal;dès {prix};from {prix};kuanzia {prix};kutamba ku {prix};;Garder tel quel ce qui est entre { } (ex. {prix}).
+112;normal;Tous;All;Zote;Bonso;;
+113;normal;Urgences 24h;24h emergencies;Dharura saa 24;Bupyasakane 24h;;
+114;normal;Hôpitaux;Hospitals;Hospitali;Malupitalo;;
+115;normal;Cliniques;Clinics;Kliniki;Bakiliniki;;
+116;normal;Centres de santé;Health centres;Vituo vya afya;Bitenta bya bukomo;;
+117;normal;Laboratoires;Laboratories;Maabara;Balabolatwali;;
+118;normal;Maternités;Maternity units;Wodi za uzazi;Bya kwivwila;;
+119;normal;Aucun établissement dans cette catégorie;No facilities in this category;Hakuna kituo katika kundi hili;Kekudipo kintu mu kino kisaka;;
+120;normal;"Annuaire
+santé";"Health
+directory";"Orodha ya
+huduma za afya";Mukanda / wa bukomo;;
+121;normal;Hôpitaux, cliniques, laboratoires près de vous.;Hospitals, clinics, laboratories near you.;Hospitali, kliniki, maabara karibu nawe.;Malupitalo, bakiliniki, balabolatwali kubwipi na kobe.;;
+123;normal;Urgences 24h/24;24/7 emergencies;Dharura saa 24;Bupyasakane 24h/24;;
+124;normal;Code {code} inconnu. Tapez plutôt le nom du médicament.;Unknown code {code}. Type the medicine name instead.;Msimbo {code} haujulikani. Andika jina la dawa badala yake.;Kodi {code} keiyukanwepo. Sonekai dijina dya bwanga.;;Garder tel quel ce qui est entre { } (ex. {prix}).
+125;normal;Lampe;Flashlight;Tochi;Muni;;
+126;normal;Caméra indisponible. Autorisez l'accès à la caméra dans les réglages du téléphone.;Camera unavailable. Allow camera access in the phone settings.;Kamera haipatikani. Ruhusu kamera kwenye mipangilio ya simu.;Kamera keidipo. Itabija kamera mu bitungo bya telefone.;;
+127;normal;Placez le code-barres de la boîte dans le cadre;Place the box barcode inside the frame;Weka msimbo pau wa boksi ndani ya fremu;Bika kodi-ba ya kiyombo mu kipindi;;
+129;normal;Ajouter un traitement;Add a treatment;Ongeza matibabu;Bweja bwanga bwa kutwela;;
+130;normal;Aucun traitement suivi;No treatments tracked;Hakuna matibabu yanayofuatiliwa;Kekudipo bwanga bwa kutwela;;
+131;normal;Ajoutez votre traitement : Uzima vous rappelle chaque prise et le renouvellement.;Add your treatment: Uzima reminds you of each dose and when to refill.;Ongeza matibabu yako: Uzima itakukumbusha kila wakati wa kumeza dawa na wakati wa kununua tena.;Bweja bwanga bobe : Uzima ukakuvulukija kitatyi kyonso.;;
+132;normal;Aujourd'hui;Today;Leo;Dyalelo;;
+133;normal;Aucune prise prévue aujourd'hui.;No doses scheduled today.;Hakuna dawa ya kumeza leo.;Kekudipo kutwela kwa dyalelo.;;
+134;normal;Mes traitements;My treatments;Matibabu yangu;Bwanga bwami bwa kutwela;;
+135;normal;Pris ✓;Taken ✓;Imemezwa ✓;Wātwele ✓;;
+136;normal;En retard — {dose};Late — {dose};Umechelewa — {dose};Kitatyi kyapita — {dose};;Garder tel quel ce qui est entre { } (ex. {prix}).
+137;normal;Terminé;Finished;Imekamilika;Byapwa;;
+138;normal;Au long cours;Long-term;Muda mrefu;Kitatyi kyabula mfulo;;
+139;normal;Se termine le {date} — pensez au renouvellement;Ends on {date} — remember to refill;Inaisha tarehe {date} — kumbuka kununua tena;Bikapwa {date} — vuluka kupingakanya;;Garder tel quel ce qui est entre { } (ex. {prix}).
+140;normal;Jusqu'au {date};Until {date};Hadi tarehe {date};Kufika {date};;Garder tel quel ce qui est entre { } (ex. {prix}).
+141;normal;Supprimer;Delete;Futa;Fundula;;
+142;normal;Supprimer ce traitement ?;Delete this treatment?;Futa matibabu haya?;Kufundula buno bwanga ?;;
+143;normal;Les rappels de « {nom} » seront arrêtés.;"Reminders for ""{nom}"" will stop.";Vikumbusho vya « {nom} » vitasimamishwa.;Bivulukijo bya « {nom} » bikalekwa.;;Garder tel quel ce qui est entre { } (ex. {prix}).
+144;normal;1 comprimé;1 tablet;Kidonge 1;Kiboko 1;;
+145;normal;Nouveau traitement;New treatment;Matibabu mapya;Bwanga bupya;;
+147;normal;Médicament (ex. Amoxicilline 500 mg);Medicine (e.g. Amoxicillin 500 mg);Dawa (mf. Amoxicilline 500 mg);Bwanga (kif. Amoxicilline 500 mg);;
+148;normal;Dose par prise;Dose each time;Kipimo kwa kila mara;Bungi pa kutwela kumo;;
+149;normal;Heures de prise;Dose times;Saa za kumeza;Ola ya kutwela;;
+150;normal;Heure;Time;Saa;Ola;;
+151;normal;Durée;Duration;Muda;Kitatyi;;
+152;normal;{n} jours;{n} days;Siku {n};Mafuku {n};;Garder tel quel ce qui est entre { } (ex. {prix}).
+153;normal;Note (ex. après le repas);Note (e.g. after meals);Maelezo (mf. baada ya kula);Bisonekwa (kif. kunyuma kwa kudya);;
+154;normal;Enregistrer et activer les rappels;Save and turn on reminders;Hifadhi na uwashe vikumbusho;Lama ne shitula bivulukijo;;
+156;normal;Rappels de traitement;Treatment reminders;Vikumbusho vya matibabu;Bivulukijo bya bwanga;;
+157;normal;Heure de prise de vos médicaments;Time to take your medicines;Saa za kumeza dawa zako;Ola ya kutwela bwanga bobe;;
+160;normal;Vérifier un médicament;Check a medicine;Hakiki dawa;Tala bwanga;;
+162;normal;Numéro de lot;Batch number;Namba ya bechi;Numelo ya lot;;
+163;normal;ex. DEMO-C001;e.g. DEMO-C001;mf. DEMO-C001;kif. DEMO-C001;;
+164;normal;Vérifier;Check;Hakiki;Tala;;
+165;normal;Un produit vous semble suspect ?;Does a product look suspicious?;Una shaka na bidhaa fulani?;Bwanga bukutyinyika ?;;
+167;normal;Signaler un produit suspect;Report a suspicious product;Ripoti bidhaa yenye shaka;Lupula bwanga bukutyinyika;;
+173;normal;Lot {numero};Batch {numero};Bechi {numero};Lot {numero};;Garder tel quel ce qui est entre { } (ex. {prix}).
+174;normal;exp. {date};exp. {date};mwisho {date};kup. {date};;Garder tel quel ce qui est entre { } (ex. {prix}).
+175;normal;Merci, votre signalement a été transmis à l'équipe Uzima.;Thank you, your report has been sent to the Uzima team.;Asante, ripoti yako imetumwa kwa timu ya Uzima.;Twasanta, kilupwilo kyobe kyatumibwa ku kisaka kya Uzima.;;
+176;normal;Numéro de lot (si visible);Batch number (if visible);Namba ya bechi (ikiwa inaonekana);Numelo ya lot (shi imoneka);;
+177;normal;Où l'avez-vous acheté ?;Where did you buy it?;Uliinunua wapi?;Wāpotele kwepi ?;;
+178;normal;Qu'est-ce qui vous inquiète ?;What worries you?;Nini kinakutia wasiwasi?;Le i kika kikutyinyika ?;;
+179;normal;Téléphone pour vous recontacter (facultatif);Phone number to contact you (optional);Simu ya kuwasiliana nawe (si lazima);Telefone ya kukwitanga (kebikakatyepo);;
+180;normal;Photo;Photo;Picha;Kifwatulo;;
+181;normal;Galerie;Gallery;Picha zilizohifadhiwa;Bifwatulo;;
+182;normal;Photo jointe : {nom};Photo attached: {nom};Picha imeambatishwa: {nom};Kifwatulo kyabwejibwa : {nom};;Garder tel quel ce qui est entre { } (ex. {prix}).
+183;normal;Envoyer le signalement;Send report;Tuma ripoti;Tuma kilupwilo;;
+184;normal;© contributeurs OpenStreetMap;© OpenStreetMap contributors;© wachangiaji wa OpenStreetMap;© bakwashi ba OpenStreetMap;;
+185;normal;En stock;In stock;Inapatikana;Budi'po;;
+186;normal;Image d'illustration : la boîte vendue peut être différente.;Illustration only: the box sold may look different.;Picha ya mfano: boksi linalouzwa linaweza kuwa tofauti.;Kifwatulo kya kifwanijo : kiyombo kipotwa kibwanya kwishila.;;
+187;normal;Impossible d'appeler {telephone};Unable to call {telephone};Imeshindwa kupiga {telephone};Kekiketēlepo kwita {telephone};;Garder tel quel ce qui est entre { } (ex. {prix}).
+188;normal;Impossible d'ouvrir la carte;Unable to open the map;Imeshindwa kufungua ramani;Kekiketēlepo kushitula mapa;;
+189;normal;Meilleur prix;Best price;Bei nafuu zaidi;Mutengo mutyetye;;
+190;normal;Le plus proche;Closest;Lililo karibu zaidi;Wa kubwipi;;
+191;normal;Stock à confirmer;Stock to be confirmed;Upatikanaji haujathibitishwa;Bidi'po bya kwijija;;
+192;normal;Équivalent : ;Equivalent: ;Mbadala: ;Kifwene : ;;
+193;normal;Appeler la pharmacie;Call the pharmacy;Piga simu duka la dawa;Ita famasi;;
+194;normal;La pharmacie met le médicament de côté pendant 2 heures.;The pharmacy sets the medicine aside for 2 hours.;Duka la dawa litaiweka dawa kando kwa saa 2.;Famasi ikabulama bwanga myanda 2.;;
+196;normal;Votre nom;Your name;Jina lako;Dijina dyobe;;
+197;normal;Indiquez votre nom;Enter your name;Andika jina lako;Sonekai dijina dyobe;;
+198;normal;Téléphone (ex. +243 99 000 0000);Phone (e.g. +243 99 000 0000);Simu (mf. +243 99 000 0000);Telefone (kif. +243 99 000 0000);;
+199;normal;Numéro invalide;Invalid number;Namba si sahihi;Numelo keifwenepo;;
+200;normal;Confirmer la réservation;Confirm reservation;Thibitisha uhifadhi;Kwijija kibikwa;;
+201;normal;Réserver · {prix};Reserve · {prix};Hifadhi · {prix};Bika · {prix};;Garder tel quel ce qui est entre { } (ex. {prix}).
+202;normal;Paiement à la pharmacie, au moment du retrait.;Pay at the pharmacy when you collect it.;Malipo kwenye duka la dawa, unapochukua dawa.;Kufuta ku famasi, pa kitatyi kya kutambula.;;
+203;normal;Une boîte de moins;One box less;Punguza boksi moja;Kiyombo kimo kutyepeja;;
+204;normal;Une boîte de plus;One more box;Ongeza boksi moja;Kiyombo kimo kubweja;;
+205;normal;Réservation envoyée;Reservation sent;Uhifadhi umetumwa;Kibikwa kyatumibwa;;
+206;normal;{pharmacie} va confirmer votre demande. Suivez-la dans « Mon espace ».;"{pharmacie} will confirm your request. Follow it in ""My space"".";{pharmacie} itathibitisha ombi lako. Lifuatilie kwenye « Ukurasa wangu ».;{pharmacie} ikejija kilombwa kyobe. Kilondele mu « Kipindi kyami ».;;Garder tel quel ce qui est entre { } (ex. {prix}).
+207;normal;Compris;Got it;Nimeelewa;Nategele;;
+208;normal;Comprimé;Tablet;Kidonge;Kiboko;;
+209;normal;Gélule;Capsule;Kapsuli;Kapile;;
+210;normal;Sirop;Syrup;Shurubati;Sirop;;
+211;normal;Injectable;Injection;Sindano;Kya mpushi;;
+212;normal;Pommade / crème;Ointment / cream;Mafuta / krimu;Mafuta / kelemu;;
+213;normal;Suspension;Suspension;Dawa ya maji ya kutikisa;Kya mema;;
+214;normal;Sachet;Sachet;Paketi;Kakobo;;
+215;normal;Autre;Other;Nyingine;Kingi;;
+216;normal;En attente de la pharmacie;Waiting for the pharmacy;Inasubiri duka la dawa;Kutengela famasi;;
+217;normal;Acceptée;Accepted;Imekubaliwa;Kyetabijibwa;;
+218;normal;Prête;Ready;Iko tayari;Kidi kipwile;;
+219;normal;En cours de livraison;Out for delivery;Inaletwa;Kidi mu dishinda;;
+220;normal;Livrée;Delivered;Imefikishwa;Kyafikile;;
+221;normal;Retirée;Collected;Imechukuliwa;Kyatambulwa;;
+222;normal;Refusée;Declined;Imekataliwa;Kyapelwa;;
+223;normal;Annulée;Cancelled;Imeghairiwa;Kyalekwa;;
+224;normal;Expirée;Expired;Muda umeisha;Kyapitulwa kitatyi;;
+225;normal;Hôpital;Hospital;Hospitali;Lupitalo;;
+226;normal;Clinique;Clinic;Kliniki;Kiliniki;;
+227;normal;Centre de santé;Health centre;Kituo cha afya;Kitenta kya bukomo;;
+228;normal;Laboratoire;Laboratory;Maabara;Labolatwali;;
+229;normal;Maternité;Maternity unit;Wodi ya uzazi;Kya kwivwila;;
+230;normal;En attente de réponse;Awaiting answer;Inasubiri jibu;Kutengela malondololo;;
+231;normal;Répondue;Answered;Imejibiwa;Kyalondololwa;;
+232;normal;Orientée vers un médecin;Referred to a doctor;Umeelekezwa kwa daktari;Kyatumwa kwa munganga;;
+238;normal;Saisissez le numéro de lot imprimé sur la boîte (au moins 3 caractères).;Enter the batch number printed on the box (at least 3 characters).;Andika namba ya bechi iliyochapishwa kwenye boksi (angalau herufi 3).;Sonekai numelo ya lot isonekelwe pa kiyombo (kupita bisonekwa 3).;;
+239;normal;Médicament inconnu.;Unknown medicine.;Dawa haijulikani.;Bwanga keuyukanwepo.;;
+240;normal;Pharmacie inconnue.;Unknown pharmacy.;Duka la dawa halijulikani.;Famasi keiyukanwepo.;;
+241;normal;Tapez au moins 2 caractères.;Type at least 2 characters.;Andika angalau herufi 2.;Sonekai kupita bisonekwa 2.;;
+242;normal;Cette réservation n'est plus active.;This reservation is no longer active.;Uhifadhi huu haufanyi kazi tena.;Kino kibikwa kekidipo monka.;;
+243;normal;Réservation introuvable.;Reservation not found.;Uhifadhi haukupatikana.;Kibikwa kekimonekepo.;;
+244;normal;Ce médicament n'est plus disponible dans cette pharmacie.;This medicine is no longer available at this pharmacy.;Dawa hii haipatikani tena kwenye duka hili la dawa.;Buno bwanga kebudipo monka mu ino famasi.;;
+245;normal;Cette pharmacie ne livre pas encore. Choisissez le retrait.;This pharmacy does not deliver yet. Choose pick-up.;Duka hili la dawa bado halileti dawa nyumbani. Chagua kuichukua mwenyewe.;Ino famasi kekidi kuleta bwanga. Sobola kutambula.;;
+246;normal;Décrivez le problème en quelques mots (10 caractères minimum).;Describe the problem in a few words (at least 10 characters).;Eleza tatizo kwa maneno machache (angalau herufi 10).;Lombola kyabipile mu bishima bitye (bisonekwa 10 nansha kupita).;;
+247;normal;Indiquez l'adresse de livraison (avenue, numéro, repère).;Enter the delivery address (street, number, landmark).;Andika anwani ya kuletewa (barabara, namba, alama ya karibu).;Sonekai kifuko kya kuleta (avenue, numelo, kiyukeno).;;
+248;normal;Numéro de téléphone invalide.;Invalid phone number.;Namba ya simu si sahihi.;Numelo ya telefone keifwenepo.;;
+249;normal;Posez votre question en une phrase (10 caractères minimum).;Ask your question in one sentence (at least 10 characters).;Uliza swali lako kwa sentensi moja (angalau herufi 10).;Ipangula mu kishima kimo (bisonekwa 10 nansha kupita).;;
+250;normal;Vous avez déjà réservé ce médicament dans cette pharmacie.;You have already reserved this medicine at this pharmacy.;Tayari umehifadhi dawa hii kwenye duka hili la dawa.;Wābikile kala buno bwanga mu ino famasi.;;
+251;normal;Vous avez déjà 3 réservations en cours.;You already have 3 reservations in progress.;Tayari una uhifadhi 3 unaoendelea.;Udi kala na bibikwa 3.;;
+252;normal;Notifications activées;Notifications on;Arifa zimewashwa;Bisapwilo byashitulwa;;
+253;normal;Activation des notifications…;Turning on notifications…;Inawasha arifa…;Kushitula bisapwilo…;;
+254;normal;Notifications refusées : autorisez-les dans les réglages du téléphone;Notifications blocked: allow them in the phone settings;Arifa zimekataliwa: ziruhusu kwenye mipangilio ya simu;Bisapwilo byapelwa : bitabije mu bitungo bya telefone;;
+255;normal;Notifications non activées;Notifications not turned on;Arifa hazijawashwa;Bisapwilo kebidi kushitulwapo;;
+256;normal;Disponible en {duree} {mode};Available in {duree} {mode};Inapatikana baada ya {duree} {mode};Budi'po mu {duree} {mode};;Garder tel quel ce qui est entre { } (ex. {prix}).
+257;normal;Fermée cette semaine;Closed this week;Imefungwa wiki hii;Ishitwe uno mulungu;;
+258;normal;Le plus rapide;Fastest;Haraka zaidi;Wa lubilo;;
+259;normal;Moto;Motorbike;Pikipiki;Pikipiki;;
+260;normal;Voiture;Car;Gari;Motoka;;
+261;normal;À pied;On foot;Kwa miguu;Na maulu;;
+262;normal;à pied;on foot;kwa miguu;na maulu;;
+263;normal;à moto;by motorbike;kwa pikipiki;na pikipiki;;
+264;normal;en voiture;by car;kwa gari;na motoka;;
+265;normal;environ {distance} (estimation);about {distance} (estimate);karibu {distance} (makadirio);kukwatakanya {distance} (kwelela);;Garder tel quel ce qui est entre { } (ex. {prix}).
+266;normal;{distance} par la route;{distance} by road;{distance} kwa barabara;{distance} mu dishinda;;Garder tel quel ce qui est entre { } (ex. {prix}).
+267;normal;{n} j;{n} d;siku {n};{n} mafuku;;Garder tel quel ce qui est entre { } (ex. {prix}).
+268;normal;{n} min;{n} min;dak. {n};{n} min;;Garder tel quel ce qui est entre { } (ex. {prix}).
+269;normal;Fermée : disponible dans {duree} (à l'ouverture);Closed: available in {duree} (when it opens);Imefungwa: inapatikana baada ya {duree} (ikifunguliwa);Ishitwe : budi'po mu {duree} (pa kushitula);;Garder tel quel ce qui est entre { } (ex. {prix}).
+270;normal;Trajet exact indisponible : ligne droite et durée estimée.;Exact route unavailable: straight line and estimated time.;Njia kamili haipatikani: mstari wa moja kwa moja na muda wa makadirio.;Dishinda dibinebine kedimonekepo : mulongo wa bunka ne kitatyi kya kwelela.;;
+271;normal;Position indisponible : départ du centre-ville.;Location unavailable: starting from the city centre.;Mahali hapajulikani: kuanzia katikati ya mji.;Kifuko kyobe kekimonekepo : kutamba ku kibundi.;;
+272;normal;Ouvrir dans Google Maps;Open in Google Maps;Fungua kwenye Google Maps;Shitula mu Google Maps;;
+273;normal;Activez la localisation : le livreur a besoin de savoir où vous êtes.;Turn on location: the delivery rider needs to know where you are.;Washa eneo: msafirishaji anahitaji kujua ulipo.;Shitula kifuko : muleti usaka kuyuka kodi.;;
+274;normal;Adresse (avenue, numéro, repère);Address (street, number, landmark);Anwani (barabara, namba, alama ya karibu);Kifuko (avenue, numelo, kiyukeno);;
+275;normal;Arrivée vers {heure} · dans {duree};Arriving around {heure} · in {duree};Atafika karibu {heure} · baada ya {duree};Ukafika ku {heure} · mu {duree};;Garder tel quel ce qui est entre { } (ex. {prix}).
+276;normal;Commande livrée;Order delivered;Agizo limefikishwa;Bwanga bwafika;;
+277;normal;Encore {distance};{distance} to go;Bado {distance};Kushele {distance};;Garder tel quel ce qui est entre { } (ex. {prix}).
+278;normal;Je passe la prendre;I'll pick it up;Nitaichukua;Nkebutambula ami mwine;;
+279;normal;La pharmacie prépare la commande et un livreur vous l'apporte à moto.;The pharmacy prepares the order and a rider brings it to you by motorbike.;Famasia inaandaa agizo na msafirishaji anakuletea kwa pikipiki.;Famasi ipwija bwanga ne muleti ukakuletela na pikipiki.;;
+280;normal;Le livreur est en route;The rider is on the way;Msafirishaji yuko njiani;Muleti udi mu dishinda;;
+281;normal;Livraison;Delivery;Kuletewa;Kuleta;;
+282;normal;Livraison : {adresse};Delivery: {adresse};Kuletewa: {adresse};Kuleta : {adresse};;Garder tel quel ce qui est entre { } (ex. {prix}).
+283;normal;Livraison : {frais} ({distance});Delivery: {frais} ({distance});Kuletewa: {frais} ({distance});Kuleta : {frais} ({distance});;Garder tel quel ce qui est entre { } (ex. {prix}).
+284;normal;Livreur : {nom};Rider: {nom};Msafirishaji: {nom};Muleti : {nom};;Garder tel quel ce qui est entre { } (ex. {prix}).
+285;normal;Paiement au livreur, à la livraison.;Pay the rider on delivery.;Lipa msafirishaji unapoletewa.;Kufuta kwa muleti, pa kufika.;;
+286;normal;Sa position apparaîtra dès que son téléphone l'enverra.;Their position will appear as soon as their phone sends it.;Mahali alipo kutaonekana simu yake ikituma.;Kifuko kyandi kikamoneka shi telefone wandi wakitumina.;;
+287;normal;Suivi de la livraison;Delivery tracking;Kufuatilia uletaji;Kulondela kuleta;;
+288;normal;Suivre le livreur sur la carte;Follow the rider on the map;Fuatilia msafirishaji kwenye ramani;Londela muleti pa mapa;;
+289;normal;Vous êtes trop loin de cette pharmacie pour être livré.;You are too far from this pharmacy for delivery.;Uko mbali sana na famasia hii kuletewa.;Udi kulampe na ino famasi, kebibwanikepo kukuletela.;;
+290;normal;position reçue à {heure};position received at {heure};mahali palipokelewa saa {heure};kifuko kyatambulwa pa {heure};;Garder tel quel ce qui est entre { } (ex. {prix}).
+291;normal;vitesse habituelle {v} km/h;usual speed {v} km/h;mwendo wa kawaida km {v}/saa;lubilo lwa kingidila {v} km/h;;Garder tel quel ce qui est entre { } (ex. {prix}).
+292;normal;vitesse mesurée {v} km/h;measured speed {v} km/h;mwendo uliopimwa km {v}/saa;lubilo lwelelwe {v} km/h;;Garder tel quel ce qui est entre { } (ex. {prix}).
+293;normal;Cette réservation n'est pas une livraison.;This reservation is not a delivery.;Uhifadhi huu si wa kuletewa.;Kino kibikwa kekidipo kya kuleta.;;
+295;normal;Assistant Uzima;Uzima assistant;Msaidizi wa Uzima;Mukwashi wa Uzima;;
+296;normal;Autres possibilités;Other options;Njia nyingine;Bingi bibwanika;;
+297;normal;Besoin d'un médicament vite ?;Need a medicine fast?;Unahitaji dawa haraka?;Usaka bwanga lubilo ?;;
+299;normal;Coartem livré à la maison;Coartem delivered at home;Coartem iletwe nyumbani;Coartem walētwa ku nzubo;;
+300;normal;Demandez à l'assistant : la pharmacie la plus rapide, réserver ou se faire livrer.;Ask the assistant: the fastest pharmacy, reserve or get it delivered.;Uliza msaidizi: famasia ya haraka zaidi, kuhifadhi au kuletewa.;Ipangula mukwashi : famasi ya lubilo, kubika nansha kuletelwa.;;
+301;normal;Dites ce qu'il vous faut et comment vous vous déplacez : l'assistant choisit la pharmacie la plus rapide, avec les stocks et les trajets réels.;Say what you need and how you travel: the assistant picks the fastest pharmacy using real stock and routes.;Sema unachohitaji na jinsi unavyosafiri: msaidizi anachagua famasia ya haraka zaidi kwa akiba na njia halisi.;Nena kyo usaka ne byo wenda : mukwashi usobola famasi ya lubilo, na bwanga budi'po ne mashinda a binebine.;;
+302;normal;Ex. Amoxicilline, je suis à pied;E.g. Amoxicillin, I'm on foot;Mf. Amoxicilline, niko kwa miguu;Kif. Amoxicilline, ndi na maulu;;
+303;normal;Exemples;Examples;Mifano;Bifwanijo;;
+304;normal;J'ai besoin d'Amoxicilline, je suis à pied, c'est urgent;I need Amoxicillin, I'm on foot, it's urgent;Nahitaji Amoxicilline, niko kwa miguu, ni haraka;Nsaka Amoxicilline, ndi na maulu, i bya lubilo;;
+305;normal;Je n'ai pas reconnu le médicament. Écrivez son nom, par exemple « Amoxicilline ».;"I didn't recognise the medicine. Write its name, for example ""Amoxicillin"".";"Sikutambua dawa. Andika jina lake, kwa mfano ""Amoxicilline"".";Kentukwile bwanga. Sonekai dijina dyabo, kif. « Amoxicilline ».;;
+306;normal;Je regarde les stocks et les trajets…;Checking stock and routes…;Ninaangalia akiba na njia…;Ndi mu kutala bwanga budi'po ne mashinda…;;
+308;normal;Le plus rapide : vous faire livrer par {pharmacie}{prix}, chez vous dans environ {duree}, livraison {frais}.;Fastest: delivery from {pharmacie}{prix}, at your door in about {duree}, delivery {frais}.;Haraka zaidi: kuletewa na {pharmacie}{prix}, nyumbani baada ya karibu {duree}, gharama ya kuletewa {frais}.;Wa lubilo : kukuletela kwa {pharmacie}{prix}, ku nzubo mu {duree}, kuleta {frais}.;;Garder tel quel ce qui est entre { } (ex. {prix}).
+309;normal;Le plus rapide : {pharmacie}{prix}.;Fastest: {pharmacie}{prix}.;Haraka zaidi: {pharmacie}{prix}.;Wa lubilo : {pharmacie}{prix}.;;Garder tel quel ce qui est entre { } (ex. {prix}).
+310;normal;Me faire livrer;Get it delivered;Niletewe;Unkuletele;;
+311;normal;Obtenez votre médicament au plus vite;Get your medicine as fast as possible;Pata dawa yako haraka iwezekanavyo;Tambula bwanga bobe lubilo;;
+312;normal;Paracétamol sirop, je suis à moto;Paracetamol syrup, I'm on a motorbike;Paracétamol ya maji, niko kwa pikipiki;Paracétamol sirop, ndi na pikipiki;;
+313;normal;Réservez : la pharmacie vous le met de côté.;Reserve it: the pharmacy will set it aside for you.;Hifadhi: famasia itakuwekea.;Bika : famasi ikakubulamina bo.;;
+315;normal;Écrivez le médicament dont vous avez besoin.;Write the medicine you need.;Andika dawa unayohitaji.;Sonekai bwanga bo usaka.;;

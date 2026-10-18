@@ -122,7 +122,7 @@ class NotificationsPush {
   Future<void> _enregistrer(String? jeton) async {
     if (jeton == null) return;
     _jeton = jeton;
-    await api.enregistrerNotifications(jeton, langues.courante.value.name);
+    await api.enregistrerNotifications(jeton, langues.courante.value.codeServeur);
     erreur = null;
     if (etat.value != EtatNotifications.refusees) etat.value = EtatNotifications.actives;
   }
